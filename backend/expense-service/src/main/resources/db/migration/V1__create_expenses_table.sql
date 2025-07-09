@@ -1,0 +1,9 @@
+CREATE TABLE expenses (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    description VARCHAR(255) NOT NULL,
+    amount DECIMAL(12,2) NOT NULL,
+    outlet_id BIGINT NOT NULL,
+    category VARCHAR(100) NOT NULL,
+    created_by VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+); 
