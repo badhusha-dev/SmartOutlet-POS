@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,10 +25,10 @@ import java.util.stream.Collectors;
 @Transactional
 public class UserService {
     
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
+    private UserRepository userRepository;
+    private RoleRepository roleRepository;
+    private PasswordEncoder passwordEncoder;
+    private JwtUtil jwtUtil;
     
     public AuthResponse authenticate(LoginRequest loginRequest) {
         log.info("Authenticating user: {}", loginRequest.getUsernameOrEmail());
@@ -59,16 +58,16 @@ public class UserService {
         
         log.info("User {} authenticated successfully", user.getUsername());
         
-        return new AuthResponse(
-                token,
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getFirstName(),
-                user.getLastName(),
-                roleNames,
-                expiresAt
-        );
+        return AuthResponse.builder()
+                .token(token)
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .roles(roleNames)
+                .expiresAt(expiresAt)
+                .build();
     }
     
     public UserResponse register(RegisterRequest registerRequest) {
@@ -150,18 +149,18 @@ public class UserService {
                 .map(Role::getName)
                 .collect(Collectors.toSet());
         
-        return new UserResponse(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getPhoneNumber(),
-                user.getIsActive(),
-                user.getIsVerified(),
-                user.getLastLogin(),
-                user.getCreatedAt(),
-                roleNames
-        );
+        return UserResponse.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .phoneNumber(user.getPhoneNumber())
+                .isActive(user.getIsActive())
+                .isVerified(user.getIsVerified())
+                .lastLogin(user.getLastLogin())
+                .createdAt(user.getCreatedAt())
+                .roles(roleNames)
+                .build();
     }
 }

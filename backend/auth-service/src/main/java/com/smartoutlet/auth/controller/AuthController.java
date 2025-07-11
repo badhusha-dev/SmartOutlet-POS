@@ -1,10 +1,14 @@
 package com.smartoutlet.auth.controller;
 
-import com.smartoutlet.auth.dto.*;
+import com.smartoutlet.auth.dto.AuthResponse;
+import com.smartoutlet.auth.dto.LoginRequest;
+import com.smartoutlet.auth.dto.RegisterRequest;
+import com.smartoutlet.auth.dto.UserResponse;
+import com.smartoutlet.auth.dto.ValidationRequest;
 import com.smartoutlet.auth.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,99 +29,97 @@ public class AuthController {
     @PostMapping("/login")
     @Operation(summary = "User login", description = "Authenticate user and return JWT token")
     @ApiResponses(value = {
-        @SwaggerApiResponse(responseCode = "200", description = "Login successful"),
-        @SwaggerApiResponse(responseCode = "400", description = "Invalid credentials"),
-        @SwaggerApiResponse(responseCode = "404", description = "User not found")
+        @ApiResponse(responseCode = "200", description = "Login successful"),
+        @ApiResponse(responseCode = "400", description = "Invalid credentials"),
+        @ApiResponse(responseCode = "404", description = "User not found")
     })
-    public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<com.smartoutlet.auth.dto.ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest loginRequest) {
         log.info("Login attempt for user: {}", loginRequest.getUsernameOrEmail());
-        
+
         AuthResponse authResponse = userService.authenticate(loginRequest);
-        
         return ResponseEntity.ok(
-            ApiResponse.success("Login successful", authResponse)
+            com.smartoutlet.auth.dto.ApiResponse.success("Login successful", authResponse)
         );
     }
     
     @PostMapping("/register")
     @Operation(summary = "User registration", description = "Register a new user account")
     @ApiResponses(value = {
-        @SwaggerApiResponse(responseCode = "201", description = "Registration successful"),
-        @SwaggerApiResponse(responseCode = "400", description = "Invalid input"),
-        @SwaggerApiResponse(responseCode = "409", description = "User already exists")
+        @ApiResponse(responseCode = "201", description = "Registration successful"),
+        @ApiResponse(responseCode = "400", description = "Invalid input"),
+        @ApiResponse(responseCode = "409", description = "User already exists")
     })
-    public ResponseEntity<ApiResponse<UserResponse>> register(@Valid @RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<com.smartoutlet.auth.dto.ApiResponse<UserResponse>> register(@Valid @RequestBody RegisterRequest registerRequest) {
         log.info("Registration attempt for user: {}", registerRequest.getUsername());
-        
+
         UserResponse userResponse = userService.register(registerRequest);
-        
         return ResponseEntity.status(HttpStatus.CREATED).body(
-            ApiResponse.success("Registration successful", userResponse)
+            com.smartoutlet.auth.dto.ApiResponse.success("Registration successful", userResponse)
         );
     }
     
-    @PostMapping("/validate")
-    @Operation(summary = "Validate JWT token", description = "Validate JWT token and return user information")
+    @PostMapping("/validate-token")
+    @Operation(summary = "Validate JWT token", description = "Validate a JWT token and return user info if valid")
     @ApiResponses(value = {
-        @SwaggerApiResponse(responseCode = "200", description = "Token valid"),
-        @SwaggerApiResponse(responseCode = "400", description = "Invalid token")
+        @ApiResponse(responseCode = "200", description = "Token is valid"),
+        @ApiResponse(responseCode = "400", description = "Invalid token")
     })
-    public ResponseEntity<ApiResponse<UserResponse>> validateToken(@Valid @RequestBody ValidationRequest validationRequest) {
+    public ResponseEntity<com.smartoutlet.auth.dto.ApiResponse<UserResponse>> validateToken(@Valid @RequestBody ValidationRequest validationRequest) {
         log.info("Token validation request");
         
         Boolean isValid = userService.validateToken(validationRequest.getToken());
         
         if (!isValid) {
             return ResponseEntity.badRequest().body(
-                ApiResponse.error("Invalid token")
+                com.smartoutlet.auth.dto.ApiResponse.error("Invalid token")
             );
         }
         
         UserResponse userResponse = userService.getUserFromToken(validationRequest.getToken());
         
         return ResponseEntity.ok(
-            ApiResponse.success("Token is valid", userResponse)
+            com.smartoutlet.auth.dto.ApiResponse.success("Token is valid", userResponse)
         );
     }
     
     @GetMapping("/user/{id}")
     @Operation(summary = "Get user by ID", description = "Retrieve user information by user ID")
     @ApiResponses(value = {
-        @SwaggerApiResponse(responseCode = "200", description = "User found"),
-        @SwaggerApiResponse(responseCode = "404", description = "User not found")
+        @ApiResponse(responseCode = "200", description = "User found"),
+        @ApiResponse(responseCode = "404", description = "User not found")
     })
-    public ResponseEntity<ApiResponse<UserResponse>> getUserById(@PathVariable Long id) {
+    public ResponseEntity<com.smartoutlet.auth.dto.ApiResponse<UserResponse>> getUserById(@PathVariable Long id) {
         log.info("Get user by ID: {}", id);
         
         UserResponse userResponse = userService.getUserById(id);
         
         return ResponseEntity.ok(
-            ApiResponse.success("User found", userResponse)
+            com.smartoutlet.auth.dto.ApiResponse.success("User found", userResponse)
         );
     }
     
     @GetMapping("/user/username/{username}")
     @Operation(summary = "Get user by username", description = "Retrieve user information by username")
     @ApiResponses(value = {
-        @SwaggerApiResponse(responseCode = "200", description = "User found"),
-        @SwaggerApiResponse(responseCode = "404", description = "User not found")
+        @ApiResponse(responseCode = "200", description = "User found"),
+        @ApiResponse(responseCode = "404", description = "User not found")
     })
-    public ResponseEntity<ApiResponse<UserResponse>> getUserByUsername(@PathVariable String username) {
+    public ResponseEntity<com.smartoutlet.auth.dto.ApiResponse<UserResponse>> getUserByUsername(@PathVariable String username) {
         log.info("Get user by username: {}", username);
         
         UserResponse userResponse = userService.getUserByUsername(username);
         
         return ResponseEntity.ok(
-            ApiResponse.success("User found", userResponse)
+            com.smartoutlet.auth.dto.ApiResponse.success("User found", userResponse)
         );
     }
     
     @GetMapping("/health")
     @Operation(summary = "Health check", description = "Check if the auth service is running")
-    @SwaggerApiResponse(responseCode = "200", description = "Service is healthy")
-    public ResponseEntity<ApiResponse<String>> healthCheck() {
+    @ApiResponse(responseCode = "200", description = "Service is healthy")
+    public ResponseEntity<com.smartoutlet.auth.dto.ApiResponse<String>> healthCheck() {
         return ResponseEntity.ok(
-            ApiResponse.success("Auth service is running", "OK")
+            com.smartoutlet.auth.dto.ApiResponse.success("Auth service is running", "OK")
         );
     }
 }

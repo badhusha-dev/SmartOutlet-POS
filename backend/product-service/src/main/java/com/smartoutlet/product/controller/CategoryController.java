@@ -4,7 +4,7 @@ import com.smartoutlet.product.dto.*;
 import com.smartoutlet.product.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,9 +28,9 @@ public class CategoryController {
     @PostMapping
     @Operation(summary = "Create category", description = "Create a new product category")
     @ApiResponses(value = {
-        @SwaggerApiResponse(responseCode = "201", description = "Category created successfully"),
-        @SwaggerApiResponse(responseCode = "400", description = "Invalid input"),
-        @SwaggerApiResponse(responseCode = "409", description = "Category already exists")
+        @ApiResponse(responseCode = "201", description = "Category created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input"),
+        @ApiResponse(responseCode = "409", description = "Category already exists")
     })
     public ResponseEntity<ApiResponse<CategoryResponse>> createCategory(@Valid @RequestBody CategoryRequest request) {
         log.info("Creating category: {}", request.getName());
@@ -45,8 +45,8 @@ public class CategoryController {
     @GetMapping("/{id}")
     @Operation(summary = "Get category by ID", description = "Retrieve category details by ID")
     @ApiResponses(value = {
-        @SwaggerApiResponse(responseCode = "200", description = "Category found"),
-        @SwaggerApiResponse(responseCode = "404", description = "Category not found")
+        @ApiResponse(responseCode = "200", description = "Category found"),
+        @ApiResponse(responseCode = "404", description = "Category not found")
     })
     public ResponseEntity<ApiResponse<CategoryResponse>> getCategoryById(@PathVariable Long id) {
         log.info("Getting category by ID: {}", id);
@@ -60,7 +60,7 @@ public class CategoryController {
     
     @GetMapping
     @Operation(summary = "Get all categories", description = "Retrieve all categories with pagination")
-    @SwaggerApiResponse(responseCode = "200", description = "Categories retrieved successfully")
+    @ApiResponse(responseCode = "200", description = "Categories retrieved successfully")
     public ResponseEntity<ApiResponse<Page<CategoryResponse>>> getAllCategories(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -78,7 +78,7 @@ public class CategoryController {
     
     @GetMapping("/active")
     @Operation(summary = "Get active categories", description = "Retrieve all active categories")
-    @SwaggerApiResponse(responseCode = "200", description = "Active categories retrieved successfully")
+    @ApiResponse(responseCode = "200", description = "Active categories retrieved successfully")
     public ResponseEntity<ApiResponse<List<CategoryResponse>>> getActiveCategories() {
         log.info("Getting active categories");
         
@@ -91,7 +91,7 @@ public class CategoryController {
     
     @GetMapping("/root")
     @Operation(summary = "Get root categories", description = "Retrieve top-level categories")
-    @SwaggerApiResponse(responseCode = "200", description = "Root categories retrieved successfully")
+    @ApiResponse(responseCode = "200", description = "Root categories retrieved successfully")
     public ResponseEntity<ApiResponse<List<CategoryResponse>>> getRootCategories() {
         log.info("Getting root categories");
         
@@ -104,7 +104,7 @@ public class CategoryController {
     
     @GetMapping("/parent/{parentId}")
     @Operation(summary = "Get categories by parent", description = "Retrieve categories by parent ID")
-    @SwaggerApiResponse(responseCode = "200", description = "Categories found")
+    @ApiResponse(responseCode = "200", description = "Categories found")
     public ResponseEntity<ApiResponse<List<CategoryResponse>>> getCategoriesByParent(@PathVariable Long parentId) {
         log.info("Getting categories by parent ID: {}", parentId);
         
@@ -118,9 +118,9 @@ public class CategoryController {
     @PutMapping("/{id}")
     @Operation(summary = "Update category", description = "Update category details")
     @ApiResponses(value = {
-        @SwaggerApiResponse(responseCode = "200", description = "Category updated successfully"),
-        @SwaggerApiResponse(responseCode = "400", description = "Invalid input"),
-        @SwaggerApiResponse(responseCode = "404", description = "Category not found")
+        @ApiResponse(responseCode = "200", description = "Category updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input"),
+        @ApiResponse(responseCode = "404", description = "Category not found")
     })
     public ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(
             @PathVariable Long id, 
@@ -138,9 +138,9 @@ public class CategoryController {
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete category", description = "Soft delete category by marking as inactive")
     @ApiResponses(value = {
-        @SwaggerApiResponse(responseCode = "200", description = "Category deleted successfully"),
-        @SwaggerApiResponse(responseCode = "400", description = "Cannot delete category with products or subcategories"),
-        @SwaggerApiResponse(responseCode = "404", description = "Category not found")
+        @ApiResponse(responseCode = "200", description = "Category deleted successfully"),
+        @ApiResponse(responseCode = "400", description = "Cannot delete category with products or subcategories"),
+        @ApiResponse(responseCode = "404", description = "Category not found")
     })
     public ResponseEntity<ApiResponse<Void>> deleteCategory(@PathVariable Long id) {
         log.info("Deleting category: {}", id);

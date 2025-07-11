@@ -82,11 +82,4 @@ public class Outlet {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
-    
-    public Outlet(String name, String address, String city, String managerId) {
-        this.name = name;
-        this.address = address;
-        this.city = city;
-        this.managerName = managerId;
-    }
 }

@@ -1,13 +1,15 @@
 package com.smartoutlet.auth.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthResponse {
@@ -21,16 +23,4 @@ public class AuthResponse {
     private String lastName;
     private Set<String> roles;
     private LocalDateTime expiresAt;
-    
-    public AuthResponse(String token, Long id, String username, String email, 
-                       String firstName, String lastName, Set<String> roles, LocalDateTime expiresAt) {
-        this.token = token;
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.roles = roles;
-        this.expiresAt = expiresAt;
-    }
 }

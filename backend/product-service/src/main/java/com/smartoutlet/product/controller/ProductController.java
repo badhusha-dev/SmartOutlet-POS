@@ -4,7 +4,7 @@ import com.smartoutlet.product.dto.*;
 import com.smartoutlet.product.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,9 +28,9 @@ public class ProductController {
     @PostMapping
     @Operation(summary = "Create product", description = "Create a new product in the catalog")
     @ApiResponses(value = {
-        @SwaggerApiResponse(responseCode = "201", description = "Product created successfully"),
-        @SwaggerApiResponse(responseCode = "400", description = "Invalid input"),
-        @SwaggerApiResponse(responseCode = "409", description = "Product already exists")
+        @ApiResponse(responseCode = "201", description = "Product created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input"),
+        @ApiResponse(responseCode = "409", description = "Product already exists")
     })
     public ResponseEntity<ApiResponse<ProductResponse>> createProduct(@Valid @RequestBody ProductRequest request) {
         log.info("Creating product: {}", request.getName());
@@ -45,8 +45,8 @@ public class ProductController {
     @GetMapping("/{id}")
     @Operation(summary = "Get product by ID", description = "Retrieve product details by ID")
     @ApiResponses(value = {
-        @SwaggerApiResponse(responseCode = "200", description = "Product found"),
-        @SwaggerApiResponse(responseCode = "404", description = "Product not found")
+        @ApiResponse(responseCode = "200", description = "Product found"),
+        @ApiResponse(responseCode = "404", description = "Product not found")
     })
     public ResponseEntity<ApiResponse<ProductResponse>> getProductById(@PathVariable Long id) {
         log.info("Getting product by ID: {}", id);
@@ -60,7 +60,7 @@ public class ProductController {
     
     @GetMapping("/sku/{sku}")
     @Operation(summary = "Get product by SKU", description = "Retrieve product details by SKU")
-    @SwaggerApiResponse(responseCode = "200", description = "Product found")
+    @ApiResponse(responseCode = "200", description = "Product found")
     public ResponseEntity<ApiResponse<ProductResponse>> getProductBySku(@PathVariable String sku) {
         log.info("Getting product by SKU: {}", sku);
         
@@ -73,7 +73,7 @@ public class ProductController {
     
     @GetMapping("/barcode/{barcode}")
     @Operation(summary = "Get product by barcode", description = "Retrieve product details by barcode")
-    @SwaggerApiResponse(responseCode = "200", description = "Product found")
+    @ApiResponse(responseCode = "200", description = "Product found")
     public ResponseEntity<ApiResponse<ProductResponse>> getProductByBarcode(@PathVariable String barcode) {
         log.info("Getting product by barcode: {}", barcode);
         
@@ -86,7 +86,7 @@ public class ProductController {
     
     @GetMapping
     @Operation(summary = "Get all products", description = "Retrieve all products with pagination")
-    @SwaggerApiResponse(responseCode = "200", description = "Products retrieved successfully")
+    @ApiResponse(responseCode = "200", description = "Products retrieved successfully")
     public ResponseEntity<ApiResponse<Page<ProductResponse>>> getAllProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -104,7 +104,7 @@ public class ProductController {
     
     @GetMapping("/active")
     @Operation(summary = "Get active products", description = "Retrieve all active products")
-    @SwaggerApiResponse(responseCode = "200", description = "Active products retrieved successfully")
+    @ApiResponse(responseCode = "200", description = "Active products retrieved successfully")
     public ResponseEntity<ApiResponse<List<ProductResponse>>> getActiveProducts() {
         log.info("Getting active products");
         
@@ -117,7 +117,7 @@ public class ProductController {
     
     @GetMapping("/search")
     @Operation(summary = "Search products", description = "Search products by keyword")
-    @SwaggerApiResponse(responseCode = "200", description = "Products found")
+    @ApiResponse(responseCode = "200", description = "Products found")
     public ResponseEntity<ApiResponse<Page<ProductResponse>>> searchProducts(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
@@ -134,7 +134,7 @@ public class ProductController {
     
     @GetMapping("/category/{categoryId}")
     @Operation(summary = "Get products by category", description = "Retrieve products by category ID")
-    @SwaggerApiResponse(responseCode = "200", description = "Products found")
+    @ApiResponse(responseCode = "200", description = "Products found")
     public ResponseEntity<ApiResponse<Page<ProductResponse>>> getProductsByCategory(
             @PathVariable Long categoryId,
             @RequestParam(defaultValue = "0") int page,
@@ -151,7 +151,7 @@ public class ProductController {
     
     @GetMapping("/low-stock")
     @Operation(summary = "Get low stock products", description = "Retrieve products with low stock levels")
-    @SwaggerApiResponse(responseCode = "200", description = "Low stock products found")
+    @ApiResponse(responseCode = "200", description = "Low stock products found")
     public ResponseEntity<ApiResponse<List<ProductResponse>>> getLowStockProducts() {
         log.info("Getting low stock products");
         
@@ -164,7 +164,7 @@ public class ProductController {
     
     @GetMapping("/out-of-stock")
     @Operation(summary = "Get out of stock products", description = "Retrieve products that are out of stock")
-    @SwaggerApiResponse(responseCode = "200", description = "Out of stock products found")
+    @ApiResponse(responseCode = "200", description = "Out of stock products found")
     public ResponseEntity<ApiResponse<List<ProductResponse>>> getOutOfStockProducts() {
         log.info("Getting out of stock products");
         
@@ -178,9 +178,9 @@ public class ProductController {
     @PutMapping("/{id}")
     @Operation(summary = "Update product", description = "Update product details")
     @ApiResponses(value = {
-        @SwaggerApiResponse(responseCode = "200", description = "Product updated successfully"),
-        @SwaggerApiResponse(responseCode = "400", description = "Invalid input"),
-        @SwaggerApiResponse(responseCode = "404", description = "Product not found")
+        @ApiResponse(responseCode = "200", description = "Product updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input"),
+        @ApiResponse(responseCode = "404", description = "Product not found")
     })
     public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(
             @PathVariable Long id, 
@@ -198,9 +198,9 @@ public class ProductController {
     @PutMapping("/{id}/stock")
     @Operation(summary = "Update product stock", description = "Update product stock quantity")
     @ApiResponses(value = {
-        @SwaggerApiResponse(responseCode = "200", description = "Stock updated successfully"),
-        @SwaggerApiResponse(responseCode = "400", description = "Invalid stock operation"),
-        @SwaggerApiResponse(responseCode = "404", description = "Product not found")
+        @ApiResponse(responseCode = "200", description = "Stock updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid stock operation"),
+        @ApiResponse(responseCode = "404", description = "Product not found")
     })
     public ResponseEntity<ApiResponse<ProductResponse>> updateStock(
             @PathVariable Long id,
@@ -218,8 +218,8 @@ public class ProductController {
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete product", description = "Soft delete product by marking as inactive")
     @ApiResponses(value = {
-        @SwaggerApiResponse(responseCode = "200", description = "Product deleted successfully"),
-        @SwaggerApiResponse(responseCode = "404", description = "Product not found")
+        @ApiResponse(responseCode = "200", description = "Product deleted successfully"),
+        @ApiResponse(responseCode = "404", description = "Product not found")
     })
     public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long id) {
         log.info("Deleting product: {}", id);
@@ -233,7 +233,7 @@ public class ProductController {
     
     @GetMapping("/health")
     @Operation(summary = "Health check", description = "Check if the product service is running")
-    @SwaggerApiResponse(responseCode = "200", description = "Service is healthy")
+    @ApiResponse(responseCode = "200", description = "Service is healthy")
     public ResponseEntity<ApiResponse<String>> healthCheck() {
         return ResponseEntity.ok(
             ApiResponse.success("Product service is running", "OK")

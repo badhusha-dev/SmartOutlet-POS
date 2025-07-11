@@ -1,10 +1,11 @@
 package com.smartoutlet.outlet.controller;
 
-import com.smartoutlet.outlet.dto.*;
+import com.smartoutlet.outlet.dto.ApiResponse;
+import com.smartoutlet.outlet.dto.OutletRequest;
+import com.smartoutlet.outlet.dto.OutletResponse;
 import com.smartoutlet.outlet.service.OutletService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,9 +29,9 @@ public class OutletController {
     @PostMapping
     @Operation(summary = "Create outlet", description = "Create a new outlet")
     @ApiResponses(value = {
-        @SwaggerApiResponse(responseCode = "201", description = "Outlet created successfully"),
-        @SwaggerApiResponse(responseCode = "400", description = "Invalid input"),
-        @SwaggerApiResponse(responseCode = "409", description = "Outlet already exists")
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Outlet created successfully"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid input"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "Outlet already exists")
     })
     public ResponseEntity<ApiResponse<OutletResponse>> createOutlet(@Valid @RequestBody OutletRequest request) {
         log.info("Creating outlet: {}", request.getName());
@@ -45,8 +46,8 @@ public class OutletController {
     @GetMapping("/{id}")
     @Operation(summary = "Get outlet by ID", description = "Retrieve outlet details by ID")
     @ApiResponses(value = {
-        @SwaggerApiResponse(responseCode = "200", description = "Outlet found"),
-        @SwaggerApiResponse(responseCode = "404", description = "Outlet not found")
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Outlet found"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Outlet not found")
     })
     public ResponseEntity<ApiResponse<OutletResponse>> getOutletById(@PathVariable Long id) {
         log.info("Getting outlet by ID: {}", id);
@@ -61,7 +62,7 @@ public class OutletController {
     @GetMapping
     @Operation(summary = "Get all outlets", description = "Retrieve all outlets with pagination")
     @ApiResponses(value = {
-        @SwaggerApiResponse(responseCode = "200", description = "Outlets retrieved successfully")
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Outlets retrieved successfully")
     })
     public ResponseEntity<ApiResponse<Page<OutletResponse>>> getAllOutlets(
             @RequestParam(defaultValue = "0") int page,
@@ -80,7 +81,7 @@ public class OutletController {
     
     @GetMapping("/active")
     @Operation(summary = "Get active outlets", description = "Retrieve all active outlets")
-    @SwaggerApiResponse(responseCode = "200", description = "Active outlets retrieved successfully")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Active outlets retrieved successfully")
     public ResponseEntity<ApiResponse<List<OutletResponse>>> getActiveOutlets() {
         log.info("Getting active outlets");
         
@@ -93,7 +94,7 @@ public class OutletController {
     
     @GetMapping("/search")
     @Operation(summary = "Search outlets", description = "Search outlets by keyword")
-    @SwaggerApiResponse(responseCode = "200", description = "Outlets found")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Outlets found")
     public ResponseEntity<ApiResponse<Page<OutletResponse>>> searchOutlets(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
@@ -111,9 +112,9 @@ public class OutletController {
     @PutMapping("/{id}")
     @Operation(summary = "Update outlet", description = "Update outlet details")
     @ApiResponses(value = {
-        @SwaggerApiResponse(responseCode = "200", description = "Outlet updated successfully"),
-        @SwaggerApiResponse(responseCode = "400", description = "Invalid input"),
-        @SwaggerApiResponse(responseCode = "404", description = "Outlet not found")
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Outlet updated successfully"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid input"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Outlet not found")
     })
     public ResponseEntity<ApiResponse<OutletResponse>> updateOutlet(
             @PathVariable Long id, 
@@ -131,8 +132,8 @@ public class OutletController {
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete outlet", description = "Soft delete outlet by marking as inactive")
     @ApiResponses(value = {
-        @SwaggerApiResponse(responseCode = "200", description = "Outlet deleted successfully"),
-        @SwaggerApiResponse(responseCode = "404", description = "Outlet not found")
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Outlet deleted successfully"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Outlet not found")
     })
     public ResponseEntity<ApiResponse<Void>> deleteOutlet(@PathVariable Long id) {
         log.info("Deleting outlet: {}", id);
@@ -146,7 +147,7 @@ public class OutletController {
     
     @GetMapping("/manager/{managerId}")
     @Operation(summary = "Get outlets by manager", description = "Retrieve outlets managed by a specific manager")
-    @SwaggerApiResponse(responseCode = "200", description = "Outlets found")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Outlets found")
     public ResponseEntity<ApiResponse<List<OutletResponse>>> getOutletsByManagerId(@PathVariable Long managerId) {
         log.info("Getting outlets by manager ID: {}", managerId);
         
@@ -159,7 +160,7 @@ public class OutletController {
     
     @GetMapping("/health")
     @Operation(summary = "Health check", description = "Check if the outlet service is running")
-    @SwaggerApiResponse(responseCode = "200", description = "Service is healthy")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Service is healthy")
     public ResponseEntity<ApiResponse<String>> healthCheck() {
         return ResponseEntity.ok(
             ApiResponse.success("Outlet service is running", "OK")
