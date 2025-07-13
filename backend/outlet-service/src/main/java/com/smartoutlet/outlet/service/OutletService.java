@@ -7,7 +7,6 @@ import com.smartoutlet.outlet.entity.StaffAssignment;
 import com.smartoutlet.outlet.exception.OutletNotFoundException;
 import com.smartoutlet.outlet.exception.OutletAlreadyExistsException;
 import com.smartoutlet.outlet.repository.OutletRepository;
-import com.smartoutlet.outlet.repository.StaffAssignmentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -28,7 +27,6 @@ import java.util.stream.Collectors;
 public class OutletService {
     
     private final OutletRepository outletRepository;
-    private final StaffAssignmentRepository staffAssignmentRepository;
     private final KafkaTemplate<String, Object> kafkaTemplate;
     
     public OutletResponse createOutlet(OutletRequest request) {

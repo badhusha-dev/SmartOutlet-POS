@@ -11,9 +11,10 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf().disable()
-            .authorizeRequests()
-            .antMatchers("/expenses/**").permitAll() // Change to authenticated() for prod
-            .anyRequest().permitAll();
+            .authorizeHttpRequests((authz) -> authz
+                .requestMatchers("/expenses/**").permitAll() // Change to authenticated() for prod
+                .anyRequest().permitAll()
+            );
         return http.build();
     }
 } 

@@ -1,5 +1,4 @@
 package com.smartoutlet.outlet.controller;
-
 import com.smartoutlet.outlet.dto.ApiResponse;
 import com.smartoutlet.outlet.dto.OutletRequest;
 import com.smartoutlet.outlet.dto.OutletResponse;

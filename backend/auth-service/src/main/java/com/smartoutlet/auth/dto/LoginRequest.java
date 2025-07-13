@@ -3,6 +3,7 @@ package com.smartoutlet.auth.dto;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

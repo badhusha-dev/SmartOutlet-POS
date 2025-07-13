@@ -33,15 +33,15 @@ echo "✅ All required ports are available"
 
 # Start infrastructure services first
 echo "🚀 Starting infrastructure services..."
-docker-compose up -d mysql redis zookeeper kafka
+docker-compose up -d postgres redis zookeeper kafka
 
-# Wait for MySQL to be ready
-echo "⏳ Waiting for MySQL to be ready..."
-until docker exec smartoutlet-mysql mysqladmin ping -h localhost --silent; do
-    echo "   MySQL is starting up..."
+# Wait for PostgreSQL to be ready
+echo "⏳ Waiting for PostgreSQL to be ready..."
+until docker exec smartoutlet-postgres pg_isready -U postgres; do
+    echo "   PostgreSQL is starting up..."
     sleep 2
 done
-echo "✅ MySQL is ready"
+echo "✅ PostgreSQL is ready"
 
 # Wait for Kafka to be ready
 echo "⏳ Waiting for Kafka to be ready..."
@@ -129,7 +129,7 @@ echo "   All Services:    curl http://localhost:8080/actuator/health"
 echo "   Individual:      curl http://localhost:808X/actuator/health"
 echo ""
 echo "📊 Infrastructure:"
-echo "   MySQL:           localhost:3306"
+echo "   PostgreSQL:      localhost:5432"
 echo "   Redis:           localhost:6379"
 echo "   Kafka:           localhost:9092"
 echo ""

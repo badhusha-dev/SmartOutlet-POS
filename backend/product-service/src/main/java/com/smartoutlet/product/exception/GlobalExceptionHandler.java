@@ -1,5 +1,8 @@
 package com.smartoutlet.product.exception;
 
+import com.smartoutlet.product.entity.ErrorLog;
+import com.smartoutlet.product.service.ErrorLogService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -11,18 +14,29 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
-import javax.validation.ConstraintViolationException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+    
+    private final ErrorLogService errorLogService;
 
     @ExceptionHandler(ProductNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleProductNotFoundException(ProductNotFoundException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleProductNotFoundException(ProductNotFoundException ex, WebRequest request, HttpServletRequest httpRequest) {
         log.error("Product not found: {}", ex.getMessage());
+        
+        // Log error to database
+        logErrorToDatabase(ex, "ProductNotFoundException", "Product lookup", httpRequest, HttpStatus.NOT_FOUND.value());
+        
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.NOT_FOUND.value())
@@ -34,8 +48,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(CategoryNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleCategoryNotFoundException(CategoryNotFoundException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleCategoryNotFoundException(CategoryNotFoundException ex, WebRequest request, HttpServletRequest httpRequest) {
         log.error("Category not found: {}", ex.getMessage());
+        
+        // Log error to database
+        logErrorToDatabase(ex, "CategoryNotFoundException", "Category lookup", httpRequest, HttpStatus.NOT_FOUND.value());
+        
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.NOT_FOUND.value())
@@ -143,8 +161,11 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException ex, WebRequest request, HttpServletRequest httpRequest) {
         log.error("Data integrity violation: {}", ex.getMessage());
+        
+        // Log error to database
+        logErrorToDatabase(ex, "DataIntegrityViolationException", "Data operation", httpRequest, HttpStatus.CONFLICT.value());
         
         String message = "Data integrity violation";
         if (ex.getMessage() != null) {
@@ -179,8 +200,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex, WebRequest request, HttpServletRequest httpRequest) {
         log.error("Unexpected error: ", ex);
+        
+        // Log error to database
+        logErrorToDatabase(ex, "UnexpectedException", "General operation", httpRequest, HttpStatus.INTERNAL_SERVER_ERROR.value());
+        
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
@@ -189,5 +214,60 @@ public class GlobalExceptionHandler {
                 .path(request.getDescription(false).replace("uri=", ""))
                 .build();
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    
+    /**
+     * Helper method to log errors to database
+     */
+    private void logErrorToDatabase(Exception ex, String errorType, String actionPerformed, 
+                                   HttpServletRequest request, Integer responseStatus) {
+        try {
+            // Get request information
+            String requestUrl = request.getRequestURL().toString();
+            String requestMethod = request.getMethod();
+            String ipAddress = getClientIpAddress(request);
+            String userAgent = request.getHeader("User-Agent");
+            
+            // Get stack trace
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            ex.printStackTrace(pw);
+            String stackTrace = sw.toString();
+            
+            // Log to database
+            errorLogService.logError(
+                ex.getMessage(),
+                errorType,
+                actionPerformed,
+                null, // userId - not available without security
+                "anonymous", // username - not available without security
+                ipAddress,
+                userAgent,
+                stackTrace,
+                requestUrl,
+                requestMethod,
+                null, // request body - could be extracted if needed
+                responseStatus
+            );
+        } catch (Exception logEx) {
+            log.error("Failed to log error to database: {}", logEx.getMessage());
+        }
+    }
+    
+    /**
+     * Helper method to get client IP address
+     */
+    private String getClientIpAddress(HttpServletRequest request) {
+        String xForwardedFor = request.getHeader("X-Forwarded-For");
+        if (xForwardedFor != null && !xForwardedFor.isEmpty() && !"unknown".equalsIgnoreCase(xForwardedFor)) {
+            return xForwardedFor.split(",")[0];
+        }
+        
+        String xRealIp = request.getHeader("X-Real-IP");
+        if (xRealIp != null && !xRealIp.isEmpty() && !"unknown".equalsIgnoreCase(xRealIp)) {
+            return xRealIp;
+        }
+        
+        return request.getRemoteAddr();
     }
 }

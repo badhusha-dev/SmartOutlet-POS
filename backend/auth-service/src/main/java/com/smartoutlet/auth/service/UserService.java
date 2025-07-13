@@ -25,10 +25,10 @@ import java.util.stream.Collectors;
 @Transactional
 public class UserService {
     
-    private UserRepository userRepository;
-    private RoleRepository roleRepository;
-    private PasswordEncoder passwordEncoder;
-    private JwtUtil jwtUtil;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
     
     public AuthResponse authenticate(LoginRequest loginRequest) {
         log.info("Authenticating user: {}", loginRequest.getUsernameOrEmail());
