@@ -3,13 +3,14 @@ package com.smartoutlet.auth.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class RegisterRequest {
     
     @NotBlank(message = "Username is required")

@@ -1,10 +1,11 @@
 package com.smartoutlet.product.controller;
 
-import com.smartoutlet.product.dto.*;
+import com.smartoutlet.product.dto.ApiResponseDTO;
+import com.smartoutlet.product.dto.ProductRequest;
+import com.smartoutlet.product.dto.ProductResponse;
 import com.smartoutlet.product.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,66 +29,66 @@ public class ProductController {
     @PostMapping
     @Operation(summary = "Create product", description = "Create a new product in the catalog")
     @ApiResponses(value = {
-        @SwaggerApiResponse(responseCode = "201", description = "Product created successfully"),
-        @SwaggerApiResponse(responseCode = "400", description = "Invalid input"),
-        @SwaggerApiResponse(responseCode = "409", description = "Product already exists")
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Product created successfully"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid input"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "Product already exists")
     })
-    public ResponseEntity<ApiResponse<ProductResponse>> createProduct(@Valid @RequestBody ProductRequest request) {
+    public ResponseEntity<ApiResponseDTO<ProductResponse>> createProduct(@Valid @RequestBody ProductRequest request) {
         log.info("Creating product: {}", request.getName());
         
         ProductResponse product = productService.createProduct(request);
         
         return ResponseEntity.status(HttpStatus.CREATED).body(
-            ApiResponse.success("Product created successfully", product)
+            ApiResponseDTO.success("Product created successfully", product)
         );
     }
     
     @GetMapping("/{id}")
     @Operation(summary = "Get product by ID", description = "Retrieve product details by ID")
     @ApiResponses(value = {
-        @SwaggerApiResponse(responseCode = "200", description = "Product found"),
-        @SwaggerApiResponse(responseCode = "404", description = "Product not found")
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Product found"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Product not found")
     })
-    public ResponseEntity<ApiResponse<ProductResponse>> getProductById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponseDTO<ProductResponse>> getProductById(@PathVariable Long id) {
         log.info("Getting product by ID: {}", id);
         
         ProductResponse product = productService.getProductById(id);
         
         return ResponseEntity.ok(
-            ApiResponse.success("Product found", product)
+            ApiResponseDTO.success("Product found", product)
         );
     }
     
     @GetMapping("/sku/{sku}")
     @Operation(summary = "Get product by SKU", description = "Retrieve product details by SKU")
-    @SwaggerApiResponse(responseCode = "200", description = "Product found")
-    public ResponseEntity<ApiResponse<ProductResponse>> getProductBySku(@PathVariable String sku) {
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Product found")
+    public ResponseEntity<ApiResponseDTO<ProductResponse>> getProductBySku(@PathVariable String sku) {
         log.info("Getting product by SKU: {}", sku);
         
         ProductResponse product = productService.getProductBySku(sku);
         
         return ResponseEntity.ok(
-            ApiResponse.success("Product found", product)
+            ApiResponseDTO.success("Product found", product)
         );
     }
     
     @GetMapping("/barcode/{barcode}")
     @Operation(summary = "Get product by barcode", description = "Retrieve product details by barcode")
-    @SwaggerApiResponse(responseCode = "200", description = "Product found")
-    public ResponseEntity<ApiResponse<ProductResponse>> getProductByBarcode(@PathVariable String barcode) {
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Product found")
+    public ResponseEntity<ApiResponseDTO<ProductResponse>> getProductByBarcode(@PathVariable String barcode) {
         log.info("Getting product by barcode: {}", barcode);
         
         ProductResponse product = productService.getProductByBarcode(barcode);
         
         return ResponseEntity.ok(
-            ApiResponse.success("Product found", product)
+            ApiResponseDTO.success("Product found", product)
         );
     }
     
     @GetMapping
     @Operation(summary = "Get all products", description = "Retrieve all products with pagination")
-    @SwaggerApiResponse(responseCode = "200", description = "Products retrieved successfully")
-    public ResponseEntity<ApiResponse<Page<ProductResponse>>> getAllProducts(
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Products retrieved successfully")
+    public ResponseEntity<ApiResponseDTO<Page<ProductResponse>>> getAllProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -98,27 +99,27 @@ public class ProductController {
         Page<ProductResponse> products = productService.getAllProducts(page, size, sortBy, sortDir);
         
         return ResponseEntity.ok(
-            ApiResponse.success("Products retrieved successfully", products)
+            ApiResponseDTO.success("Products retrieved successfully", products)
         );
     }
     
     @GetMapping("/active")
     @Operation(summary = "Get active products", description = "Retrieve all active products")
-    @SwaggerApiResponse(responseCode = "200", description = "Active products retrieved successfully")
-    public ResponseEntity<ApiResponse<List<ProductResponse>>> getActiveProducts() {
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Active products retrieved successfully")
+    public ResponseEntity<ApiResponseDTO<List<ProductResponse>>> getActiveProducts() {
         log.info("Getting active products");
         
         List<ProductResponse> products = productService.getActiveProducts();
         
         return ResponseEntity.ok(
-            ApiResponse.success("Active products retrieved successfully", products)
+            ApiResponseDTO.success("Active products retrieved successfully", products)
         );
     }
     
     @GetMapping("/search")
     @Operation(summary = "Search products", description = "Search products by keyword")
-    @SwaggerApiResponse(responseCode = "200", description = "Products found")
-    public ResponseEntity<ApiResponse<Page<ProductResponse>>> searchProducts(
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Products found")
+    public ResponseEntity<ApiResponseDTO<Page<ProductResponse>>> searchProducts(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -128,14 +129,14 @@ public class ProductController {
         Page<ProductResponse> products = productService.searchProducts(keyword, page, size);
         
         return ResponseEntity.ok(
-            ApiResponse.success("Products found", products)
+            ApiResponseDTO.success("Products found", products)
         );
     }
     
     @GetMapping("/category/{categoryId}")
     @Operation(summary = "Get products by category", description = "Retrieve products by category ID")
-    @SwaggerApiResponse(responseCode = "200", description = "Products found")
-    public ResponseEntity<ApiResponse<Page<ProductResponse>>> getProductsByCategory(
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Products found")
+    public ResponseEntity<ApiResponseDTO<Page<ProductResponse>>> getProductsByCategory(
             @PathVariable Long categoryId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -145,44 +146,44 @@ public class ProductController {
         Page<ProductResponse> products = productService.getProductsByCategory(categoryId, page, size);
         
         return ResponseEntity.ok(
-            ApiResponse.success("Products found", products)
+            ApiResponseDTO.success("Products found", products)
         );
     }
     
     @GetMapping("/low-stock")
     @Operation(summary = "Get low stock products", description = "Retrieve products with low stock levels")
-    @SwaggerApiResponse(responseCode = "200", description = "Low stock products found")
-    public ResponseEntity<ApiResponse<List<ProductResponse>>> getLowStockProducts() {
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Low stock products found")
+    public ResponseEntity<ApiResponseDTO<List<ProductResponse>>> getLowStockProducts() {
         log.info("Getting low stock products");
         
         List<ProductResponse> products = productService.getLowStockProducts();
         
         return ResponseEntity.ok(
-            ApiResponse.success("Low stock products found", products)
+            ApiResponseDTO.success("Low stock products found", products)
         );
     }
     
     @GetMapping("/out-of-stock")
     @Operation(summary = "Get out of stock products", description = "Retrieve products that are out of stock")
-    @SwaggerApiResponse(responseCode = "200", description = "Out of stock products found")
-    public ResponseEntity<ApiResponse<List<ProductResponse>>> getOutOfStockProducts() {
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Out of stock products found")
+    public ResponseEntity<ApiResponseDTO<List<ProductResponse>>> getOutOfStockProducts() {
         log.info("Getting out of stock products");
         
         List<ProductResponse> products = productService.getOutOfStockProducts();
         
         return ResponseEntity.ok(
-            ApiResponse.success("Out of stock products found", products)
+            ApiResponseDTO.success("Out of stock products found", products)
         );
     }
     
     @PutMapping("/{id}")
     @Operation(summary = "Update product", description = "Update product details")
     @ApiResponses(value = {
-        @SwaggerApiResponse(responseCode = "200", description = "Product updated successfully"),
-        @SwaggerApiResponse(responseCode = "400", description = "Invalid input"),
-        @SwaggerApiResponse(responseCode = "404", description = "Product not found")
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Product updated successfully"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid input"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Product not found")
     })
-    public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(
+    public ResponseEntity<ApiResponseDTO<ProductResponse>> updateProduct(
             @PathVariable Long id, 
             @Valid @RequestBody ProductRequest request) {
         
@@ -191,52 +192,54 @@ public class ProductController {
         ProductResponse product = productService.updateProduct(id, request);
         
         return ResponseEntity.ok(
-            ApiResponse.success("Product updated successfully", product)
+            ApiResponseDTO.success("Product updated successfully", product)
         );
     }
     
+    /*
     @PutMapping("/{id}/stock")
     @Operation(summary = "Update product stock", description = "Update product stock quantity")
     @ApiResponses(value = {
-        @SwaggerApiResponse(responseCode = "200", description = "Stock updated successfully"),
-        @SwaggerApiResponse(responseCode = "400", description = "Invalid stock operation"),
-        @SwaggerApiResponse(responseCode = "404", description = "Product not found")
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Stock updated successfully"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid stock operation"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Product not found")
     })
     public ResponseEntity<ApiResponse<ProductResponse>> updateStock(
             @PathVariable Long id,
-            @Valid @RequestBody StockUpdateRequest request) {
+            @RequestParam Integer quantity) {
         
-        log.info("Updating stock for product: {}", id);
+        log.info("Updating stock for product: {} with quantity: {}", id, quantity);
         
-        ProductResponse product = productService.updateStock(id, request);
+        ProductResponse product = productService.updateStock(id, quantity);
         
         return ResponseEntity.ok(
             ApiResponse.success("Stock updated successfully", product)
         );
     }
+    */
     
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete product", description = "Soft delete product by marking as inactive")
     @ApiResponses(value = {
-        @SwaggerApiResponse(responseCode = "200", description = "Product deleted successfully"),
-        @SwaggerApiResponse(responseCode = "404", description = "Product not found")
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Product deleted successfully"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Product not found")
     })
-    public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long id) {
+    public ResponseEntity<ApiResponseDTO<Void>> deleteProduct(@PathVariable Long id) {
         log.info("Deleting product: {}", id);
         
         productService.deleteProduct(id);
         
         return ResponseEntity.ok(
-            ApiResponse.success("Product deleted successfully")
+            ApiResponseDTO.success("Product deleted successfully")
         );
     }
     
     @GetMapping("/health")
     @Operation(summary = "Health check", description = "Check if the product service is running")
-    @SwaggerApiResponse(responseCode = "200", description = "Service is healthy")
-    public ResponseEntity<ApiResponse<String>> healthCheck() {
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Service is healthy")
+    public ResponseEntity<ApiResponseDTO<String>> healthCheck() {
         return ResponseEntity.ok(
-            ApiResponse.success("Product service is running", "OK")
+            ApiResponseDTO.success("Product service is running", "OK")
         );
     }
 }

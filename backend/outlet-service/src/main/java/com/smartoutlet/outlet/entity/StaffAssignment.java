@@ -49,15 +49,4 @@ public class StaffAssignment {
     protected void onCreate() {
         assignedAt = LocalDateTime.now();
     }
-    
-    public StaffAssignment(Long userId, String username, String userEmail, 
-                          String userFullName, Outlet outlet, String role) {
-        this.userId = userId;
-        this.username = username;
-        this.userEmail = userEmail;
-        this.userFullName = userFullName;
-        this.outlet = outlet;
-        this.role = role;
-        this.isActive = true;
-    }
 }
