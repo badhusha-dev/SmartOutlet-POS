@@ -4,6 +4,23 @@ import toast from 'react-hot-toast'
 
 const AuthContext = createContext({})
 
+// Development mode flags
+const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true'
+const DISABLE_AUTH = import.meta.env.VITE_DISABLE_AUTH === 'true'
+const MOCK_USER = import.meta.env.VITE_MOCK_USER === 'true'
+
+// Mock user for development
+const MOCK_USER_DATA = {
+  id: 1,
+  username: 'dev-admin',
+  email: 'admin@smartoutlet.dev',
+  role: 'ADMIN',
+  firstName: 'Development',
+  lastName: 'Admin',
+  isActive: true,
+  createdAt: new Date().toISOString(),
+}
+
 export const useAuth = () => {
   const context = useContext(AuthContext)
   if (!context) {
@@ -18,6 +35,14 @@ export const AuthProvider = ({ children }) => {
 
   // Check for existing token on app load
   useEffect(() => {
+    if (DEV_MODE && DISABLE_AUTH && MOCK_USER) {
+      // Development mode: Use mock user
+      console.log('🔓 Development mode: Using mock user (security disabled)')
+      setUser(MOCK_USER_DATA)
+      setLoading(false)
+      return
+    }
+
     const token = localStorage.getItem('token')
     const userData = localStorage.getItem('user')
     
@@ -35,6 +60,14 @@ export const AuthProvider = ({ children }) => {
   }, [])
 
   const login = async (credentials) => {
+    if (DEV_MODE && DISABLE_AUTH && MOCK_USER) {
+      // Development mode: Skip actual login
+      console.log('🔓 Development mode: Mock login successful')
+      setUser(MOCK_USER_DATA)
+      toast.success('Development mode: Mock login successful!')
+      return { success: true }
+    }
+
     try {
       setLoading(true)
       const response = await apiClient.post(API_ENDPOINTS.LOGIN, credentials)
@@ -57,6 +90,14 @@ export const AuthProvider = ({ children }) => {
   }
 
   const register = async (userData) => {
+    if (DEV_MODE && DISABLE_AUTH && MOCK_USER) {
+      // Development mode: Skip actual registration
+      console.log('🔓 Development mode: Mock registration successful')
+      setUser(MOCK_USER_DATA)
+      toast.success('Development mode: Mock registration successful!')
+      return { success: true }
+    }
+
     try {
       setLoading(true)
       const response = await apiClient.post(API_ENDPOINTS.REGISTER, userData)
@@ -79,6 +120,14 @@ export const AuthProvider = ({ children }) => {
   }
 
   const logout = () => {
+    if (DEV_MODE && DISABLE_AUTH) {
+      // Development mode: Reset to mock user
+      console.log('🔓 Development mode: Mock logout')
+      setUser(MOCK_USER_DATA)
+      toast.success('Development mode: Mock logout (user reset)')
+      return
+    }
+
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     setUser(null)
@@ -86,6 +135,15 @@ export const AuthProvider = ({ children }) => {
   }
 
   const updateProfile = async (profileData) => {
+    if (DEV_MODE && DISABLE_AUTH) {
+      // Development mode: Mock profile update
+      console.log('🔓 Development mode: Mock profile update')
+      const updatedUser = { ...MOCK_USER_DATA, ...profileData }
+      setUser(updatedUser)
+      toast.success('Development mode: Mock profile update successful!')
+      return { success: true }
+    }
+
     try {
       setLoading(true)
       const response = await apiClient.put(API_ENDPOINTS.PROFILE, profileData)
@@ -114,6 +172,12 @@ export const AuthProvider = ({ children }) => {
   }
 
   const hasPermission = (requiredRole) => {
+    if (DEV_MODE && DISABLE_AUTH) {
+      // Development mode: Grant all permissions
+      console.log('🔓 Development mode: Granting all permissions')
+      return true
+    }
+
     if (!user) return false
     
     const roleHierarchy = {
@@ -137,6 +201,7 @@ export const AuthProvider = ({ children }) => {
     isAdmin,
     isStaff,
     hasPermission,
+    isDevMode: DEV_MODE && DISABLE_AUTH,
   }
 
   return (

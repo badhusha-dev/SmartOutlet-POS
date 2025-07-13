@@ -1,21 +1,47 @@
 import React, { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from 'react-query'
-import { Plus, Edit, Trash2, Store, MapPin, User } from 'lucide-react'
+import { useQuery } from 'react-query'
+import { 
+  Plus, 
+  Search, 
+  Filter, 
+  Edit, 
+  Trash2, 
+  Eye,
+  MapPin,
+  Phone,
+  Mail,
+  Users,
+  DollarSign,
+  ShoppingCart,
+  CheckCircle,
+  XCircle
+} from 'lucide-react'
 import { motion } from 'framer-motion'
-import { useForm } from 'react-hook-form'
 import apiClient, { API_ENDPOINTS } from '../api/client'
-import Modal from '../components/ui/Modal'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
-import { useAuth } from '../contexts/AuthContext'
-import toast from 'react-hot-toast'
+import Modal from '../components/ui/Modal'
+import { mockOutlets, mockStaff } from '../data/mockData'
 
 const OutletManagement = () => {
-  const { isAdmin } = useAuth()
-  const queryClient = useQueryClient()
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [editingOutlet, setEditingOutlet] = useState(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState('ALL')
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [showViewModal, setShowViewModal] = useState(false)
+  const [selectedOutlet, setSelectedOutlet] = useState(null)
+  const [formData, setFormData] = useState({
+    name: '',
+    address: '',
+    phone: '',
+    email: '',
+    manager: '',
+    openingHours: '',
+    status: 'ACTIVE'
+  })
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm()
+  // Development mode flags
+  const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true'
+  const DISABLE_AUTH = import.meta.env.VITE_DISABLE_AUTH === 'true'
 
   // Fetch outlets
   const { data: outlets, isLoading } = useQuery(
@@ -23,98 +49,155 @@ const OutletManagement = () => {
     () => apiClient.get(API_ENDPOINTS.OUTLETS),
     {
       select: (response) => response.data.data,
+      enabled: !(DEV_MODE && DISABLE_AUTH),
     }
   )
 
-  // Create outlet mutation
-  const createMutation = useMutation(
-    (data) => apiClient.post(API_ENDPOINTS.OUTLETS, data),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries('outlets')
-        setIsModalOpen(false)
-        reset()
-        toast.success('Outlet created successfully!')
-      },
-      onError: () => {
-        toast.error('Failed to create outlet')
-      }
-    }
-  )
+  // Use mock data in development mode
+  const currentOutlets = (DEV_MODE && DISABLE_AUTH) ? mockOutlets : (outlets || mockOutlets)
 
-  // Update outlet mutation
-  const updateMutation = useMutation(
-    ({ id, ...data }) => apiClient.put(API_ENDPOINTS.OUTLET_BY_ID(id), data),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries('outlets')
-        setIsModalOpen(false)
-        setEditingOutlet(null)
-        reset()
-        toast.success('Outlet updated successfully!')
-      },
-      onError: () => {
-        toast.error('Failed to update outlet')
-      }
-    }
-  )
+  // Filter outlets based on search and status
+  const filteredOutlets = currentOutlets.filter(outlet => {
+    const matchesSearch = outlet.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         outlet.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         outlet.manager.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesStatus = statusFilter === 'ALL' || outlet.status === statusFilter
+    return matchesSearch && matchesStatus
+  })
 
-  // Delete outlet mutation
-  const deleteMutation = useMutation(
-    (id) => apiClient.delete(API_ENDPOINTS.OUTLET_BY_ID(id)),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries('outlets')
-        toast.success('Outlet deleted successfully!')
-      },
-      onError: () => {
-        toast.error('Failed to delete outlet')
-      }
-    }
-  )
-
-  const handleSubmitForm = (data) => {
-    if (editingOutlet) {
-      updateMutation.mutate({ id: editingOutlet.id, ...data })
-    } else {
-      createMutation.mutate(data)
-    }
+  const handleAddOutlet = () => {
+    setFormData({
+      name: '',
+      address: '',
+      phone: '',
+      email: '',
+      manager: '',
+      openingHours: '',
+      status: 'ACTIVE'
+    })
+    setShowAddModal(true)
   }
 
-  const handleEdit = (outlet) => {
-    setEditingOutlet(outlet)
-    reset(outlet)
-    setIsModalOpen(true)
+  const handleEditOutlet = (outlet) => {
+    setSelectedOutlet(outlet)
+    setFormData({
+      name: outlet.name,
+      address: outlet.address,
+      phone: outlet.phone,
+      email: outlet.email,
+      manager: outlet.manager,
+      openingHours: outlet.openingHours,
+      status: outlet.status
+    })
+    setShowEditModal(true)
   }
 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this outlet?')) {
-      deleteMutation.mutate(id)
+  const handleViewOutlet = (outlet) => {
+    setSelectedOutlet(outlet)
+    setShowViewModal(true)
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    // In development mode, just close the modal
+    if (DEV_MODE && DISABLE_AUTH) {
+      console.log('🔓 Development mode: Mock outlet operation')
+      setShowAddModal(false)
+      setShowEditModal(false)
+      return
     }
+    // TODO: Implement actual API call
   }
 
-  const handleAddNew = () => {
-    setEditingOutlet(null)
-    reset({})
-    setIsModalOpen(true)
+  const handleDeleteOutlet = (outletId) => {
+    if (DEV_MODE && DISABLE_AUTH) {
+      console.log('🔓 Development mode: Mock delete outlet', outletId)
+      return
+    }
+    // TODO: Implement actual delete
   }
 
-  if (!isAdmin()) {
-    return (
-      <div className="text-center py-12">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-          Access Denied
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          You don't have permission to manage outlets.
-        </p>
-      </div>
-    )
-  }
-
-  if (isLoading) {
+  if (isLoading && !(DEV_MODE && DISABLE_AUTH)) {
     return <LoadingSpinner />
   }
+
+  const OutletCard = ({ outlet }) => (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="card"
+    >
+      <div className="flex items-start justify-between">
+        <div className="flex-1">
+          <div className="flex items-center space-x-2 mb-2">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              {outlet.name}
+            </h3>
+            {outlet.status === 'ACTIVE' ? (
+              <CheckCircle className="h-4 w-4 text-green-500" />
+            ) : (
+              <XCircle className="h-4 w-4 text-red-500" />
+            )}
+          </div>
+          
+          <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <div className="flex items-center space-x-2">
+              <MapPin className="h-4 w-4" />
+              <span>{outlet.address}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Phone className="h-4 w-4" />
+              <span>{outlet.phone}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Mail className="h-4 w-4" />
+              <span>{outlet.email}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Users className="h-4 w-4" />
+              <span>Manager: {outlet.manager}</span>
+            </div>
+          </div>
+
+          <div className="mt-4 grid grid-cols-3 gap-4 text-sm">
+            <div className="text-center">
+              <p className="font-semibold text-gray-900 dark:text-white">{outlet.staffCount}</p>
+              <p className="text-gray-600 dark:text-gray-400">Staff</p>
+            </div>
+            <div className="text-center">
+              <p className="font-semibold text-gray-900 dark:text-white">${outlet.revenue.toLocaleString()}</p>
+              <p className="text-gray-600 dark:text-gray-400">Revenue</p>
+            </div>
+            <div className="text-center">
+              <p className="font-semibold text-gray-900 dark:text-white">{outlet.orders}</p>
+              <p className="text-gray-600 dark:text-gray-400">Orders</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col space-y-2 ml-4">
+          <button
+            onClick={() => handleViewOutlet(outlet)}
+            className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+          >
+            <Eye className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => handleEditOutlet(outlet)}
+            className="p-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors"
+          >
+            <Edit className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => handleDeleteOutlet(outlet.id)}
+            className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  )
 
   return (
     <div className="space-y-6">
@@ -125,11 +208,11 @@ const OutletManagement = () => {
             Outlet Management
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Manage your store outlets and locations.
+            Manage your retail outlets and their operations
           </p>
         </div>
         <button
-          onClick={handleAddNew}
+          onClick={handleAddOutlet}
           className="btn-primary px-4 py-2"
         >
           <Plus className="h-4 w-4 mr-2" />
@@ -137,166 +220,313 @@ const OutletManagement = () => {
         </button>
       </div>
 
+      {/* Filters */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search outlets..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          />
+        </div>
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+        >
+          <option value="ALL">All Status</option>
+          <option value="ACTIVE">Active</option>
+          <option value="INACTIVE">Inactive</option>
+        </select>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                Total Outlets
+              </p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                {currentOutlets.length}
+              </p>
+            </div>
+            <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+              <MapPin className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            </div>
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                Active Outlets
+              </p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                {currentOutlets.filter(o => o.status === 'ACTIVE').length}
+              </p>
+            </div>
+            <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+              <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
+            </div>
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                Total Staff
+              </p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                {currentOutlets.reduce((sum, outlet) => sum + outlet.staffCount, 0)}
+              </p>
+            </div>
+            <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+              <Users className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+            </div>
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                Total Revenue
+              </p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                ${currentOutlets.reduce((sum, outlet) => sum + outlet.revenue, 0).toLocaleString()}
+              </p>
+            </div>
+            <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+              <DollarSign className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Outlets Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {outlets?.map((outlet) => (
-          <motion.div
-            key={outlet.id}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="card hover:shadow-lg transition-shadow"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/20 rounded-lg flex items-center justify-center">
-                  <Store className="h-6 w-6 text-primary-600 dark:text-primary-400" />
-                </div>
-                <div className="ml-3">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    {outlet.name}
-                  </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    ID: {outlet.id}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => handleEdit(outlet)}
-                  className="p-2 text-gray-400 hover:text-primary-600 dark:hover:text-primary-400"
-                >
-                  <Edit className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={() => handleDelete(outlet.id)}
-                  className="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                <MapPin className="h-4 w-4 mr-2" />
-                {outlet.location || 'No location specified'}
-              </div>
-              <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                <User className="h-4 w-4 mr-2" />
-                Manager: {outlet.managerName || 'Unassigned'}
-              </div>
-            </div>
-
-            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-500 dark:text-gray-400">Status</span>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  outlet.isActive 
-                    ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400'
-                    : 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400'
-                }`}>
-                  {outlet.isActive ? 'Active' : 'Inactive'}
-                </span>
-              </div>
-            </div>
-          </motion.div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {filteredOutlets.map((outlet) => (
+          <OutletCard key={outlet.id} outlet={outlet} />
         ))}
       </div>
 
       {/* Add/Edit Modal */}
       <Modal
-        isOpen={isModalOpen}
+        isOpen={showAddModal || showEditModal}
         onClose={() => {
-          setIsModalOpen(false)
-          setEditingOutlet(null)
-          reset({})
+          setShowAddModal(false)
+          setShowEditModal(false)
         }}
-        title={editingOutlet ? 'Edit Outlet' : 'Add New Outlet'}
+        title={showAddModal ? 'Add New Outlet' : 'Edit Outlet'}
       >
-        <form onSubmit={handleSubmit(handleSubmitForm)} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Outlet Name
             </label>
             <input
-              {...register('name', { required: 'Outlet name is required' })}
               type="text"
-              className="input"
-              placeholder="Enter outlet name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              required
             />
-            {errors.name && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-                {errors.name.message}
-              </p>
-            )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Location
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Address
             </label>
-            <input
-              {...register('location', { required: 'Location is required' })}
-              type="text"
-              className="input"
-              placeholder="Enter outlet location"
+            <textarea
+              value={formData.address}
+              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              rows={3}
+              required
             />
-            {errors.location && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-                {errors.location.message}
-              </p>
-            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Phone
+              </label>
+              <input
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Email
+              </label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Manager
+              </label>
+              <input
+                type="text"
+                value={formData.manager}
+                onChange={(e) => setFormData({ ...formData, manager: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Opening Hours
+              </label>
+              <input
+                type="text"
+                value={formData.openingHours}
+                onChange={(e) => setFormData({ ...formData, openingHours: e.target.value })}
+                placeholder="9:00 AM - 9:00 PM"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                required
+              />
+            </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Manager ID
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Status
             </label>
-            <input
-              {...register('managerId')}
-              type="number"
-              className="input"
-              placeholder="Enter manager ID (optional)"
-            />
+            <select
+              value={formData.status}
+              onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            >
+              <option value="ACTIVE">Active</option>
+              <option value="INACTIVE">Inactive</option>
+            </select>
           </div>
 
-          <div className="flex items-center">
-            <input
-              {...register('isActive')}
-              type="checkbox"
-              className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-            />
-            <label className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-              Active
-            </label>
-          </div>
-
-          <div className="flex space-x-3 pt-4">
+          <div className="flex justify-end space-x-3 pt-4">
             <button
               type="button"
               onClick={() => {
-                setIsModalOpen(false)
-                setEditingOutlet(null)
-                reset({})
+                setShowAddModal(false)
+                setShowEditModal(false)
               }}
-              className="flex-1 btn-secondary py-2"
+              className="btn-secondary px-4 py-2"
             >
               Cancel
             </button>
             <button
               type="submit"
-              disabled={createMutation.isLoading || updateMutation.isLoading}
-              className="flex-1 btn-primary py-2"
+              className="btn-primary px-4 py-2"
             >
-              {createMutation.isLoading || updateMutation.isLoading
-                ? 'Saving...'
-                : editingOutlet
-                ? 'Update'
-                : 'Create'
-              }
+              {showAddModal ? 'Add Outlet' : 'Update Outlet'}
             </button>
           </div>
         </form>
+      </Modal>
+
+      {/* View Modal */}
+      <Modal
+        isOpen={showViewModal}
+        onClose={() => setShowViewModal(false)}
+        title="Outlet Details"
+      >
+        {selectedOutlet && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Outlet Name
+                </label>
+                <p className="text-gray-900 dark:text-white">{selectedOutlet.name}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Status
+                </label>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  selectedOutlet.status === 'ACTIVE' 
+                    ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                    : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                }`}>
+                  {selectedOutlet.status}
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Address
+              </label>
+              <p className="text-gray-900 dark:text-white">{selectedOutlet.address}</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Phone
+                </label>
+                <p className="text-gray-900 dark:text-white">{selectedOutlet.phone}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Email
+                </label>
+                <p className="text-gray-900 dark:text-white">{selectedOutlet.email}</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Manager
+                </label>
+                <p className="text-gray-900 dark:text-white">{selectedOutlet.manager}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Opening Hours
+                </label>
+                <p className="text-gray-900 dark:text-white">{selectedOutlet.openingHours}</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{selectedOutlet.staffCount}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Staff</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">${selectedOutlet.revenue.toLocaleString()}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Revenue</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{selectedOutlet.orders}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Orders</p>
+              </div>
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   )

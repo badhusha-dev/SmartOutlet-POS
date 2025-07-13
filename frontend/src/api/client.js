@@ -1,6 +1,10 @@
 import axios from 'axios'
 import toast from 'react-hot-toast'
 
+// Development mode flags
+const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true'
+const DISABLE_AUTH = import.meta.env.VITE_DISABLE_AUTH === 'true'
+
 // Create axios instance
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
 
@@ -15,6 +19,12 @@ const apiClient = axios.create({
 // Request interceptor to add auth token
 apiClient.interceptors.request.use(
   (config) => {
+    // Development mode: Skip token injection
+    if (DEV_MODE && DISABLE_AUTH) {
+      console.log('🔓 Development mode: Skipping token injection for:', config.url)
+      return config
+    }
+
     const token = localStorage.getItem('token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
@@ -32,6 +42,12 @@ apiClient.interceptors.response.use(
     return response
   },
   (error) => {
+    // Development mode: Skip error handling
+    if (DEV_MODE && DISABLE_AUTH) {
+      console.log('🔓 Development mode: Skipping error handling for:', error.config?.url)
+      return Promise.reject(error)
+    }
+
     const { response } = error
 
     if (response?.status === 401) {

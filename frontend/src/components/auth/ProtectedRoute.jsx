@@ -3,9 +3,19 @@ import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import LoadingSpinner from '../ui/LoadingSpinner'
 
+// Development mode flags
+const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true'
+const DISABLE_PROTECTED_ROUTES = import.meta.env.VITE_DISABLE_PROTECTED_ROUTES === 'true'
+
 const ProtectedRoute = ({ children, requiredRole = null }) => {
-  const { user, loading, hasPermission } = useAuth()
+  const { user, loading, hasPermission, isDevMode } = useAuth()
   const location = useLocation()
+
+  // Development mode: Bypass all protection
+  if (DEV_MODE && DISABLE_PROTECTED_ROUTES) {
+    console.log('🔓 Development mode: Bypassing route protection')
+    return children
+  }
 
   if (loading) {
     return <LoadingSpinner />

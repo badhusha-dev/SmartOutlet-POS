@@ -28,8 +28,20 @@ import {
 import { motion } from 'framer-motion'
 import apiClient, { API_ENDPOINTS } from '../api/client'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
+import { 
+  mockDashboardStats, 
+  mockSalesData, 
+  mockCategoryData, 
+  mockTopProducts,
+  mockNotifications,
+  mockActivityLog
+} from '../data/mockData'
 
 const Dashboard = () => {
+  // Development mode flags
+  const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true'
+  const DISABLE_AUTH = import.meta.env.VITE_DISABLE_AUTH === 'true'
+
   // Fetch dashboard stats
   const { data: stats, isLoading } = useQuery(
     'dashboardStats',
@@ -37,49 +49,17 @@ const Dashboard = () => {
     {
       select: (response) => response.data.data,
       refetchInterval: 30000, // Refetch every 30 seconds
+      enabled: !(DEV_MODE && DISABLE_AUTH), // Disable API call in dev mode
     }
   )
 
-  // Mock data for demo purposes (replace with actual API data)
-  const mockStats = {
-    totalSales: 125420,
-    totalOrders: 1247,
-    totalProducts: 342,
-    totalOutlets: 8,
-    salesGrowth: 12.5,
-    ordersGrowth: -2.3,
-    productsGrowth: 8.7,
-    outletsGrowth: 0,
-  }
+  // Use mock data in development mode
+  const currentStats = (DEV_MODE && DISABLE_AUTH) ? mockDashboardStats : (stats || mockDashboardStats)
+  const salesData = mockSalesData
+  const categoryData = mockCategoryData
+  const topProducts = mockTopProducts
 
-  const salesData = [
-    { name: 'Jan', sales: 12000, orders: 45 },
-    { name: 'Feb', sales: 19000, orders: 67 },
-    { name: 'Mar', sales: 15000, orders: 52 },
-    { name: 'Apr', sales: 25000, orders: 89 },
-    { name: 'May', sales: 22000, orders: 78 },
-    { name: 'Jun', sales: 30000, orders: 95 },
-  ]
-
-  const categoryData = [
-    { name: 'Electronics', value: 35, color: '#3b82f6' },
-    { name: 'Clothing', value: 25, color: '#10b981' },
-    { name: 'Food & Beverage', value: 20, color: '#f59e0b' },
-    { name: 'Books', value: 12, color: '#ef4444' },
-    { name: 'Others', value: 8, color: '#8b5cf6' },
-  ]
-
-  const topProducts = [
-    { name: 'iPhone 15 Pro', sales: 850, revenue: 850000 },
-    { name: 'Samsung Galaxy S24', sales: 720, revenue: 720000 },
-    { name: 'MacBook Air M3', sales: 450, revenue: 675000 },
-    { name: 'AirPods Pro', sales: 1200, revenue: 300000 },
-    { name: 'iPad Air', sales: 380, revenue: 228000 },
-  ]
-
-  const currentStats = stats || mockStats
-
-  if (isLoading) {
+  if (isLoading && !(DEV_MODE && DISABLE_AUTH)) {
     return <LoadingSpinner />
   }
 
@@ -205,17 +185,30 @@ const Dashboard = () => {
           </div>
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={salesData}>
-              <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+              <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis />
-              <Tooltip />
+              <Tooltip 
+                formatter={(value, name) => [
+                  name === 'sales' ? `$${value.toLocaleString()}` : value,
+                  name === 'sales' ? 'Sales' : 'Orders'
+                ]}
+              />
               <Area 
                 type="monotone" 
                 dataKey="sales" 
-                stackId="1" 
+                stackId="1"
                 stroke="#3b82f6" 
                 fill="#3b82f6" 
-                fillOpacity={0.6}
+                fillOpacity={0.3}
+              />
+              <Area 
+                type="monotone" 
+                dataKey="orders" 
+                stackId="2"
+                stroke="#10b981" 
+                fill="#10b981" 
+                fillOpacity={0.3}
               />
             </AreaChart>
           </ResponsiveContainer>
@@ -231,51 +224,51 @@ const Dashboard = () => {
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
             Sales by Category
           </h3>
-          <div className="flex items-center justify-center">
-            <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
-                <Pie
-                  data={categoryData}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  dataKey="value"
-                  label={({ name, value }) => `${name}: ${value}%`}
-                >
-                  {categoryData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={categoryData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {categoryData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip formatter={(value) => [`${value}%`, 'Market Share']} />
+            </PieChart>
+          </ResponsiveContainer>
         </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Products */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="lg:col-span-2 card"
+          className="card"
         >
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
-            Top Selling Products
+            Top Performing Products
           </h3>
           <div className="space-y-4">
             {topProducts.map((product, index) => (
               <div key={product.name} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <div className="flex items-center">
-                  <div className="w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center text-sm font-medium mr-3">
-                    {index + 1}
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center">
+                    <span className="text-sm font-semibold text-primary-600 dark:text-primary-400">
+                      {index + 1}
+                    </span>
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900 dark:text-white">
-                      {product.name}
-                    </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="font-medium text-gray-900 dark:text-white">{product.name}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
                       {product.sales} units sold
                     </p>
                   </div>
@@ -284,8 +277,8 @@ const Dashboard = () => {
                   <p className="font-semibold text-gray-900 dark:text-white">
                     ${product.revenue.toLocaleString()}
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Revenue
+                  <p className={`text-sm ${product.growth > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {product.growth > 0 ? '+' : ''}{product.growth}%
                   </p>
                 </div>
               </div>
@@ -304,53 +297,78 @@ const Dashboard = () => {
             Recent Activity
           </h3>
           <div className="space-y-4">
-            <div className="flex items-start space-x-3">
-              <div className="w-2 h-2 bg-green-500 rounded-full mt-2" />
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  New order #1247
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  2 minutes ago
-                </p>
+            {mockActivityLog.slice(0, 5).map((activity) => (
+              <div key={activity.id} className="flex items-start space-x-3">
+                <div className="w-2 h-2 bg-primary-500 rounded-full mt-2"></div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    {activity.description}
+                  </p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                    {new Date(activity.timestamp).toLocaleString()} • {activity.user}
+                  </p>
+                </div>
               </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <div className="w-2 h-2 bg-blue-500 rounded-full mt-2" />
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  Product added to inventory
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  15 minutes ago
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2" />
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  Low stock alert
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  1 hour ago
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <div className="w-2 h-2 bg-purple-500 rounded-full mt-2" />
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  New user registered
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  3 hours ago
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
         </motion.div>
       </div>
+
+      {/* Additional Stats */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+        className="grid grid-cols-1 md:grid-cols-3 gap-6"
+      >
+        <div className="card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                Monthly Revenue
+              </p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                ${currentStats.monthlyRevenue.toLocaleString()}
+              </p>
+            </div>
+            <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+              <TrendingUp className="h-6 w-6 text-green-600 dark:text-green-400" />
+            </div>
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                Average Order Value
+              </p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                ${currentStats.averageOrderValue}
+              </p>
+            </div>
+            <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+              <ShoppingCart className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            </div>
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                Total Customers
+              </p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                {currentStats.customerCount}
+              </p>
+            </div>
+            <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+              <Users className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+            </div>
+          </div>
+        </div>
+      </motion.div>
     </div>
   )
 }
