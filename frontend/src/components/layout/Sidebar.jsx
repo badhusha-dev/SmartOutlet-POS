@@ -11,11 +11,14 @@ import {
   X,
   Settings
 } from 'lucide-react'
-import { useAuth } from '../../contexts/AuthContext'
+import { useAppSelector } from '../../store/hooks'
+import { selectUser } from '../../store/slices/authSlice'
+import { useUserRole } from '../../hooks/useUserRole'
 import clsx from 'clsx'
 
 const Sidebar = ({ isOpen, onClose }) => {
-  const { user, isAdmin } = useAuth()
+  const user = useAppSelector(selectUser)
+  const { isAdmin } = useUserRole()
   const location = useLocation()
 
   const navigation = [
