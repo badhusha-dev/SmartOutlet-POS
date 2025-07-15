@@ -11,7 +11,7 @@ import {
   Globe,
   Navigation
 } from 'lucide-react'
-import outletService from '../../services/outletService'
+import outletService from '../outletService'
 import toast from 'react-hot-toast'
 
 const AddOutletModal = ({ isOpen, onClose, onSuccess, editingOutlet = null }) => {

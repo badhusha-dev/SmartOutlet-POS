@@ -12,7 +12,7 @@ import {
   CheckCircle,
   AlertCircle
 } from 'lucide-react'
-import reportService from '../../services/reportService'
+import reportService from '../reportService'
 import OutletReport from './OutletReport'
 import toast from 'react-hot-toast'
 

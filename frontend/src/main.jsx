@@ -9,6 +9,7 @@ import { PersistGate } from 'redux-persist/integration/react'
 import { store, persistor } from './store'
 import App from './App.jsx'
 import { ReduxProvider } from './components/common/ReduxProvider.jsx'
+import { AuthProvider } from './contexts/AuthContext.jsx'
 import './index.css'
 
 // Create a client
@@ -28,18 +29,20 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <BrowserRouter>
           <QueryClientProvider client={queryClient}>
             <ReduxProvider>
-              <App />
-              <Toaster 
-                position="top-right"
-                toastOptions={{
-                  duration: 4000,
-                  style: {
-                    background: 'var(--toast-bg)',
-                    color: 'var(--toast-color)',
-                  },
-                }}
-              />
-              <ReactQueryDevtools initialIsOpen={false} />
+              <AuthProvider>
+                <App />
+                <Toaster 
+                  position="top-right"
+                  toastOptions={{
+                    duration: 4000,
+                    style: {
+                      background: 'var(--toast-bg)',
+                      color: 'var(--toast-color)',
+                    },
+                  }}
+                />
+                <ReactQueryDevtools initialIsOpen={false} />
+              </AuthProvider>
             </ReduxProvider>
           </QueryClientProvider>
         </BrowserRouter>

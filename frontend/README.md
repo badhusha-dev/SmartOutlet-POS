@@ -302,6 +302,60 @@ npm run build
 npm run preview
 ```
 
+---
+
+## 🛠️ Frontend Management Scripts
+
+For easier development and maintenance, use the provided shell scripts in the `scripts/` directory:
+
+### 1. Comprehensive Script
+- **Path:** `frontend/scripts/frontend.sh`
+- **Usage:**
+  ```bash
+  ./scripts/frontend.sh [command]
+  ```
+- **Available Commands:**
+  - `install`      – Install dependencies
+  - `dev`          – Start development server (`http://localhost:3000`)
+  - `dev:no-auth`  – Start dev server without authentication
+  - `build`        – Build for production
+  - `preview`      – Preview production build (`http://localhost:4173`)
+  - `lint`         – Run ESLint
+  - `lint:fix`     – Fix ESLint issues
+  - `clean`        – Clean build artifacts (`dist/`)
+  - `clean:deps`   – Clean `node_modules`
+  - `clean:all`    – Clean all generated files (`dist/`, `node_modules`, `package-lock.json`)
+  - `check`        – Check for outdated packages
+  - `update`       – Update dependencies
+  - `audit`        – Audit dependencies for security issues
+  - `audit:fix`    – Fix security audit issues
+  - `info`         – Show project information
+  - `env`          – Show environment variables
+  - `help`         – Show help message
+
+**Example:**
+```bash
+./scripts/frontend.sh dev
+```
+
+### 2. Simple Interactive Script
+- **Path:** `frontend/scripts/dev.sh`
+- **Usage:**
+  ```bash
+  ./scripts/dev.sh
+  ```
+  (or pass a command, e.g. `./scripts/dev.sh dev`)
+
+---
+
+### Make Scripts Executable
+If you get a "permission denied" error, run:
+```bash
+chmod +x ./scripts/frontend.sh ./scripts/dev.sh
+```
+
+---
+
 ### Environment Variables
 ```env
 VITE_API_BASE_URL=http://localhost:8080

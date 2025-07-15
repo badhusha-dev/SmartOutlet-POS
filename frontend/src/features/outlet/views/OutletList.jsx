@@ -11,13 +11,13 @@ import {
   setFilters,
   clearFilters,
   updateTaskStatus
-} from '../../outletSlice'
+} from '../outletSlice'
 import { 
   openOutletModal, 
   openConfirmModal,
   setGlobalLoading 
 } from '../../../store/slices/uiSlice'
-import { addNotification } from '../../../store/slices/notificationSlice'
+import { addNotification } from '../../notification/notificationSlice'
 import { 
   Plus, 
   Search, 

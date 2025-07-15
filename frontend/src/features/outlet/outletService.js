@@ -1,5 +1,5 @@
-import apiClient, { API_ENDPOINTS } from '../api/client'
-import { mockOutlets, mockStaff } from '../data/mockData'
+import apiClient, { API_ENDPOINTS } from '../../services/client'
+import { mockOutlets, mockStaff } from '../../utils/mockData'
 
 // Development mode flags
 const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true'
