@@ -210,7 +210,7 @@ const ExpenseTracker = () => {
         <div className="card">
           <div className="flex items-center">
             <div className="p-3 bg-green-100 dark:bg-green-900/20 rounded-lg">
-              <Tag className="h-6 w-6 text-green-600 dark:text-green-400" />
+{/*               <Tag className="h-6 w-6 text-green-600 dark:text-green-400" /> */}
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Categories</p>

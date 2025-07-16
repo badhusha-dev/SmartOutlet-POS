@@ -9,12 +9,12 @@ export function useUserRole() {
   const { user } = useAuth();
 
   const isAdmin = () => {
-    if (isDevMode) return true
+    //if (isDevMode) return true
     return user?.role === USER_ROLES.ADMIN
   }
 
   const isStaff = () => {
-    if (isDevMode) return true
+    //if (isDevMode) return true
     return user?.role === USER_ROLES.STAFF
   }
 
