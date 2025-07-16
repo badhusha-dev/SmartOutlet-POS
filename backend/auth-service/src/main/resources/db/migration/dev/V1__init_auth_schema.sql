@@ -1,18 +1,17 @@
-ALTER DATABASE smartoutlet_auth;
+-- V1__init_auth_schema.sql for PostgreSQL
 
-USE smartoutlet_auth;
-
--- Create users and roles tables for auth-service
+-- Create roles table
 CREATE TABLE IF NOT EXISTS roles (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    id BIGSERIAL PRIMARY KEY,
     name VARCHAR(50) UNIQUE NOT NULL,
     description VARCHAR(200),
     created_at TIMESTAMP,
     updated_at TIMESTAMP
 );
 
+-- Create users table
 CREATE TABLE IF NOT EXISTS users (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    id BIGSERIAL PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
@@ -26,47 +25,49 @@ CREATE TABLE IF NOT EXISTS users (
     last_login TIMESTAMP
 );
 
+-- Create user_roles table
 CREATE TABLE IF NOT EXISTS user_roles (
     user_id BIGINT NOT NULL,
     role_id BIGINT NOT NULL,
     PRIMARY KEY (user_id, role_id),
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (role_id) REFERENCES roles(id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE
 );
 
--- Create error logs table for tracking service issues
+-- Create error_logs table
 CREATE TABLE IF NOT EXISTS error_logs (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    error_message TEXT NOT NULL,
+    id BIGSERIAL PRIMARY KEY,
+    error_message TEXT,
     error_type VARCHAR(100),
-    action_performed VARCHAR(200),
+    stack_trace TEXT,
+    file_name VARCHAR(255),
+    line_number INTEGER,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
     user_id BIGINT,
     username VARCHAR(50),
-    ip_address VARCHAR(45),
-    user_agent TEXT,
-    stack_trace TEXT,
-    request_url VARCHAR(500),
+    request_url VARCHAR(255),
     request_method VARCHAR(10),
     request_body TEXT,
     response_status INTEGER,
-    occurrence_count INTEGER DEFAULT 1,
-    first_occurrence TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_occurrence TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_resolved BOOLEAN DEFAULT FALSE,
-    file_name VARCHAR(500),
-    line_number INTEGER,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    resolution_notes TEXT
+    action_performed VARCHAR(255),
+    occurrence_count INTEGER,
+    first_occurrence TIMESTAMP,
+    last_occurrence TIMESTAMP,
+    is_resolved BOOLEAN,
+    resolution_notes TEXT,
+    ip_address VARCHAR(50),
+    user_agent VARCHAR(255),
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 -- Create indexes for better performance
-CREATE INDEX IF NOT EXISTS idx_error_type ON error_logs (error_type);
-CREATE INDEX IF NOT EXISTS idx_action_performed ON error_logs (action_performed);
-CREATE INDEX IF NOT EXISTS idx_user_id ON error_logs (user_id);
-CREATE INDEX IF NOT EXISTS idx_occurrence_count ON error_logs (occurrence_count);
-CREATE INDEX IF NOT EXISTS idx_is_resolved ON error_logs (is_resolved);
-CREATE INDEX IF NOT EXISTS idx_created_at ON error_logs (created_at);
-CREATE INDEX IF NOT EXISTS idx_last_occurrence ON error_logs (last_occurrence);
-CREATE INDEX IF NOT EXISTS idx_file_name ON error_logs (file_name);
-CREATE INDEX IF NOT EXISTS idx_line_number ON error_logs (line_number); 
+CREATE INDEX idx_error_type ON error_logs (error_type);
+CREATE INDEX idx_action_performed ON error_logs (action_performed);
+CREATE INDEX idx_user_id ON error_logs (user_id);
+CREATE INDEX idx_occurrence_count ON error_logs (occurrence_count);
+CREATE INDEX idx_is_resolved ON error_logs (is_resolved);
+CREATE INDEX idx_created_at ON error_logs (created_at);
+CREATE INDEX idx_last_occurrence ON error_logs (last_occurrence);
+CREATE INDEX idx_file_name ON error_logs (file_name);
+CREATE INDEX idx_line_number ON error_logs (line_number); 

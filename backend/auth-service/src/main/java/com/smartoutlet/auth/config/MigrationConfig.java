@@ -25,7 +25,10 @@ public class MigrationConfig {
     @Bean
     @Profile("dev")
     public FlywayMigrationStrategy cleanMigrationStrategy() {
-        return new DataCleanMigration();
+        return flyway -> {
+            flyway.clean();
+            flyway.migrate();
+        };
     }
 
     @Bean

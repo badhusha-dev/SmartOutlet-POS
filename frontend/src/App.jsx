@@ -1,8 +1,7 @@
 import React from 'react'
-import { useAppSelector } from './store/hooks'
-import { selectIsDevMode } from './store/slices/authSlice'
+// import { useAppSelector } from './store/hooks'
+// import { selectIsDevMode } from './store/slices/authSlice'
 
-// Development mode flags
 const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true'
 const DISABLE_AUTH = import.meta.env.VITE_DISABLE_AUTH === 'true'
 
@@ -10,13 +9,9 @@ const DISABLE_AUTH = import.meta.env.VITE_DISABLE_AUTH === 'true'
 import AppRoutes from './routes/AppRoutes'
 
 function App() {
-  const isDevMode = useAppSelector(selectIsDevMode)
-
-  // Development mode: Show dev mode indicator
   React.useEffect(() => {
     if (DEV_MODE && DISABLE_AUTH) {
       console.log('🔓 Development mode: Security disabled')
-      // Add visual indicator
       const indicator = document.createElement('div')
       indicator.style.cssText = `
         position: fixed;
@@ -33,7 +28,6 @@ function App() {
       `
       indicator.textContent = '🔓 DEV MODE'
       document.body.appendChild(indicator)
-      
       return () => {
         if (document.body.contains(indicator)) {
           document.body.removeChild(indicator)

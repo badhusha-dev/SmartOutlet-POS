@@ -1,14 +1,12 @@
-import { useAppSelector } from '../store/hooks'
-import { selectUser, selectIsDevMode } from '../store/slices/authSlice'
 import { USER_ROLES } from '../utils/constants'
+import { useAuth } from '../contexts/AuthContext';
 
 /**
  * Custom hook for user role management and permissions
  * @returns {object} User role utilities
  */
-export const useUserRole = () => {
-  const user = useAppSelector(selectUser)
-  const isDevMode = useAppSelector(selectIsDevMode)
+export function useUserRole() {
+  const { user } = useAuth();
 
   const isAdmin = () => {
     if (isDevMode) return true

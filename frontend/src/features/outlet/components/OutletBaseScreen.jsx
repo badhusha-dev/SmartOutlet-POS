@@ -24,8 +24,7 @@ import {
   LogOut
 } from 'lucide-react'
 import { useUserRole } from '../../../hooks/useUserRole'
-import { useAppSelector, useAppDispatch } from '../../../store/hooks'
-import { selectUser } from '../../../store/slices/authSlice'
+import { useAuth } from '../../../contexts/AuthContext'
 import OutletManagerView from './OutletManagerView'
 import OutletStaffView from './OutletStaffView'
 import OutletViewerView from './OutletViewerView'
@@ -33,7 +32,7 @@ import OutletList from '../views/OutletList'
 import AddOutletModal from './AddOutletModal'
 
 const OutletBaseScreen = () => {
-  const { user, isDevMode, logout } = useAppSelector(selectUser)
+  const { user, isDevMode, logout } = useAuth()
   const {
     userRole,
     assignedOutlet,

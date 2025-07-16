@@ -37,6 +37,7 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("User not found with username or email: " + loginRequest.getUsernameOrEmail()));
         
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+            log.warn("Password mismatch for user: {} (input: '{}', db hash: '{}')", loginRequest.getUsernameOrEmail(), loginRequest.getPassword(), user.getPassword());
             throw new RuntimeException("Invalid password");
         }
         

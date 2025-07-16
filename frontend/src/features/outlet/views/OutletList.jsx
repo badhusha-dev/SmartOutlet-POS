@@ -1,23 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { AgGridReact } from 'ag-grid-react'
-import { useAppSelector, useAppDispatch } from '../../../store/hooks'
-import { 
-  fetchOutlets, 
-  selectOutlets, 
-  selectOutletsLoading, 
-  selectOutletsError,
-  selectFilteredOutlets,
-  setSelectedOutlet,
-  setFilters,
-  clearFilters,
-  updateTaskStatus
-} from '../outletSlice'
-import { 
-  openOutletModal, 
-  openConfirmModal,
-  setGlobalLoading 
-} from '../../../store/slices/uiSlice'
-import { addNotification } from '../../notification/notificationSlice'
 import { 
   Plus, 
   Search, 
@@ -39,12 +21,15 @@ import toast from 'react-hot-toast'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-alpine.css'
 
+const isDev = import.meta.env.MODE === 'development';
+
+// In dev, provide fallback values
+const loading = isDev ? false : undefined;
+const error = isDev ? null : undefined;
+
 const OutletList = () => {
-  const dispatch = useAppDispatch()
-  const outlets = useAppSelector(selectOutlets)
-  const loading = useAppSelector(selectOutletsLoading)
-  const error = useAppSelector(selectOutletsError)
-  const filteredOutlets = useAppSelector(selectFilteredOutlets)
+  const [outlets, setOutlets] = useState([])
+  const [filteredOutlets, setFilteredOutlets] = useState([])
   
   const [gridApi, setGridApi] = useState(null)
   const [columnApi, setColumnApi] = useState(null)
@@ -53,16 +38,57 @@ const OutletList = () => {
 
   // Fetch outlets on component mount
   useEffect(() => {
-    dispatch(fetchOutlets())
-  }, [dispatch])
+    // Mock data for development
+    const mockOutlets = [
+      {
+        id: 1,
+        name: 'Main Outlet',
+        manager: 'John Doe',
+        status: 'ACTIVE',
+        staff: ['Alice', 'Bob', 'Charlie'],
+        notices: ['Notice 1', 'Notice 2'],
+        tasks: [{ id: 1, name: 'Task A', status: 'PENDING' }, { id: 2, name: 'Task B', status: 'COMPLETED' }],
+        createdAt: '2023-01-01T10:00:00Z',
+        address: '123 Main St, City A'
+      },
+      {
+        id: 2,
+        name: 'Branch Outlet',
+        manager: 'Jane Smith',
+        status: 'INACTIVE',
+        staff: ['David', 'Eve'],
+        notices: [],
+        tasks: [{ id: 3, name: 'Task C', status: 'PENDING' }],
+        createdAt: '2023-02-15T14:30:00Z',
+        address: '456 Oak Ave, City B'
+      },
+      {
+        id: 3,
+        name: 'New Outlet',
+        manager: 'Peter Jones',
+        status: 'ACTIVE',
+        staff: ['Frank', 'Grace'],
+        notices: ['Notice 3'],
+        tasks: [],
+        createdAt: '2023-03-20T09:15:00Z',
+        address: '789 Pine Ln, City A'
+      }
+    ];
+    setOutlets(mockOutlets);
+    setFilteredOutlets(mockOutlets);
+  }, []);
 
   // Update filters when search or status changes
   useEffect(() => {
-    dispatch(setFilters({ 
-      search: searchTerm, 
-      status: statusFilter 
-    }))
-  }, [dispatch, searchTerm, statusFilter])
+    const filtered = outlets.filter(outlet => {
+      const matchesSearch = outlet.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            outlet.manager.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            outlet.address.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = statusFilter === 'ALL' || outlet.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+    setFilteredOutlets(filtered);
+  }, [outlets, searchTerm, statusFilter]);
 
   // Column definitions
   const columnDefs = useMemo(() => [
@@ -211,40 +237,20 @@ const OutletList = () => {
   }, [])
 
   const handleViewOutlet = useCallback((outlet) => {
-    dispatch(setSelectedOutlet(outlet))
-    dispatch(addNotification({
-      type: 'info',
-      title: 'Outlet Selected',
-      message: `Viewing details for ${outlet.name}`,
-    }))
-  }, [dispatch])
+    toast.info(`Viewing details for ${outlet.name}`)
+  }, [])
 
   const handleEditOutlet = useCallback((outlet) => {
-    dispatch(openOutletModal({ mode: 'edit', data: outlet }))
-  }, [dispatch])
+    toast.info(`Editing outlet: ${outlet.name}`)
+  }, [])
 
   const handleDeleteOutlet = useCallback((outlet) => {
-    dispatch(openConfirmModal({
-      title: 'Delete Outlet',
-      message: `Are you sure you want to delete "${outlet.name}"? This action cannot be undone.`,
-      onConfirm: () => {
-        // Handle delete logic here
-        toast.success(`Outlet "${outlet.name}" deleted successfully`)
-        dispatch(addNotification({
-          type: 'success',
-          title: 'Outlet Deleted',
-          message: `Successfully deleted ${outlet.name}`,
-        }))
-      },
-      onCancel: () => {
-        toast.error('Delete cancelled')
-      }
-    }))
-  }, [dispatch])
+    toast.info(`Deleting outlet: ${outlet.name}`)
+  }, [])
 
   const handleAddOutlet = useCallback(() => {
-    dispatch(openOutletModal({ mode: 'create' }))
-  }, [dispatch])
+    toast.info('Adding new outlet...')
+  }, [])
 
   const handleExport = useCallback((format) => {
     if (gridApi) {
@@ -273,18 +279,16 @@ const OutletList = () => {
   }, [gridApi])
 
   const handleRefresh = useCallback(() => {
-    dispatch(fetchOutlets())
     toast.success('Data refreshed successfully')
-  }, [dispatch])
+  }, [])
 
   const handleClearFilters = useCallback(() => {
     setSearchTerm('')
     setStatusFilter('ALL')
-    dispatch(clearFilters())
     if (gridApi) {
       gridApi.setFilterModel(null)
     }
-  }, [dispatch, gridApi])
+  }, [])
 
   if (loading) {
     return (

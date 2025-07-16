@@ -19,8 +19,8 @@ import {
   Filter
 } from 'lucide-react'
 import outletService from '../outletService'
-import { useAppSelector } from '../../../store/hooks'
-import { selectUser, selectIsDevMode } from '../../../store/slices/authSlice'
+// Remove: import { useAppSelector } from '../../../store/hooks'
+// Replace all usages of selectUser and selectIsDevMode with mock values or context
 
 // Custom cell renderers for AG Grid
 const TaskStatusRenderer = ({ value }) => {
@@ -92,8 +92,13 @@ const OutletStaffView = ({ assignedOutlet }) => {
   const [outlet, setOutlet] = useState(null)
   const [performance, setPerformance] = useState(null)
   const [loading, setLoading] = useState(true)
-  const user = useAppSelector(selectUser)
-  const isDevMode = useAppSelector(selectIsDevMode)
+  // Mock user data
+  const user = {
+    firstName: 'John',
+    username: 'jsmith'
+  }
+  // Mock dev mode flag
+  const isDevMode = false
 
   // AG Grid ref
   const tasksGridRef = useRef()

@@ -38,7 +38,8 @@ import {
   mockDashboardStats, 
   mockSalesData, 
   mockCategoryData, 
-  mockTopProducts
+  mockTopProducts,
+  mockActivityLog
 } from '../../../utils/mockData'
 
 const Dashboard = () => {

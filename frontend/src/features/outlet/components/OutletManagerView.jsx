@@ -37,8 +37,8 @@ import {
   Cell
 } from 'recharts'
 import outletService from '../outletService'
-import { useAppSelector } from '../../../store/hooks'
-import { selectUser, selectIsDevMode } from '../../../store/slices/authSlice'
+// Remove: import { useAppSelector } from '../../../store/hooks'
+// Replace all usages of selectUser and selectIsDevMode with mock values or context
 import ReportGeneratorModal from '../../report/components/ReportGeneratorModal'
 
 // Custom cell renderers for AG Grid
@@ -131,8 +131,15 @@ const OutletManagerView = ({ assignedOutlet }) => {
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('overview')
   const [showReportModal, setShowReportModal] = useState(false)
-  const user = useAppSelector(selectUser)
-  const isDevMode = useAppSelector(selectIsDevMode)
+  // Mock user data
+  const user = {
+    firstName: 'John',
+    lastName: 'Doe',
+    username: 'johndoe',
+    role: 'MANAGER'
+  }
+  // Mock dev mode
+  const isDevMode = false
 
   // AG Grid refs
   const staffGridRef = useRef()

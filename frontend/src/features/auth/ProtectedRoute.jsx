@@ -1,12 +1,5 @@
 import React from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
-import { useAppSelector } from '../../store/hooks'
-import { 
-  selectUser, 
-  selectAuthLoading, 
-  selectIsDevMode,
-  selectHasPermission 
-} from '../../store/slices/authSlice'
 import LoadingSpinner from '../../components/common/LoadingSpinner'
 
 // Development mode flags
@@ -14,12 +7,10 @@ const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true'
 const DISABLE_PROTECTED_ROUTES = import.meta.env.VITE_DISABLE_PROTECTED_ROUTES === 'true'
 
 const ProtectedRoute = ({ children, requiredRole = null }) => {
-  const user = useAppSelector(selectUser)
-  const loading = useAppSelector(selectAuthLoading)
-  const isDevMode = useAppSelector(selectIsDevMode)
-  const hasPermission = useAppSelector(state => 
-    requiredRole ? selectHasPermission(state, requiredRole) : true
-  )
+  const user = null // Placeholder for user state
+  const loading = false // Placeholder for loading state
+  const isDevMode = DEV_MODE
+  const hasPermission = true // Placeholder for permission state
   const location = useLocation()
 
   // Development mode: Bypass all protection

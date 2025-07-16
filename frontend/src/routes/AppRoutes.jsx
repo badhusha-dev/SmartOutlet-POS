@@ -1,7 +1,6 @@
 import React from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { useAppSelector } from '../store/hooks'
-import { selectUser, selectIsAuthenticated, selectAuthLoading, selectIsDevMode } from '../store/slices/authSlice'
+import { useAuth } from '../contexts/AuthContext'
 
 // Development mode flags
 const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true'
@@ -28,10 +27,7 @@ import ExpenseTracker from '../features/expense/views/ExpenseTracker'
 import LoadingSpinner from '../components/common/LoadingSpinner'
 
 const AppRoutes = () => {
-  const user = useAppSelector(selectUser)
-  const loading = useAppSelector(selectAuthLoading)
-  const isAuthenticated = useAppSelector(selectIsAuthenticated)
-  const isDevMode = useAppSelector(selectIsDevMode)
+  const { user, loading, isAuthenticated } = useAuth();
 
   if (loading) {
     return <LoadingSpinner />

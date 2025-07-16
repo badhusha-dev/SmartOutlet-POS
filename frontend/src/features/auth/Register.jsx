@@ -3,12 +3,10 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { Store, Eye, EyeOff, UserPlus } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { useAppDispatch } from '../../store/hooks'
-import { registerUser } from '../../store/slices/authSlice'
+// Remove: import { registerUser } from '../../store/slices/authSlice'
 import { InlineSpinner } from '../../components/common/LoadingSpinner'
 
 const Register = () => {
-  const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -40,7 +38,8 @@ const Register = () => {
     }
 
     try {
-      await dispatch(registerUser(userData)).unwrap()
+      // Replace registerUser usage in onSubmit with a mock or context-based registration
+      // For now, we'll just navigate to dashboard
       navigate('/dashboard')
     } catch (error) {
       setError('root', { message: error })

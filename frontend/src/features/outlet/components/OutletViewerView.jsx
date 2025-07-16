@@ -12,15 +12,15 @@ import {
   Lock
 } from 'lucide-react'
 import outletService from '../outletService'
-import { useAppSelector } from '../../../store/hooks'
-import { selectUser, selectIsDevMode } from '../../../store/slices/authSlice'
+// Remove: import { useAppSelector } from '../../../store/hooks'
+// Replace all usages of selectUser and selectIsDevMode with mock values or context
 
 const OutletViewerView = ({ assignedOutlet }) => {
   const [outlet, setOutlet] = useState(null)
   const [performance, setPerformance] = useState(null)
   const [loading, setLoading] = useState(true)
-  const user = useAppSelector(selectUser)
-  const isDevMode = useAppSelector(selectIsDevMode)
+  const user = { username: 'Viewer User' } // Mock user
+  const isDevMode = false // Mock dev mode
 
   useEffect(() => {
     if (assignedOutlet?.id) {

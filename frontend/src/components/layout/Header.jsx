@@ -1,25 +1,22 @@
 import React, { useState } from 'react'
 import { Menu, Sun, Moon, LogOut, User, Settings } from 'lucide-react'
-import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import { selectUser, logout } from '../../store/slices/authSlice'
-import { selectIsDarkMode, toggleTheme } from '../../store/slices/themeSlice'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../contexts/AuthContext';
 
 const Header = ({ onMenuClick }) => {
-  const dispatch = useAppDispatch()
-  const user = useAppSelector(selectUser)
-  const isDarkMode = useAppSelector(selectIsDarkMode)
-  const navigate = useNavigate()
-  const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const { user, logout } = useAuth();
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const navigate = useNavigate();
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const handleLogout = () => {
-    dispatch(logout())
-    navigate('/login')
-  }
+    logout();
+    navigate('/login');
+  };
 
   const handleToggleTheme = () => {
-    dispatch(toggleTheme())
-  }
+    setIsDarkMode((prev) => !prev);
+  };
 
   return (
     <header className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700">

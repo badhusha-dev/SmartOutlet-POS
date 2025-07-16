@@ -3,12 +3,9 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { Store, Eye, EyeOff, ArrowRight } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { useAppDispatch } from '../../store/hooks'
-import { loginUser } from '../../store/slices/authSlice'
 import { InlineSpinner } from '../../components/common/LoadingSpinner'
 
 const Login = () => {
-  const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const location = useLocation()
   const [showPassword, setShowPassword] = useState(false)
@@ -23,17 +20,7 @@ const Login = () => {
     setError
   } = useForm()
 
-  const onSubmit = async (data) => {
-    setIsLoading(true)
-    try {
-      const result = await dispatch(loginUser(data)).unwrap()
-      navigate(from, { replace: true })
-    } catch (error) {
-      setError('root', { message: error })
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-purple-50 dark:from-gray-900 dark:to-gray-950 py-12 px-4 sm:px-6 lg:px-8">

@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
           role: 'ADMIN',
           permissions: ['read', 'write', 'delete']
         })
-        return { success: true }
+      return { success: true }
       }
       // TODO: Implement real authentication
       return { success: false, error: 'Authentication not implemented' }
