@@ -1,8 +1,7 @@
 package com.smartoutlet.product.repository;
 
+import com.smartoutlet.product.entity.MovementType;
 import com.smartoutlet.product.entity.StockMovement;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,32 +13,27 @@ import java.util.List;
 @Repository
 public interface StockMovementRepository extends JpaRepository<StockMovement, Long> {
     
-    List<StockMovement> findByProductIdOrderByCreatedAtDesc(Long productId);
+    List<StockMovement> findByProductId(Long productId);
     
-    Page<StockMovement> findByProductIdOrderByCreatedAtDesc(Long productId, Pageable pageable);
+    List<StockMovement> findByMovementType(MovementType movementType);
     
-    List<StockMovement> findByOutletIdOrderByCreatedAtDesc(Long outletId);
+    List<StockMovement> findByProductIdAndMovementType(Long productId, MovementType movementType);
     
-    Page<StockMovement> findByOutletIdOrderByCreatedAtDesc(Long outletId, Pageable pageable);
+    List<StockMovement> findByReferenceIdAndReferenceType(String referenceId, String referenceType);
     
-    @Query("SELECT sm FROM StockMovement sm WHERE sm.createdAt BETWEEN :startDate AND :endDate ORDER BY sm.createdAt DESC")
-    Page<StockMovement> findByDateRange(@Param("startDate") LocalDateTime startDate, 
-                                       @Param("endDate") LocalDateTime endDate, 
-                                       Pageable pageable);
+    List<StockMovement> findByOutletId(Long outletId);
     
-    @Query("SELECT sm FROM StockMovement sm WHERE sm.movementType = :movementType ORDER BY sm.createdAt DESC")
-    Page<StockMovement> findByMovementType(@Param("movementType") StockMovement.MovementType movementType, 
-                                          Pageable pageable);
+    List<StockMovement> findByUserId(Long userId);
     
-    @Query("SELECT sm FROM StockMovement sm WHERE sm.referenceType = :referenceType ORDER BY sm.createdAt DESC")
-    List<StockMovement> findByReferenceType(@Param("referenceType") String referenceType);
+    @Query("SELECT sm FROM StockMovement sm WHERE sm.product.id = :productId ORDER BY sm.createdAt DESC")
+    List<StockMovement> findRecentMovementsByProduct(@Param("productId") Long productId);
     
-    @Query("SELECT sm FROM StockMovement sm WHERE sm.referenceId = :referenceId ORDER BY sm.createdAt DESC")
-    List<StockMovement> findByReferenceId(@Param("referenceId") String referenceId);
+    @Query("SELECT sm FROM StockMovement sm WHERE sm.createdAt BETWEEN :startDate AND :endDate")
+    List<StockMovement> findByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
     
-    @Query("SELECT SUM(sm.quantity) FROM StockMovement sm WHERE sm.product.id = :productId AND sm.movementType = 'IN'")
-    Long getTotalStockIn(@Param("productId") Long productId);
+    @Query("SELECT sm FROM StockMovement sm WHERE sm.product.id = :productId AND sm.createdAt BETWEEN :startDate AND :endDate")
+    List<StockMovement> findByProductAndDateRange(@Param("productId") Long productId, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
     
-    @Query("SELECT SUM(sm.quantity) FROM StockMovement sm WHERE sm.product.id = :productId AND sm.movementType = 'OUT'")
-    Long getTotalStockOut(@Param("productId") Long productId);
-}
+    @Query("SELECT sm FROM StockMovement sm WHERE sm.outletId = :outletId AND sm.createdAt BETWEEN :startDate AND :endDate")
+    List<StockMovement> findByOutletAndDateRange(@Param("outletId") Long outletId, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+} 
