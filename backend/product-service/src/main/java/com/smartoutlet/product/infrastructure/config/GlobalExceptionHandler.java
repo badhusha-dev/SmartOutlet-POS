@@ -1,6 +1,5 @@
 package com.smartoutlet.product.infrastructure.config;
 
-import com.smartoutlet.product.entity.ErrorLog;
 import com.smartoutlet.product.application.service.ErrorLogService;
 import com.smartoutlet.product.exception.*;
 import lombok.RequiredArgsConstructor;

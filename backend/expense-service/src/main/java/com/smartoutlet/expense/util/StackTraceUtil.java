@@ -8,29 +8,26 @@ import java.util.regex.Pattern;
 @Slf4j
 public class StackTraceUtil {
     
-    private static final Pattern STACK_TRACE_PATTERN = Pattern.compile(
-        "at\\s+([\\w.$]+)\\.([\\w$<>]+)\\(([^:]+):(\\d+)\\)"
-    );
+    private static final Pattern FILE_NAME_PATTERN = Pattern.compile("at\\s+[^(]+\\s*\\(([^:]+):(\\d+)\\)");
+    private static final Pattern LINE_NUMBER_PATTERN = Pattern.compile("at\\s+[^(]+\\s*\\([^:]+:(\\d+)\\)");
     
     /**
      * Extract file name from stack trace
-     * @param stackTrace The full stack trace string
-     * @return The file name where the error occurred, or null if not found
      */
     public static String extractFileName(String stackTrace) {
-        if (stackTrace == null || stackTrace.isEmpty()) {
+        if (stackTrace == null || stackTrace.trim().isEmpty()) {
             return null;
         }
         
         try {
-            Matcher matcher = STACK_TRACE_PATTERN.matcher(stackTrace);
+            Matcher matcher = FILE_NAME_PATTERN.matcher(stackTrace);
             if (matcher.find()) {
-                String fullClassName = matcher.group(1);
-                String fileName = fullClassName.substring(fullClassName.lastIndexOf('.') + 1) + ".java";
-                return fileName;
+                String fileName = matcher.group(1);
+                // Extract just the file name without the full path
+                return fileName.substring(fileName.lastIndexOf('/') + 1);
             }
         } catch (Exception e) {
-            log.warn("Failed to extract file name from stack trace: {}", e.getMessage());
+            log.warn("Error extracting file name from stack trace: {}", e.getMessage());
         }
         
         return null;
@@ -38,50 +35,48 @@ public class StackTraceUtil {
     
     /**
      * Extract line number from stack trace
-     * @param stackTrace The full stack trace string
-     * @return The line number where the error occurred, or null if not found
      */
     public static Integer extractLineNumber(String stackTrace) {
-        if (stackTrace == null || stackTrace.isEmpty()) {
+        if (stackTrace == null || stackTrace.trim().isEmpty()) {
             return null;
         }
         
         try {
-            Matcher matcher = STACK_TRACE_PATTERN.matcher(stackTrace);
+            Matcher matcher = LINE_NUMBER_PATTERN.matcher(stackTrace);
             if (matcher.find()) {
-                String lineNumberStr = matcher.group(4);
-                return Integer.parseInt(lineNumberStr);
+                return Integer.parseInt(matcher.group(1));
             }
         } catch (Exception e) {
-            log.warn("Failed to extract line number from stack trace: {}", e.getMessage());
+            log.warn("Error extracting line number from stack trace: {}", e.getMessage());
         }
         
         return null;
     }
     
     /**
-     * Extract both file name and line number from stack trace
-     * @param stackTrace The full stack trace string
-     * @return Array containing [fileName, lineNumber] or [null, null] if not found
+     * Get a simplified stack trace for logging
      */
-    public static Object[] extractFileAndLine(String stackTrace) {
-        if (stackTrace == null || stackTrace.isEmpty()) {
-            return new Object[]{null, null};
+    public static String getSimplifiedStackTrace(String stackTrace) {
+        if (stackTrace == null || stackTrace.trim().isEmpty()) {
+            return null;
         }
         
         try {
-            Matcher matcher = STACK_TRACE_PATTERN.matcher(stackTrace);
-            if (matcher.find()) {
-                String fullClassName = matcher.group(1);
-                String fileName = fullClassName.substring(fullClassName.lastIndexOf('.') + 1) + ".java";
-                String lineNumberStr = matcher.group(4);
-                Integer lineNumber = Integer.parseInt(lineNumberStr);
-                return new Object[]{fileName, lineNumber};
+            String[] lines = stackTrace.split("\n");
+            StringBuilder simplified = new StringBuilder();
+            
+            // Take first 5 lines of stack trace
+            int maxLines = Math.min(lines.length, 5);
+            for (int i = 0; i < maxLines; i++) {
+                if (lines[i].trim().startsWith("at ")) {
+                    simplified.append(lines[i].trim()).append("\n");
+                }
             }
+            
+            return simplified.toString().trim();
         } catch (Exception e) {
-            log.warn("Failed to extract file and line from stack trace: {}", e.getMessage());
+            log.warn("Error simplifying stack trace: {}", e.getMessage());
+            return stackTrace;
         }
-        
-        return new Object[]{null, null};
     }
 } 

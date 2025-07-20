@@ -3,8 +3,6 @@ package com.smartoutlet.product.application.service;
 import com.smartoutlet.product.api.dto.ProductRequest;
 import com.smartoutlet.product.api.dto.ProductResponse;
 import com.smartoutlet.product.api.dto.StockUpdateRequest;
-import com.smartoutlet.product.domain.model.Product;
-
 import java.util.List;
 
 public interface ProductApplicationService {

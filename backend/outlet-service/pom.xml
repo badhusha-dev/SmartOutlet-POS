@@ -52,6 +52,12 @@
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
+        
+        <!-- Redis -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
 
         <!-- Lombok -->
         <dependency>
@@ -82,11 +88,17 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
         </dependency>
-        <!-- Common Module -->
+        <!-- Common Module - Commented out as it may not exist yet -->
+        <!--
         <dependency>
             <groupId>com.smartoutlet</groupId>
             <artifactId>common-module</artifactId>
             <version>1.0.0</version>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
         </dependency>
     </dependencies>
 
