@@ -4,9 +4,8 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { ReactQueryDevtools } from 'react-query/devtools'
 import { BrowserRouter } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
-import App from './App.jsx'
 import { AuthProvider } from './contexts/AuthContext.jsx'
-import { ThemeProvider } from './contexts/ThemeContext.jsx'
+import App from './App.jsx'
 import './index.css'
 
 // Create a client
@@ -23,7 +22,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
           <AuthProvider>
             <App />
             <Toaster 
@@ -38,7 +36,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             />
             <ReactQueryDevtools initialIsOpen={false} />
           </AuthProvider>
-        </ThemeProvider>
       </QueryClientProvider>
     </BrowserRouter>
   </React.StrictMode>,

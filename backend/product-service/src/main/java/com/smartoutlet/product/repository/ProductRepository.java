@@ -17,52 +17,40 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     
     Optional<Product> findBySku(String sku);
     
+    boolean existsBySku(String sku);
+    
     Optional<Product> findByBarcode(String barcode);
     
-    List<Product> findByIsActiveTrueOrderByName();
+    boolean existsByBarcode(String barcode);
+    
+    List<Product> findByCategoryId(Long categoryId);
+    
+    Page<Product> findByCategoryId(Long categoryId, Pageable pageable);
     
     List<Product> findByCategoryIdAndIsActiveTrue(Long categoryId);
     
-    @Query("SELECT p FROM Product p WHERE p.stockQuantity <= p.minStockLevel AND p.isActive = true")
-    List<Product> findLowStockProducts();
+    List<Product> findByIsActiveTrue();
     
-    @Query("SELECT p FROM Product p WHERE p.stockQuantity <= 0 AND p.isActive = true")
-    List<Product> findOutOfStockProducts();
+    List<Product> findByIsActiveTrueOrderByName();
     
-    @Query("SELECT p FROM Product p WHERE p.name LIKE %:keyword% OR p.description LIKE %:keyword% OR p.sku LIKE %:keyword% OR p.brand LIKE %:keyword%")
+    List<Product> findByStockQuantityLessThan(Integer minStock);
+    
+    @Query("SELECT p FROM Product p WHERE p.name LIKE %:searchTerm% OR p.description LIKE %:searchTerm%")
+    List<Product> searchByNameOrDescription(@Param("searchTerm") String searchTerm);
+    
+    @Query("SELECT p FROM Product p WHERE p.name LIKE %:keyword% OR p.description LIKE %:keyword%")
     Page<Product> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
     
-    @Query("SELECT p FROM Product p WHERE p.category.id = :categoryId")
-    Page<Product> findByCategoryId(@Param("categoryId") Long categoryId, Pageable pageable);
+    @Query("SELECT p FROM Product p WHERE p.price BETWEEN :minPrice AND :maxPrice")
+    List<Product> findByPriceRange(@Param("minPrice") BigDecimal minPrice, @Param("maxPrice") BigDecimal maxPrice);
     
-    @Query("SELECT p FROM Product p WHERE p.price BETWEEN :minPrice AND :maxPrice AND p.isActive = true")
-    Page<Product> findByPriceRange(@Param("minPrice") BigDecimal minPrice, @Param("maxPrice") BigDecimal maxPrice, Pageable pageable);
+    @Query("SELECT p FROM Product p WHERE p.stockQuantity <= :threshold")
+    List<Product> findLowStockProducts(@Param("threshold") Integer threshold);
     
-    @Query("SELECT p FROM Product p WHERE p.brand = :brand AND p.isActive = true")
-    Page<Product> findByBrand(@Param("brand") String brand, Pageable pageable);
+    @Query("SELECT p FROM Product p WHERE p.stockQuantity = 0")
+    List<Product> findOutOfStockProducts();
     
-    @Query("SELECT p FROM Product p WHERE p.isActive = :isActive")
-    Page<Product> findByIsActive(@Param("isActive") Boolean isActive, Pageable pageable);
+    Page<Product> findByIsActiveTrue(Pageable pageable);
     
-    @Query("SELECT DISTINCT p.brand FROM Product p WHERE p.brand IS NOT NULL AND p.isActive = true ORDER BY p.brand")
-    List<String> findAllBrands();
-    
-    @Query("SELECT COUNT(p) FROM Product p WHERE p.isActive = true")
-    Long countActiveProducts();
-    
-    @Query("SELECT COUNT(p) FROM Product p WHERE p.stockQuantity <= p.minStockLevel AND p.isActive = true")
-    Long countLowStockProducts();
-    
-    @Query("SELECT COUNT(p) FROM Product p WHERE p.stockQuantity <= 0 AND p.isActive = true")
-    Long countOutOfStockProducts();
-    
-    @Query("SELECT SUM(p.stockQuantity * p.price) FROM Product p WHERE p.isActive = true")
-    BigDecimal calculateTotalInventoryValue();
-    
-    Boolean existsBySku(String sku);
-    
-    Boolean existsByBarcode(String barcode);
-    
-    @Query("SELECT p FROM Product p LEFT JOIN FETCH p.stockMovements WHERE p.id = :id")
-    Optional<Product> findByIdWithStockMovements(@Param("id") Long id);
-}
+    Page<Product> findByCategoryIdAndIsActiveTrue(Long categoryId, Pageable pageable);
+} 

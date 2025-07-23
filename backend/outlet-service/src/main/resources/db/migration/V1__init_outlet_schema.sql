@@ -1,7 +1,8 @@
--- V1__init_outlet_schema.sql
--- Example: create outlets and staff_assignments tables for outlet-service
+-- V1__init_outlet_schema.sql for PostgreSQL
+-- Create outlets and staff_assignments tables for outlet-service
+
 CREATE TABLE IF NOT EXISTS outlets (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    id BIGSERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description VARCHAR(500),
     address VARCHAR(255),
@@ -14,20 +15,27 @@ CREATE TABLE IF NOT EXISTS outlets (
     state VARCHAR(50),
     country VARCHAR(50),
     opening_hours VARCHAR(255),
-    is_active BOOLEAN,
-    created_at TIMESTAMP,
-    updated_at TIMESTAMP
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS staff_assignments (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    id BIGSERIAL PRIMARY KEY,
     outlet_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
-    role VARCHAR(50),
     username VARCHAR(50),
     user_email VARCHAR(100),
     user_full_name VARCHAR(100),
-    is_active BOOLEAN,
-    assigned_at TIMESTAMP,
-    FOREIGN KEY (outlet_id) REFERENCES outlets(id)
-); 
+    role VARCHAR(50),
+    assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_active BOOLEAN DEFAULT true,
+    FOREIGN KEY (outlet_id) REFERENCES outlets(id) ON DELETE CASCADE
+);
+
+-- Create indexes for better performance
+CREATE INDEX idx_outlets_name ON outlets(name);
+CREATE INDEX idx_outlets_city ON outlets(city);
+CREATE INDEX idx_outlets_is_active ON outlets(is_active);
+CREATE INDEX idx_staff_assignments_outlet_id ON staff_assignments(outlet_id);
+CREATE INDEX idx_staff_assignments_user_id ON staff_assignments(user_id); 

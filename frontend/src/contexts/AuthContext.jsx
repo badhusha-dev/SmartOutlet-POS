@@ -1,8 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
-import apiClient, { API_ENDPOINTS } from '../api/client'
-import toast from 'react-hot-toast'
 
-const AuthContext = createContext({})
+const AuthContext = createContext()
 
 export const useAuth = () => {
   const context = useContext(AuthContext)
@@ -15,128 +13,53 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [isDevMode] = useState(import.meta.env.VITE_DEV_MODE === 'true')
 
-  // Check for existing token on app load
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    const userData = localStorage.getItem('user')
-    
-    if (token && userData) {
-      try {
-        const parsedUser = JSON.parse(userData)
-        setUser(parsedUser)
-      } catch (error) {
-        console.error('Error parsing user data:', error)
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
-      }
+    // Check if we're in dev mode and should use mock user
+    if (isDevMode && import.meta.env.VITE_MOCK_USER === 'true') {
+      setUser({
+        id: 1,
+        name: 'Demo User',
+        email: 'demo@smartoutlet.com',
+        role: 'ADMIN',
+        permissions: ['read', 'write', 'delete']
+      })
     }
     setLoading(false)
-  }, [])
+  }, [isDevMode])
 
   const login = async (credentials) => {
     try {
-      setLoading(true)
-      const response = await apiClient.post(API_ENDPOINTS.LOGIN, credentials)
-      
-      const { token, user: userData } = response.data.data
-      
-      localStorage.setItem('token', token)
-      localStorage.setItem('user', JSON.stringify(userData))
-      setUser(userData)
-      
-      toast.success('Login successful!')
+      // In a real app, this would make an API call
+      if (isDevMode) {
+        setUser({
+          id: 1,
+          name: 'Demo User',
+          email: credentials.email,
+          role: 'ADMIN',
+          permissions: ['read', 'write', 'delete']
+        })
       return { success: true }
+      }
+      // TODO: Implement real authentication
+      return { success: false, error: 'Authentication not implemented' }
     } catch (error) {
-      const message = error.response?.data?.message || 'Login failed'
-      toast.error(message)
-      return { success: false, error: message }
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const register = async (userData) => {
-    try {
-      setLoading(true)
-      const response = await apiClient.post(API_ENDPOINTS.REGISTER, userData)
-      
-      const { token, user: registeredUser } = response.data.data
-      
-      localStorage.setItem('token', token)
-      localStorage.setItem('user', JSON.stringify(registeredUser))
-      setUser(registeredUser)
-      
-      toast.success('Registration successful!')
-      return { success: true }
-    } catch (error) {
-      const message = error.response?.data?.message || 'Registration failed'
-      toast.error(message)
-      return { success: false, error: message }
-    } finally {
-      setLoading(false)
+      return { success: false, error: error.message }
     }
   }
 
   const logout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
     setUser(null)
-    toast.success('Logged out successfully')
-  }
-
-  const updateProfile = async (profileData) => {
-    try {
-      setLoading(true)
-      const response = await apiClient.put(API_ENDPOINTS.PROFILE, profileData)
-      
-      const updatedUser = response.data.data
-      localStorage.setItem('user', JSON.stringify(updatedUser))
-      setUser(updatedUser)
-      
-      toast.success('Profile updated successfully!')
-      return { success: true }
-    } catch (error) {
-      const message = error.response?.data?.message || 'Profile update failed'
-      toast.error(message)
-      return { success: false, error: message }
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const isAdmin = () => {
-    return user?.role === 'ADMIN'
-  }
-
-  const isStaff = () => {
-    return user?.role === 'STAFF'
-  }
-
-  const hasPermission = (requiredRole) => {
-    if (!user) return false
-    
-    const roleHierarchy = {
-      'ADMIN': 2,
-      'STAFF': 1,
-    }
-    
-    const userLevel = roleHierarchy[user.role] || 0
-    const requiredLevel = roleHierarchy[requiredRole] || 0
-    
-    return userLevel >= requiredLevel
   }
 
   const value = {
     user,
     loading,
+    isDevMode,
     login,
-    register,
     logout,
-    updateProfile,
-    isAdmin,
-    isStaff,
-    hasPermission,
+    isAuthenticated: !!user
   }
 
   return (
@@ -145,3 +68,5 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   )
 }
+
+export default AuthContext 

@@ -1,19 +1,22 @@
 import React, { useState } from 'react'
 import { Menu, Sun, Moon, LogOut, User, Settings } from 'lucide-react'
-import { useAuth } from '../../contexts/AuthContext'
-import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../contexts/AuthContext';
 
 const Header = ({ onMenuClick }) => {
-  const { user, logout } = useAuth()
-  const { isDarkMode, toggleTheme } = useTheme()
-  const navigate = useNavigate()
-  const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const { user, logout } = useAuth();
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const navigate = useNavigate();
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const handleLogout = () => {
-    logout()
-    navigate('/login')
-  }
+    logout();
+    navigate('/login');
+  };
+
+  const handleToggleTheme = () => {
+    setIsDarkMode((prev) => !prev);
+  };
 
   return (
     <header className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700">
@@ -37,7 +40,7 @@ const Header = ({ onMenuClick }) => {
         <div className="flex items-center space-x-4">
           {/* Theme toggle */}
           <button
-            onClick={toggleTheme}
+            onClick={handleToggleTheme}
             className="p-2 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
             title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
           >
