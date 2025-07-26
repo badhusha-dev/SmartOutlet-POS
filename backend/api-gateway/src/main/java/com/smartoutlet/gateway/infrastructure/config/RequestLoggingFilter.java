@@ -1,4 +1,4 @@
-package com.smartoutlet.gateway.filter;
+package com.smartoutlet.gateway.infrastructure.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

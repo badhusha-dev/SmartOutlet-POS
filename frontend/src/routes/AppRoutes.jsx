@@ -22,6 +22,10 @@ import ProductManagement from '../features/inventory/views/ProductManagement'
 import POSSales from '../features/sales/views/POSSales'
 import SalesReport from '../features/sales/views/SalesReport'
 import ExpenseTracker from '../features/expense/views/ExpenseTracker'
+import CategoryManagement from '../features/inventory/views/CategoryManagement'
+import ExpenseManagement from '../features/expense/views/ExpenseManagement'
+import ReportingDashboard from '../features/report/views/ReportingDashboard'
+import ErrorLogs from '../features/report/views/ErrorLogs'
 
 // Loading Component
 import LoadingSpinner from '../components/common/LoadingSpinner'
@@ -66,9 +70,13 @@ const AppRoutes = () => {
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="outlets" element={<OutletManagement />} />
         <Route path="products" element={<ProductManagement />} />
+        <Route path="categories" element={<CategoryManagement />} />
         <Route path="pos" element={<POSSales />} />
         <Route path="sales" element={<SalesReport />} />
         <Route path="expenses" element={<ExpenseTracker />} />
+        <Route path="expenses-management" element={<ExpenseManagement />} />
+        <Route path="reporting-dashboard" element={<ReportingDashboard />} />
+        <Route path="error-logs" element={<ErrorLogs />} />
         <Route path="profile" element={<Profile />} />
       </Route>
 

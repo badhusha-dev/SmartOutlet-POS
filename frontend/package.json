@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@react-pdf/renderer": "^4.3.0",
+    "@reduxjs/toolkit": "^2.8.2",
     "ag-grid-community": "^34.0.1",
     "ag-grid-react": "^34.0.1",
     "axios": "^1.6.2",
@@ -27,9 +28,11 @@
     "react-hot-toast": "^2.4.1",
     "react-pdf": "^10.0.1",
     "react-query": "^3.39.3",
+    "react-redux": "^9.2.0",
     "react-router-dom": "^6.20.1",
     "react-select": "^5.8.0",
-    "recharts": "^2.8.0"
+    "recharts": "^2.15.4",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.7",

@@ -21,6 +21,10 @@ import toast from 'react-hot-toast'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-alpine.css'
 
+import outletService from '../outletService'
+import Modal from '../../../components/common/Modal'
+import { useAuth } from '../../../contexts/AuthContext'
+
 const isDev = import.meta.env.MODE === 'development';
 
 // In dev, provide fallback values
@@ -35,6 +39,14 @@ const OutletList = () => {
   const [columnApi, setColumnApi] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('ALL')
+
+  const { user } = useAuth();
+  const [showStaffModal, setShowStaffModal] = useState(false);
+  const [staffModalOutlet, setStaffModalOutlet] = useState(null);
+  const [assignedStaff, setAssignedStaff] = useState([]);
+  const [allStaff, setAllStaff] = useState([]);
+  const [selectedStaffIds, setSelectedStaffIds] = useState([]);
+  const [loadingStaff, setLoadingStaff] = useState(false);
 
   // Fetch outlets on component mount
   useEffect(() => {
@@ -218,6 +230,13 @@ const OutletList = () => {
           >
             <Trash2 className="h-4 w-4" />
           </button>
+          <button
+            onClick={() => openStaffModal(params.data)}
+            className="p-1 text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-300"
+            title="Manage Staff"
+          >
+            <Users className="h-4 w-4" />
+          </button>
         </div>
       )
     }
@@ -289,6 +308,54 @@ const OutletList = () => {
       gridApi.setFilterModel(null)
     }
   }, [])
+
+  const openStaffModal = async (outlet) => {
+    setStaffModalOutlet(outlet);
+    setShowStaffModal(true);
+    setLoadingStaff(true);
+    try {
+      const assigned = await outletService.getOutletStaff(outlet.id);
+      setAssignedStaff(assigned.data || []);
+      // For demo, use mockStaff or fetch all staff from API
+      const all = await outletService.getStaff();
+      setAllStaff(all.data || []);
+      setSelectedStaffIds([]);
+    } catch (e) {
+      toast.error('Failed to load staff');
+    } finally {
+      setLoadingStaff(false);
+    }
+  };
+
+  const handleAssignStaff = async () => {
+    if (!staffModalOutlet || selectedStaffIds.length === 0) return;
+    setLoadingStaff(true);
+    try {
+      await outletService.assignStaffToOutlet(staffModalOutlet.id, selectedStaffIds);
+      const assigned = await outletService.getOutletStaff(staffModalOutlet.id);
+      setAssignedStaff(assigned.data || []);
+      setSelectedStaffIds([]);
+      toast.success('Staff assigned successfully!');
+    } catch (e) {
+      toast.error('Failed to assign staff');
+    } finally {
+      setLoadingStaff(false);
+    }
+  };
+
+  const handleRemoveStaff = async (staffId) => {
+    if (!staffModalOutlet) return;
+    setLoadingStaff(true);
+    try {
+      await outletService.removeStaffFromOutlet(staffModalOutlet.id, staffId);
+      setAssignedStaff(assignedStaff.filter(s => s.id !== staffId));
+      toast.success('Staff removed successfully!');
+    } catch (e) {
+      toast.error('Failed to remove staff');
+    } finally {
+      setLoadingStaff(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -437,6 +504,58 @@ const OutletList = () => {
           className="ag-theme-coral"
         />
       </div>
+
+      <Modal
+        isOpen={showStaffModal}
+        onClose={() => setShowStaffModal(false)}
+        title={staffModalOutlet ? `Manage Staff: ${staffModalOutlet.name}` : 'Manage Staff'}
+      >
+        {loadingStaff ? (
+          <div className="flex items-center justify-center h-32">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Assigned Staff</h3>
+              <ul className="space-y-2">
+                {assignedStaff.length === 0 && <li className="text-gray-500">No staff assigned.</li>}
+                {assignedStaff.map(staff => (
+                  <li key={staff.id} className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 rounded px-3 py-2">
+                    <span>{staff.name || staff.username}</span>
+                    <button
+                      onClick={() => handleRemoveStaff(staff.id)}
+                      className="text-red-600 hover:text-red-800 text-xs"
+                    >
+                      Remove
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Assign New Staff</h3>
+              <select
+                multiple
+                value={selectedStaffIds}
+                onChange={e => setSelectedStaffIds(Array.from(e.target.selectedOptions, option => option.value))}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              >
+                {allStaff.filter(s => !assignedStaff.some(a => a.id === s.id)).map(staff => (
+                  <option key={staff.id} value={staff.id}>{staff.name || staff.username}</option>
+                ))}
+              </select>
+              <button
+                onClick={handleAssignStaff}
+                className="btn-primary mt-3 px-4 py-2"
+                disabled={selectedStaffIds.length === 0 || loadingStaff}
+              >
+                Assign Selected
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   )
 }

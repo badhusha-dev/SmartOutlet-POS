@@ -65,6 +65,7 @@ public class ErrorLog {
     private Integer lineNumber;
     
     @Column(name = "occurrence_count")
+    @Builder.Default
     private Integer occurrenceCount = 1;
     
     @Column(name = "first_occurrence")
@@ -74,6 +75,7 @@ public class ErrorLog {
     private LocalDateTime lastOccurrence;
     
     @Column(name = "is_resolved")
+    @Builder.Default
     private Boolean isResolved = false;
     
     @Column(name = "resolution_notes", columnDefinition = "TEXT")

@@ -1,4 +1,4 @@
-package com.smartoutlet.gateway.config;
+package com.smartoutlet.gateway.infrastructure.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

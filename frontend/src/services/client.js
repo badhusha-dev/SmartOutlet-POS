@@ -1,89 +1,89 @@
 import axios from 'axios'
 import toast from 'react-hot-toast'
 
-// API base URL
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api'
+// API Gateway base URL
+const API_GATEWAY_BASE_URL = import.meta.env.VITE_API_GATEWAY_BASE_URL || 'http://localhost:8080'
 
-// Create axios instance
-const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-})
-
-// Request interceptor to add auth token
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+// Helper to create axios instance
+const createApiClient = (baseURL) => {
+  const instance = axios.create({
+    baseURL,
+    timeout: 10000,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+  instance.interceptors.request.use(
+    (config) => {
+      const token = localStorage.getItem('token')
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+      }
+      return config
+    },
+    (error) => Promise.reject(error)
+  )
+  instance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (error.response?.status === 401) {
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+        window.location.href = '/login'
+      } else if (error.response?.status === 403) {
+        toast.error('Access denied. You do not have permission to perform this action.')
+      } else if (error.response?.status >= 500) {
+        toast.error('Server error. Please try again later.')
+      } else if (error.code === 'ECONNABORTED') {
+        toast.error('Request timeout. Please check your connection.')
+      } else if (!error.response) {
+        toast.error('Network error. Please check your connection.')
+      }
+      return Promise.reject(error)
     }
-    return config
-  },
-  (error) => {
-    return Promise.reject(error)
-  }
-)
+  )
+  return instance
+}
 
-// Response interceptor for error handling
-apiClient.interceptors.response.use(
-  (response) => {
-    return response
-  },
-  (error) => {
-    if (error.response?.status === 401) {
-      // Unauthorized - clear token and redirect to login
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
-      window.location.href = '/login'
-    } else if (error.response?.status === 403) {
-      toast.error('Access denied. You do not have permission to perform this action.')
-    } else if (error.response?.status >= 500) {
-      toast.error('Server error. Please try again later.')
-    } else if (error.code === 'ECONNABORTED') {
-      toast.error('Request timeout. Please check your connection.')
-    } else if (!error.response) {
-      toast.error('Network error. Please check your connection.')
-    }
-    return Promise.reject(error)
-  }
-)
+export const api = createApiClient(API_GATEWAY_BASE_URL)
+export const authApi = api
+export const productApi = api
+export const outletApi = api
+export const expenseApi = api
 
-// API endpoints
+// API endpoints (gateway paths)
 export const API_ENDPOINTS = {
   // Auth
   LOGIN: '/auth/login',
   REGISTER: '/auth/register',
-  LOGOUT: '/auth/logout',
-  PROFILE: '/auth/profile',
-  
-  // Outlets
-  OUTLETS: '/outlets',
-  OUTLET_DETAILS: (id) => `/outlets/${id}`,
-  OUTLET_STAFF: (id) => `/outlets/${id}/staff`,
-  OUTLET_NOTICES: (id) => `/outlets/${id}/notices`,
-  OUTLET_TASKS: (id) => `/outlets/${id}/tasks`,
-  
+  VALIDATE_TOKEN: '/auth/validate',
+  PROFILE: '/auth/me',
+  USERS: '/users',
+  USER_BY_ID: (id) => `/users/${id}`,
+  ERROR_LOGS: '/error-logs',
+  ERROR_LOG_BY_ID: (id) => `/error-logs/${id}`,
+
   // Products
   PRODUCTS: '/products',
-  PRODUCT_DETAILS: (id) => `/products/${id}`,
-  PRODUCT_CATEGORIES: '/products/categories',
-  
-  // Sales
-  SALES: '/sales',
-  SALES_DETAILS: (id) => `/sales/${id}`,
-  ORDERS: '/orders',
-  
+  PRODUCT_BY_ID: (id) => `/products/${id}`,
+  PRODUCT_BY_SKU: (sku) => `/products/sku/${sku}`,
+  PRODUCT_BY_BARCODE: (barcode) => `/products/barcode/${barcode}`,
+  CATEGORIES: '/categories',
+  CATEGORY_BY_ID: (id) => `/categories/${id}`,
+  STOCK_UPDATE: '/products/stock/update',
+  STOCK_MOVEMENTS: '/products/stock/movements',
+  STOCK_MOVEMENTS_BY_PRODUCT: (id) => `/products/${id}/stock/movements`,
+
+  // Outlets
+  OUTLETS: '/outlets',
+  OUTLET_BY_ID: (id) => `/outlets/${id}`,
+  STAFF_ASSIGNMENTS: '/staff-assignments',
+  STAFF_ASSIGNMENT_BY_ID: (id) => `/staff-assignments/${id}`,
+  STAFF_ASSIGNMENTS_BY_OUTLET: (id) => `/outlets/${id}/staff-assignments`,
+
   // Expenses
   EXPENSES: '/expenses',
-  EXPENSE_DETAILS: (id) => `/expenses/${id}`,
-  EXPENSE_CATEGORIES: '/expenses/categories',
-  
-  // Reports
-  REPORTS: '/reports',
-  DASHBOARD_STATS: '/dashboard/stats',
+  EXPENSE_BY_ID: (id) => `/expenses/${id}`,
+  EXPENSES_BY_OUTLET: (id) => `/expenses/outlet/${id}`,
+  EXPENSES_BY_CATEGORY: (cat) => `/expenses/category/${cat}`,
 }
-
-export default apiClient

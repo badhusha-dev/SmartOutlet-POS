@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
                excludeFilters = @ComponentScan.Filter(type = org.springframework.context.annotation.FilterType.REGEX, 
                                                     pattern = ".*backup.*"))
 @EntityScan("com.smartoutlet.product.entity")
-@EnableJpaRepositories("com.smartoutlet.product.repository")
+@EnableJpaRepositories({"com.smartoutlet.product.repository", "com.smartoutlet.product.infrastructure.persistence"})
 public class ProductServiceApplication {
 
     public static void main(String[] args) {

@@ -17,13 +17,19 @@ import {
   MoreHorizontal,
   Download,
   Upload,
-  Settings
+  Settings,
+  HistoryIcon
 } from 'lucide-react'
 import { motion } from 'framer-motion'
-import apiClient, { API_ENDPOINTS } from '../../../services/client'
+import { productApi, API_ENDPOINTS } from '../../../services/client'
 import LoadingSpinner from '../../../components/common/LoadingSpinner'
 import Modal from '../../../components/common/Modal'
 import { mockProducts, mockCategories } from '../../../utils/mockData'
+import { useDispatch } from 'react-redux'
+import { updateStock } from '../productSlice'
+import { saveAs } from 'file-saver'
+import * as XLSX from 'xlsx'
+import SkeletonTable from '../../../components/common/SkeletonTable'
 
 const ProductManagement = () => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -46,6 +52,16 @@ const ProductManagement = () => {
     maxStockLevel: '',
     status: 'ACTIVE'
   })
+  const dispatch = useDispatch();
+  const [showStockModal, setShowStockModal] = useState(false);
+  const [stockForm, setStockForm] = useState({ quantity: '', type: 'add' });
+  const [stockProduct, setStockProduct] = useState(null);
+  const [showStockMovementsModal, setShowStockMovementsModal] = useState(false);
+  const [stockMovements, setStockMovements] = useState([]);
+  const [stockMovementsProduct, setStockMovementsProduct] = useState(null);
+  const [loadingMovements, setLoadingMovements] = useState(false);
+  const [priceMin, setPriceMin] = useState('');
+  const [priceMax, setPriceMax] = useState('');
 
   // Development mode flags
   const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true'
@@ -54,7 +70,7 @@ const ProductManagement = () => {
   // Fetch products
   const { data: products, isLoading } = useQuery(
     'products',
-    () => apiClient.get(API_ENDPOINTS.PRODUCTS),
+    () => productApi.get(API_ENDPOINTS.PRODUCTS),
     {
       select: (response) => response.data.data,
       enabled: !(DEV_MODE && DISABLE_AUTH),
@@ -65,16 +81,52 @@ const ProductManagement = () => {
   const currentProducts = (DEV_MODE && DISABLE_AUTH) ? mockProducts : (products || mockProducts)
   const currentCategories = mockCategories
 
-  // Filter products based on search and filters
+  // Enhanced filter
   const filteredProducts = currentProducts.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.barcode.includes(searchTerm)
+      product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.barcode.includes(searchTerm)
     const matchesCategory = categoryFilter === 'ALL' || product.category === categoryFilter
     const matchesStatus = statusFilter === 'ALL' || product.status === statusFilter
-    return matchesSearch && matchesCategory && matchesStatus
+    const matchesPriceMin = priceMin === '' || Number(product.price) >= Number(priceMin)
+    const matchesPriceMax = priceMax === '' || Number(product.price) <= Number(priceMax)
+    return matchesSearch && matchesCategory && matchesStatus && matchesPriceMin && matchesPriceMax
   })
+
+  // Export helpers
+  const handleExportCSV = () => {
+    const data = filteredProducts.map(p => ({
+      Name: p.name,
+      SKU: p.sku,
+      Category: p.category,
+      Price: p.price,
+      Stock: p.stockQuantity,
+      Status: p.status
+    }))
+    const ws = XLSX.utils.json_to_sheet(data)
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Products')
+    const csv = XLSX.utils.sheet_to_csv(ws)
+    const blob = new Blob([csv], { type: 'text/csv' })
+    saveAs(blob, 'products.csv')
+  }
+  const handleExportExcel = () => {
+    const data = filteredProducts.map(p => ({
+      Name: p.name,
+      SKU: p.sku,
+      Category: p.category,
+      Price: p.price,
+      Stock: p.stockQuantity,
+      Status: p.status
+    }))
+    const ws = XLSX.utils.json_to_sheet(data)
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Products')
+    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' })
+    saveAs(blob, 'products.xlsx')
+  }
 
   const handleAddProduct = () => {
     setFormData({
@@ -136,8 +188,45 @@ const ProductManagement = () => {
     // TODO: Implement actual delete
   }
 
+  const handleOpenStockModal = (product) => {
+    setStockProduct(product);
+    setStockForm({ quantity: '', type: 'add' });
+    setShowStockModal(true);
+  };
+
+  const handleStockSubmit = (e) => {
+    e.preventDefault();
+    if (!stockProduct) return;
+    dispatch(updateStock({ id: stockProduct.id, quantity: Number(stockForm.quantity), type: stockForm.type }));
+    setShowStockModal(false);
+    setStockProduct(null);
+  };
+
+  const handleOpenStockMovementsModal = async (product) => {
+    setStockMovementsProduct(product);
+    setShowStockMovementsModal(true);
+    setLoadingMovements(true);
+    try {
+      const res = await productApi.get(API_ENDPOINTS.STOCK_MOVEMENTS_BY_PRODUCT(product.id));
+      setStockMovements(res.data.data || []);
+    } catch (e) {
+      setStockMovements([]);
+    } finally {
+      setLoadingMovements(false);
+    }
+  };
+
   if (isLoading && !(DEV_MODE && DISABLE_AUTH)) {
-    return <LoadingSpinner />
+    return <SkeletonTable columns={7} rows={8} />
+  }
+
+  if (filteredProducts.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 text-gray-500 dark:text-gray-400">
+        <span className="text-2xl mb-2">No products found.</span>
+        <span>Try adjusting your filters or add a new product.</span>
+      </div>
+    )
   }
 
   const getStockStatus = (product) => {
@@ -225,6 +314,19 @@ const ProductManagement = () => {
             >
               <Trash2 className="h-4 w-4" />
             </button>
+            <button
+              onClick={() => handleOpenStockModal(product)}
+              className="p-2 text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 rounded-lg transition-colors"
+            >
+              <TrendingUp className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => handleOpenStockMovementsModal(product)}
+              className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+              title="View Stock Movements"
+            >
+              <HistoryIcon className="h-4 w-4" />
+            </button>
           </div>
         </div>
       </motion.div>
@@ -252,13 +354,13 @@ const ProductManagement = () => {
         </button>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
+      {/* Advanced Filters & Export */}
+      <div className="flex flex-col md:flex-row md:items-end gap-4">
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input
             type="text"
-            placeholder="Search products..."
+            placeholder="Search by name, SKU, description, barcode..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
@@ -283,6 +385,26 @@ const ProductManagement = () => {
           <option value="ACTIVE">Active</option>
           <option value="INACTIVE">Inactive</option>
         </select>
+        <div className="flex gap-2">
+          <input
+            type="number"
+            placeholder="Min Price"
+            value={priceMin}
+            onChange={e => setPriceMin(e.target.value)}
+            className="w-24 px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          />
+          <input
+            type="number"
+            placeholder="Max Price"
+            value={priceMax}
+            onChange={e => setPriceMax(e.target.value)}
+            className="w-24 px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          />
+        </div>
+        <div className="flex gap-2 ml-auto">
+          <button onClick={handleExportCSV} className="btn-secondary px-3 py-2">Export CSV</button>
+          <button onClick={handleExportExcel} className="btn-secondary px-3 py-2">Export Excel</button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -637,6 +759,82 @@ const ProductManagement = () => {
             </div>
         </div>
       )}
+      </Modal>
+
+      {/* Stock Adjustment Modal */}
+      <Modal
+        isOpen={showStockModal}
+        onClose={() => setShowStockModal(false)}
+        title={stockProduct ? `Adjust Stock: ${stockProduct.name}` : 'Adjust Stock'}
+      >
+        <form onSubmit={handleStockSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Quantity</label>
+            <input
+              type="number"
+              value={stockForm.quantity}
+              onChange={e => setStockForm({ ...stockForm, quantity: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type</label>
+            <select
+              value={stockForm.type}
+              onChange={e => setStockForm({ ...stockForm, type: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            >
+              <option value="add">Add</option>
+              <option value="adjust">Adjust</option>
+            </select>
+          </div>
+          <div className="flex justify-end space-x-3 pt-4">
+            <button type="button" onClick={() => setShowStockModal(false)} className="btn-secondary px-4 py-2">Cancel</button>
+            <button type="submit" className="btn-primary px-4 py-2">Update Stock</button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Stock Movements Modal */}
+      <Modal
+        isOpen={showStockMovementsModal}
+        onClose={() => setShowStockMovementsModal(false)}
+        title={stockMovementsProduct ? `Stock Movements: ${stockMovementsProduct.name}` : 'Stock Movements'}
+      >
+        {loadingMovements ? (
+          <div className="flex items-center justify-center h-32">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead>
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Type</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Quantity</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Reason</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Reference</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                {stockMovements.length === 0 && (
+                  <tr><td colSpan={5} className="text-center text-gray-500 py-4">No stock movements found.</td></tr>
+                )}
+                {stockMovements.map((m, idx) => (
+                  <tr key={idx}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{m.date || m.timestamp}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">{m.movementType}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">{m.quantity}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">{m.reason}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">{m.reference}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </Modal>
     </div>
   )

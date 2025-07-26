@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import toast from 'react-hot-toast'
+import { productApi, API_ENDPOINTS } from '../../services/client'
 
 // Mock data for development
 const MOCK_PRODUCTS = [
@@ -60,14 +61,21 @@ const MOCK_CATEGORIES = [
   { id: 4, name: 'Security', description: 'Home security devices' },
 ]
 
+// Development mode flags
+const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true'
+const DISABLE_AUTH = import.meta.env.VITE_DISABLE_AUTH === 'true'
+
 // Async thunks
 export const fetchProducts = createAsyncThunk(
   'product/fetchProducts',
   async (_, { rejectWithValue }) => {
     try {
-      // Mock API call for development
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      return MOCK_PRODUCTS
+      if (DEV_MODE && DISABLE_AUTH) {
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        return MOCK_PRODUCTS
+      }
+      const response = await productApi.get(API_ENDPOINTS.PRODUCTS)
+      return response.data.data
     } catch (error) {
       return rejectWithValue('Failed to fetch products')
     }
@@ -78,9 +86,12 @@ export const fetchCategories = createAsyncThunk(
   'product/fetchCategories',
   async (_, { rejectWithValue }) => {
     try {
-      // Mock API call for development
-      await new Promise(resolve => setTimeout(resolve, 500))
-      return MOCK_CATEGORIES
+      if (DEV_MODE && DISABLE_AUTH) {
+        await new Promise(resolve => setTimeout(resolve, 500))
+        return MOCK_CATEGORIES
+      }
+      const response = await productApi.get(API_ENDPOINTS.CATEGORIES)
+      return response.data.data
     } catch (error) {
       return rejectWithValue('Failed to fetch categories')
     }
@@ -91,16 +102,20 @@ export const createProduct = createAsyncThunk(
   'product/createProduct',
   async (productData, { rejectWithValue }) => {
     try {
-      // Mock API call for development
-      await new Promise(resolve => setTimeout(resolve, 500))
-      const newProduct = {
-        id: Date.now(),
-        ...productData,
-        createdAt: new Date().toISOString(),
-        status: 'ACTIVE',
+      if (DEV_MODE && DISABLE_AUTH) {
+        await new Promise(resolve => setTimeout(resolve, 500))
+        const newProduct = {
+          id: Date.now(),
+          ...productData,
+          createdAt: new Date().toISOString(),
+          status: 'ACTIVE',
+        }
+        toast.success('Product created successfully!')
+        return newProduct
       }
+      const response = await productApi.post(API_ENDPOINTS.PRODUCTS, productData)
       toast.success('Product created successfully!')
-      return newProduct
+      return response.data.data
     } catch (error) {
       toast.error('Failed to create product')
       return rejectWithValue('Failed to create product')
@@ -112,10 +127,14 @@ export const updateProduct = createAsyncThunk(
   'product/updateProduct',
   async ({ id, productData }, { rejectWithValue }) => {
     try {
-      // Mock API call for development
-      await new Promise(resolve => setTimeout(resolve, 500))
+      if (DEV_MODE && DISABLE_AUTH) {
+        await new Promise(resolve => setTimeout(resolve, 500))
+        toast.success('Product updated successfully!')
+        return { id, ...productData }
+      }
+      const response = await productApi.put(API_ENDPOINTS.PRODUCT_BY_ID(id), productData)
       toast.success('Product updated successfully!')
-      return { id, ...productData }
+      return response.data.data
     } catch (error) {
       toast.error('Failed to update product')
       return rejectWithValue('Failed to update product')
@@ -127,8 +146,12 @@ export const deleteProduct = createAsyncThunk(
   'product/deleteProduct',
   async (id, { rejectWithValue }) => {
     try {
-      // Mock API call for development
-      await new Promise(resolve => setTimeout(resolve, 500))
+      if (DEV_MODE && DISABLE_AUTH) {
+        await new Promise(resolve => setTimeout(resolve, 500))
+        toast.success('Product deleted successfully!')
+        return id
+      }
+      await productApi.delete(API_ENDPOINTS.PRODUCT_BY_ID(id))
       toast.success('Product deleted successfully!')
       return id
     } catch (error) {
@@ -142,14 +165,102 @@ export const updateStock = createAsyncThunk(
   'product/updateStock',
   async ({ id, quantity, type }, { rejectWithValue }) => {
     try {
-      // Mock API call for development
-      await new Promise(resolve => setTimeout(resolve, 300))
-      const message = type === 'add' ? 'Stock added successfully!' : 'Stock updated successfully!'
-      toast.success(message)
-      return { id, quantity, type }
+      if (DEV_MODE && DISABLE_AUTH) {
+        await new Promise(resolve => setTimeout(resolve, 300))
+        const message = type === 'add' ? 'Stock added successfully!' : 'Stock updated successfully!'
+        toast.success(message)
+        return { id, quantity, type }
+      }
+      // For real API, you may need to adjust payload structure
+      const response = await productApi.post(API_ENDPOINTS.STOCK_UPDATE, {
+        productId: id,
+        quantity,
+        movementType: type === 'add' ? 'IN' : 'ADJUST',
+        reason: type === 'add' ? 'Restock' : 'Manual update',
+      })
+      toast.success('Stock updated successfully!')
+      return { id, quantity: response.data.data.quantity, type }
     } catch (error) {
       toast.error('Failed to update stock')
       return rejectWithValue('Failed to update stock')
+    }
+  }
+)
+
+// Fetch single product by ID
+export const fetchProductById = createAsyncThunk(
+  'product/fetchProductById',
+  async (id, { rejectWithValue }) => {
+    try {
+      if (DEV_MODE && DISABLE_AUTH) {
+        await new Promise(resolve => setTimeout(resolve, 500))
+        return MOCK_PRODUCTS.find(p => p.id === id)
+      }
+      const response = await productApi.get(API_ENDPOINTS.PRODUCT_BY_ID(id))
+      return response.data.data
+    } catch (error) {
+      return rejectWithValue('Failed to fetch product')
+    }
+  }
+)
+
+// Create category
+export const createCategory = createAsyncThunk(
+  'product/createCategory',
+  async (categoryData, { rejectWithValue }) => {
+    try {
+      if (DEV_MODE && DISABLE_AUTH) {
+        await new Promise(resolve => setTimeout(resolve, 500))
+        const newCategory = { id: Date.now(), ...categoryData }
+        toast.success('Category created successfully!')
+        return newCategory
+      }
+      const response = await productApi.post(API_ENDPOINTS.CATEGORIES, categoryData)
+      toast.success('Category created successfully!')
+      return response.data.data
+    } catch (error) {
+      toast.error('Failed to create category')
+      return rejectWithValue('Failed to create category')
+    }
+  }
+)
+
+// Update category
+export const updateCategory = createAsyncThunk(
+  'product/updateCategory',
+  async ({ id, categoryData }, { rejectWithValue }) => {
+    try {
+      if (DEV_MODE && DISABLE_AUTH) {
+        await new Promise(resolve => setTimeout(resolve, 500))
+        toast.success('Category updated successfully!')
+        return { id, ...categoryData }
+      }
+      const response = await productApi.put(API_ENDPOINTS.CATEGORY_BY_ID(id), categoryData)
+      toast.success('Category updated successfully!')
+      return response.data.data
+    } catch (error) {
+      toast.error('Failed to update category')
+      return rejectWithValue('Failed to update category')
+    }
+  }
+)
+
+// Delete category
+export const deleteCategory = createAsyncThunk(
+  'product/deleteCategory',
+  async (id, { rejectWithValue }) => {
+    try {
+      if (DEV_MODE && DISABLE_AUTH) {
+        await new Promise(resolve => setTimeout(resolve, 500))
+        toast.success('Category deleted successfully!')
+        return id
+      }
+      await productApi.delete(API_ENDPOINTS.CATEGORY_BY_ID(id))
+      toast.success('Category deleted successfully!')
+      return id
+    } catch (error) {
+      toast.error('Failed to delete category')
+      return rejectWithValue('Failed to delete category')
     }
   }
 )
