@@ -25,7 +25,7 @@ public class JwtTokenRelayFilter implements GlobalFilter, Ordered {
             // Forward the token to downstream services
             exchange.getRequest().mutate()
                 .header(HttpHeaders.AUTHORIZATION, token)
-                .build();
+                    .build();
         } else {
             logger.debug("No JWT token found in request");
         }
