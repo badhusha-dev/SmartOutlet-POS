@@ -97,7 +97,7 @@ public class TransactionController {
             @PathVariable Long id) {
         log.info("Fetching transaction with ID: {}", id);
         TransactionDto transaction = transactionService.getTransactionById(id);
-        return ResponseEntity.ok(ApiResponseDTO.success(transaction));
+        return ResponseEntity.ok(ApiResponseDTO.success("Transaction retrieved successfully", transaction));
     }
     
     @GetMapping("/number/{transactionNumber}")
@@ -110,7 +110,7 @@ public class TransactionController {
             @PathVariable String transactionNumber) {
         log.info("Fetching transaction with number: {}", transactionNumber);
         TransactionDto transaction = transactionService.getTransactionByNumber(transactionNumber);
-        return ResponseEntity.ok(ApiResponseDTO.success(transaction));
+        return ResponseEntity.ok(ApiResponseDTO.success("Transaction retrieved successfully", transaction));
     }
     
     @GetMapping("/receipt/{receiptNumber}")
@@ -123,7 +123,7 @@ public class TransactionController {
             @PathVariable String receiptNumber) {
         log.info("Fetching transaction with receipt number: {}", receiptNumber);
         TransactionDto transaction = transactionService.getTransactionByReceiptNumber(receiptNumber);
-        return ResponseEntity.ok(ApiResponseDTO.success(transaction));
+        return ResponseEntity.ok(ApiResponseDTO.success("Transaction retrieved successfully", transaction));
     }
     
     @GetMapping
@@ -144,7 +144,7 @@ public class TransactionController {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<TransactionDto> transactions = transactionService.getAllTransactions(pageable);
-        return ResponseEntity.ok(ApiResponseDTO.success(transactions));
+        return ResponseEntity.ok(ApiResponseDTO.success("Transactions retrieved successfully", transactions));
     }
     
     @GetMapping("/outlet/{outletId}")
@@ -160,7 +160,7 @@ public class TransactionController {
         log.info("Fetching transactions for outlet: {}", outletId);
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<TransactionDto> transactions = transactionService.getTransactionsByOutlet(outletId, pageable);
-        return ResponseEntity.ok(ApiResponseDTO.success(transactions));
+        return ResponseEntity.ok(ApiResponseDTO.success("Transactions retrieved successfully", transactions));
     }
     
     @GetMapping("/cashier/{cashierId}")
@@ -176,7 +176,7 @@ public class TransactionController {
         log.info("Fetching transactions for cashier: {}", cashierId);
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<TransactionDto> transactions = transactionService.getTransactionsByCashier(cashierId, pageable);
-        return ResponseEntity.ok(ApiResponseDTO.success(transactions));
+        return ResponseEntity.ok(ApiResponseDTO.success("Transactions retrieved successfully", transactions));
     }
     
     @GetMapping("/customer/{customerId}")
@@ -192,7 +192,7 @@ public class TransactionController {
         log.info("Fetching transactions for customer: {}", customerId);
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<TransactionDto> transactions = transactionService.getTransactionsByCustomer(customerId, pageable);
-        return ResponseEntity.ok(ApiResponseDTO.success(transactions));
+        return ResponseEntity.ok(ApiResponseDTO.success("Transactions retrieved successfully", transactions));
     }
     
     @GetMapping("/status/{status}")
@@ -208,7 +208,7 @@ public class TransactionController {
         log.info("Fetching transactions with status: {}", status);
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<TransactionDto> transactions = transactionService.getTransactionsByStatus(status, pageable);
-        return ResponseEntity.ok(ApiResponseDTO.success(transactions));
+        return ResponseEntity.ok(ApiResponseDTO.success("Transactions retrieved successfully", transactions));
     }
     
     @GetMapping("/date-range")
@@ -226,7 +226,7 @@ public class TransactionController {
         log.info("Fetching transactions between {} and {}", startDate, endDate);
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<TransactionDto> transactions = transactionService.getTransactionsByDateRange(startDate, endDate, pageable);
-        return ResponseEntity.ok(ApiResponseDTO.success(transactions));
+        return ResponseEntity.ok(ApiResponseDTO.success("Transactions retrieved successfully", transactions));
     }
     
     @PutMapping("/{id}")
@@ -323,6 +323,6 @@ public class TransactionController {
                     totalSales / transactionCount : 0.0)
                 .build();
         
-        return ResponseEntity.ok(ApiResponseDTO.success(stats));
+        return ResponseEntity.ok(ApiResponseDTO.success("Outlet statistics retrieved successfully", stats));
     }
 } 

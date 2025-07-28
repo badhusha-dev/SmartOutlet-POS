@@ -51,6 +51,20 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     @Query("SELECT t FROM Transaction t WHERE t.customerId = :customerId ORDER BY t.createdAt DESC")
     List<Transaction> findRecentTransactionsByCustomer(@Param("customerId") Long customerId, Pageable pageable);
     
+    // Additional methods for OrderHistoryService
+    @Query("SELECT t FROM Transaction t WHERE t.createdAt BETWEEN :startDate AND :endDate")
+    List<Transaction> findByTransactionDateBetween(@Param("startDate") LocalDateTime startDate, 
+                                                   @Param("endDate") LocalDateTime endDate);
+    
+    @Query("SELECT t FROM Transaction t WHERE t.cashierName = :processedBy")
+    List<Transaction> findByProcessedBy(@Param("processedBy") String processedBy);
+    
+    // Additional method for DashboardService
+    @Query("SELECT t FROM Transaction t WHERE t.outletId = :outletId AND t.createdAt BETWEEN :startDate AND :endDate")
+    List<Transaction> findByOutletIdAndTransactionDateBetween(@Param("outletId") Long outletId,
+                                                              @Param("startDate") LocalDateTime startDate,
+                                                              @Param("endDate") LocalDateTime endDate);
+    
     boolean existsByTransactionNumber(String transactionNumber);
     
     boolean existsByReceiptNumber(String receiptNumber);

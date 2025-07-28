@@ -32,7 +32,7 @@ public class DashboardServiceImpl implements DashboardService {
         
         // Calculate statistics
         Double todaySales = todayTransactions.stream()
-                .mapToDouble(Transaction::getTotalAmount)
+                .mapToDouble(t -> t.getTotalAmount().doubleValue())
                 .sum();
         
         Integer todayTransactionCount = todayTransactions.size();

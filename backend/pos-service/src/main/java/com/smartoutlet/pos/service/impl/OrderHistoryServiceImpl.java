@@ -7,8 +7,10 @@ import com.smartoutlet.pos.repository.TransactionRepository;
 import com.smartoutlet.pos.service.OrderHistoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,7 +39,7 @@ public class OrderHistoryServiceImpl implements OrderHistoryService {
     
     @Override
     public List<OrderHistoryDto> getOrdersByCustomerId(Long customerId) {
-        return transactionRepository.findByCustomerId(customerId)
+        return transactionRepository.findByCustomerId(customerId, Pageable.unpaged())
                 .stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
@@ -53,7 +55,7 @@ public class OrderHistoryServiceImpl implements OrderHistoryService {
     
     @Override
     public List<OrderHistoryDto> getOrdersByStatus(String status) {
-        return transactionRepository.findByStatus(Transaction.TransactionStatus.valueOf(status.toUpperCase()))
+        return transactionRepository.findByStatus(Transaction.TransactionStatus.valueOf(status.toUpperCase()), Pageable.unpaged())
                 .stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
@@ -61,7 +63,7 @@ public class OrderHistoryServiceImpl implements OrderHistoryService {
     
     @Override
     public List<OrderHistoryDto> getOrdersByPaymentMethod(String paymentMethod) {
-        return transactionRepository.findByPaymentMethod(Transaction.PaymentMethod.valueOf(paymentMethod.toUpperCase()))
+        return transactionRepository.findByPaymentMethod(Transaction.PaymentMethod.valueOf(paymentMethod.toUpperCase()), Pageable.unpaged())
                 .stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
@@ -69,7 +71,7 @@ public class OrderHistoryServiceImpl implements OrderHistoryService {
     
     @Override
     public List<OrderHistoryDto> getOrdersByOutletId(Long outletId) {
-        return transactionRepository.findByOutletId(outletId)
+        return transactionRepository.findByOutletId(outletId, Pageable.unpaged())
                 .stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
@@ -86,13 +88,11 @@ public class OrderHistoryServiceImpl implements OrderHistoryService {
     @Override
     public List<OrderHistoryDto> searchOrders(String searchTerm) {
         // This would typically involve a more complex search query
-        // For now, we'll search by customer name
+        // For now, we'll search by customer name and transaction number
         return transactionRepository.findAll()
                 .stream()
-                .filter(t -> t.getCustomer() != null && 
-                        (t.getCustomer().getFirstName().toLowerCase().contains(searchTerm.toLowerCase()) ||
-                         t.getCustomer().getLastName().toLowerCase().contains(searchTerm.toLowerCase()) ||
-                         t.getTransactionNumber().toLowerCase().contains(searchTerm.toLowerCase())))
+                .filter(t -> (t.getCustomerName() != null && t.getCustomerName().toLowerCase().contains(searchTerm.toLowerCase())) ||
+                         (t.getTransactionNumber() != null && t.getTransactionNumber().toLowerCase().contains(searchTerm.toLowerCase())))
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
@@ -101,7 +101,7 @@ public class OrderHistoryServiceImpl implements OrderHistoryService {
     public List<OrderHistoryDto> getOrdersWithDiscounts() {
         return transactionRepository.findAll()
                 .stream()
-                .filter(t -> t.getDiscountAmount() != null && t.getDiscountAmount() > 0)
+                .filter(t -> t.getDiscountAmount() != null && t.getDiscountAmount().compareTo(BigDecimal.ZERO) > 0)
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
@@ -110,7 +110,8 @@ public class OrderHistoryServiceImpl implements OrderHistoryService {
     public List<OrderHistoryDto> getOrdersByAmountRange(Double minAmount, Double maxAmount) {
         return transactionRepository.findAll()
                 .stream()
-                .filter(t -> t.getTotalAmount() >= minAmount && t.getTotalAmount() <= maxAmount)
+                .filter(t -> t.getTotalAmount().compareTo(BigDecimal.valueOf(minAmount)) >= 0 && 
+                             t.getTotalAmount().compareTo(BigDecimal.valueOf(maxAmount)) <= 0)
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
@@ -119,7 +120,7 @@ public class OrderHistoryServiceImpl implements OrderHistoryService {
     public Double getTotalSalesForPeriod(LocalDateTime startDate, LocalDateTime endDate) {
         return transactionRepository.findByTransactionDateBetween(startDate, endDate)
                 .stream()
-                .mapToDouble(Transaction::getTotalAmount)
+                .mapToDouble(t -> t.getTotalAmount().doubleValue())
                 .sum();
     }
     
@@ -133,10 +134,10 @@ public class OrderHistoryServiceImpl implements OrderHistoryService {
                 .id(transaction.getId())
                 .transactionId(transaction.getId())
                 .transactionNumber(transaction.getTransactionNumber())
-                .customerId(transaction.getCustomer() != null ? transaction.getCustomer().getId() : null)
-                .customerName(transaction.getCustomer() != null ? transaction.getCustomer().getFullName() : null)
-                .customerEmail(transaction.getCustomer() != null ? transaction.getCustomer().getEmail() : null)
-                .totalAmount(transaction.getTotalAmount())
+                .customerId(transaction.getCustomerId())
+                .customerName(transaction.getCustomerName())
+                .customerEmail(transaction.getCustomerEmail())
+                .totalAmount(transaction.getTotalAmount().doubleValue())
                 .status(transaction.getStatus().name())
                 .paymentMethod(transaction.getPaymentMethod().name())
                 .processedBy(transaction.getProcessedBy())
@@ -145,8 +146,8 @@ public class OrderHistoryServiceImpl implements OrderHistoryService {
                 .transactionDate(transaction.getTransactionDate())
                 .items(transaction.getItems() != null ? 
                     transaction.getItems().stream().map(this::mapTransactionItemToDto).collect(Collectors.toList()) : null)
-                .discountAmount(transaction.getDiscountAmount())
-                .taxAmount(transaction.getTaxAmount())
+                .discountAmount(transaction.getDiscountAmount() != null ? transaction.getDiscountAmount().doubleValue() : null)
+                .taxAmount(transaction.getTaxAmount() != null ? transaction.getTaxAmount().doubleValue() : null)
                 .receiptNumber(transaction.getTransactionNumber().replace("TXN", "RCPT"))
                 .receiptReprinted(false) // Mock value
                 .notes(transaction.getNotes())
