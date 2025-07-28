@@ -125,4 +125,17 @@ public class Transaction {
     public enum TransactionStatus {
         PENDING, COMPLETED, CANCELLED, VOIDED, REFUNDED
     }
+    
+    // Additional methods for service compatibility
+    public String getCustomer() {
+        return this.customerName;
+    }
+    
+    public String getProcessedBy() {
+        return this.cashierName;
+    }
+    
+    public LocalDateTime getTransactionDate() {
+        return this.createdAt;
+    }
 } 

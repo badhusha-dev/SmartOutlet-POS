@@ -29,7 +29,7 @@ public class RefundController {
     @RequirePermission("refund:create")
     public ResponseEntity<ApiResponseDTO<RefundDto>> createRefund(@RequestBody RefundDto refundDto) {
         RefundDto createdRefund = refundService.createRefund(refundDto);
-        return ResponseEntity.ok(ApiResponseDTO.success(createdRefund, "Refund processed successfully"));
+        return ResponseEntity.ok(ApiResponseDTO.success("Refund processed successfully", createdRefund));
     }
     
     @GetMapping("/{id}")
@@ -37,7 +37,7 @@ public class RefundController {
     @RequirePermission("refund:read")
     public ResponseEntity<ApiResponseDTO<RefundDto>> getRefundById(@PathVariable Long id) {
         RefundDto refund = refundService.getRefundById(id);
-        return ResponseEntity.ok(ApiResponseDTO.success(refund, "Refund retrieved successfully"));
+        return ResponseEntity.ok(ApiResponseDTO.success("Refund retrieved successfully", refund));
     }
     
     @GetMapping
@@ -45,7 +45,7 @@ public class RefundController {
     @RequirePermission("refund:read")
     public ResponseEntity<ApiResponseDTO<List<RefundDto>>> getAllRefunds() {
         List<RefundDto> refunds = refundService.getAllRefunds();
-        return ResponseEntity.ok(ApiResponseDTO.success(refunds, "Refunds retrieved successfully"));
+        return ResponseEntity.ok(ApiResponseDTO.success("Refunds retrieved successfully", refunds));
     }
     
     @GetMapping("/transaction/{transactionId}")
@@ -53,7 +53,7 @@ public class RefundController {
     @RequirePermission("refund:read")
     public ResponseEntity<ApiResponseDTO<List<RefundDto>>> getRefundsByTransactionId(@PathVariable Long transactionId) {
         List<RefundDto> refunds = refundService.getRefundsByTransactionId(transactionId);
-        return ResponseEntity.ok(ApiResponseDTO.success(refunds, "Refunds retrieved successfully"));
+        return ResponseEntity.ok(ApiResponseDTO.success("Refunds retrieved successfully", refunds));
     }
     
     @GetMapping("/customer/{customerId}")
@@ -61,7 +61,7 @@ public class RefundController {
     @RequirePermission("refund:read")
     public ResponseEntity<ApiResponseDTO<List<RefundDto>>> getRefundsByCustomerId(@PathVariable Long customerId) {
         List<RefundDto> refunds = refundService.getRefundsByCustomerId(customerId);
-        return ResponseEntity.ok(ApiResponseDTO.success(refunds, "Refunds retrieved successfully"));
+        return ResponseEntity.ok(ApiResponseDTO.success("Refunds retrieved successfully", refunds));
     }
     
     @GetMapping("/status/{status}")
@@ -69,7 +69,7 @@ public class RefundController {
     @RequirePermission("refund:read")
     public ResponseEntity<ApiResponseDTO<List<RefundDto>>> getRefundsByStatus(@PathVariable String status) {
         List<RefundDto> refunds = refundService.getRefundsByStatus(status);
-        return ResponseEntity.ok(ApiResponseDTO.success(refunds, "Refunds retrieved successfully"));
+        return ResponseEntity.ok(ApiResponseDTO.success("Refunds retrieved successfully", refunds));
     }
     
     @GetMapping("/date-range")
@@ -79,7 +79,7 @@ public class RefundController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
         List<RefundDto> refunds = refundService.getRefundsByDateRange(startDate, endDate);
-        return ResponseEntity.ok(ApiResponseDTO.success(refunds, "Refunds retrieved successfully"));
+        return ResponseEntity.ok(ApiResponseDTO.success("Refunds retrieved successfully", refunds));
     }
     
     @PutMapping("/{id}/status")
@@ -87,7 +87,7 @@ public class RefundController {
     @RequirePermission("refund:update")
     public ResponseEntity<ApiResponseDTO<RefundDto>> updateRefundStatus(@PathVariable Long id, @RequestParam String status) {
         RefundDto updatedRefund = refundService.updateRefundStatus(id, status);
-        return ResponseEntity.ok(ApiResponseDTO.success(updatedRefund, "Refund status updated successfully"));
+        return ResponseEntity.ok(ApiResponseDTO.success("Refund status updated successfully", updatedRefund));
     }
     
     @PostMapping("/{id}/reprint")
@@ -95,7 +95,7 @@ public class RefundController {
     @RequirePermission("refund:update")
     public ResponseEntity<ApiResponseDTO<RefundDto>> reprintReceipt(@PathVariable Long id) {
         RefundDto updatedRefund = refundService.reprintReceipt(id);
-        return ResponseEntity.ok(ApiResponseDTO.success(updatedRefund, "Receipt reprinted successfully"));
+        return ResponseEntity.ok(ApiResponseDTO.success("Receipt reprinted successfully", updatedRefund));
     }
     
     @GetMapping("/stats/total")
@@ -105,7 +105,7 @@ public class RefundController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
         Double total = refundService.getTotalRefundsForPeriod(startDate, endDate);
-        return ResponseEntity.ok(ApiResponseDTO.success(total, "Total refunds calculated successfully"));
+        return ResponseEntity.ok(ApiResponseDTO.success("Total refunds calculated successfully", total));
     }
     
     @GetMapping("/stats/count")
@@ -115,6 +115,6 @@ public class RefundController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
         Long count = refundService.getRefundCountForPeriod(startDate, endDate);
-        return ResponseEntity.ok(ApiResponseDTO.success(count, "Refund count calculated successfully"));
+        return ResponseEntity.ok(ApiResponseDTO.success("Refund count calculated successfully", count));
     }
 } 

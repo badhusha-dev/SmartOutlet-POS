@@ -27,7 +27,7 @@ public class CustomerController {
     @RequirePermission("customer:read")
     public ResponseEntity<ApiResponseDTO<List<CustomerDto>>> getAllCustomers() {
         List<CustomerDto> customers = customerService.getAllCustomers();
-        return ResponseEntity.ok(ApiResponseDTO.success(customers, "Customers retrieved successfully"));
+        return ResponseEntity.ok(ApiResponseDTO.success("Customers retrieved successfully", customers));
     }
     
     @GetMapping("/{id}")
@@ -35,7 +35,7 @@ public class CustomerController {
     @RequirePermission("customer:read")
     public ResponseEntity<ApiResponseDTO<CustomerDto>> getCustomerById(@PathVariable Long id) {
         CustomerDto customer = customerService.getCustomerById(id);
-        return ResponseEntity.ok(ApiResponseDTO.success(customer, "Customer retrieved successfully"));
+        return ResponseEntity.ok(ApiResponseDTO.success("Customer retrieved successfully", customer));
     }
     
     @PostMapping
@@ -43,7 +43,7 @@ public class CustomerController {
     @RequirePermission("customer:create")
     public ResponseEntity<ApiResponseDTO<CustomerDto>> createCustomer(@RequestBody CustomerDto customerDto) {
         CustomerDto createdCustomer = customerService.createCustomer(customerDto);
-        return ResponseEntity.ok(ApiResponseDTO.success(createdCustomer, "Customer created successfully"));
+        return ResponseEntity.ok(ApiResponseDTO.success("Customer created successfully", createdCustomer));
     }
     
     @PutMapping("/{id}")
@@ -51,7 +51,7 @@ public class CustomerController {
     @RequirePermission("customer:update")
     public ResponseEntity<ApiResponseDTO<CustomerDto>> updateCustomer(@PathVariable Long id, @RequestBody CustomerDto customerDto) {
         CustomerDto updatedCustomer = customerService.updateCustomer(id, customerDto);
-        return ResponseEntity.ok(ApiResponseDTO.success(updatedCustomer, "Customer updated successfully"));
+        return ResponseEntity.ok(ApiResponseDTO.success("Customer updated successfully", updatedCustomer));
     }
     
     @DeleteMapping("/{id}")
@@ -59,7 +59,7 @@ public class CustomerController {
     @RequirePermission("customer:delete")
     public ResponseEntity<ApiResponseDTO<Void>> deleteCustomer(@PathVariable Long id) {
         customerService.deleteCustomer(id);
-        return ResponseEntity.ok(ApiResponseDTO.success(null, "Customer deleted successfully"));
+        return ResponseEntity.ok(ApiResponseDTO.success("Customer deleted successfully", null));
     }
     
     @GetMapping("/search")
@@ -67,7 +67,7 @@ public class CustomerController {
     @RequirePermission("customer:read")
     public ResponseEntity<ApiResponseDTO<List<CustomerDto>>> searchCustomers(@RequestParam String searchTerm) {
         List<CustomerDto> customers = customerService.searchCustomers(searchTerm);
-        return ResponseEntity.ok(ApiResponseDTO.success(customers, "Customer search completed"));
+        return ResponseEntity.ok(ApiResponseDTO.success("Customer search completed", customers));
     }
     
     @GetMapping("/email/{email}")
@@ -75,7 +75,7 @@ public class CustomerController {
     @RequirePermission("customer:read")
     public ResponseEntity<ApiResponseDTO<CustomerDto>> getCustomerByEmail(@PathVariable String email) {
         CustomerDto customer = customerService.getCustomerByEmail(email);
-        return ResponseEntity.ok(ApiResponseDTO.success(customer, "Customer retrieved successfully"));
+        return ResponseEntity.ok(ApiResponseDTO.success("Customer retrieved successfully", customer));
     }
     
     @GetMapping("/phone/{phone}")
@@ -83,7 +83,7 @@ public class CustomerController {
     @RequirePermission("customer:read")
     public ResponseEntity<ApiResponseDTO<CustomerDto>> getCustomerByPhone(@PathVariable String phone) {
         CustomerDto customer = customerService.getCustomerByPhone(phone);
-        return ResponseEntity.ok(ApiResponseDTO.success(customer, "Customer retrieved successfully"));
+        return ResponseEntity.ok(ApiResponseDTO.success("Customer retrieved successfully", customer));
     }
     
     @GetMapping("/type/{customerType}")
@@ -91,7 +91,7 @@ public class CustomerController {
     @RequirePermission("customer:read")
     public ResponseEntity<ApiResponseDTO<List<CustomerDto>>> getCustomersByType(@PathVariable String customerType) {
         List<CustomerDto> customers = customerService.getCustomersByType(customerType);
-        return ResponseEntity.ok(ApiResponseDTO.success(customers, "Customers retrieved successfully"));
+        return ResponseEntity.ok(ApiResponseDTO.success("Customers retrieved successfully", customers));
     }
     
     @PostMapping("/{id}/loyalty-points")
@@ -99,7 +99,7 @@ public class CustomerController {
     @RequirePermission("customer:update")
     public ResponseEntity<ApiResponseDTO<CustomerDto>> addLoyaltyPoints(@PathVariable Long id, @RequestParam Integer points) {
         CustomerDto updatedCustomer = customerService.addLoyaltyPoints(id, points);
-        return ResponseEntity.ok(ApiResponseDTO.success(updatedCustomer, "Loyalty points added successfully"));
+        return ResponseEntity.ok(ApiResponseDTO.success("Loyalty points added successfully", updatedCustomer));
     }
     
     @PostMapping("/{id}/spending")
@@ -107,7 +107,7 @@ public class CustomerController {
     @RequirePermission("customer:update")
     public ResponseEntity<ApiResponseDTO<CustomerDto>> updateCustomerSpending(@PathVariable Long id, @RequestParam Double amount) {
         CustomerDto updatedCustomer = customerService.updateCustomerSpending(id, amount);
-        return ResponseEntity.ok(ApiResponseDTO.success(updatedCustomer, "Customer spending updated successfully"));
+        return ResponseEntity.ok(ApiResponseDTO.success("Customer spending updated successfully", updatedCustomer));
     }
     
     @GetMapping("/top/spending")
@@ -115,7 +115,7 @@ public class CustomerController {
     @RequirePermission("customer:read")
     public ResponseEntity<ApiResponseDTO<List<CustomerDto>>> getTopCustomersBySpending(@RequestParam(defaultValue = "10") int limit) {
         List<CustomerDto> customers = customerService.getTopCustomersBySpending(limit);
-        return ResponseEntity.ok(ApiResponseDTO.success(customers, "Top customers retrieved successfully"));
+        return ResponseEntity.ok(ApiResponseDTO.success("Top customers retrieved successfully", customers));
     }
     
     @GetMapping("/top/loyalty-points")
@@ -123,6 +123,6 @@ public class CustomerController {
     @RequirePermission("customer:read")
     public ResponseEntity<ApiResponseDTO<List<CustomerDto>>> getTopCustomersByLoyaltyPoints(@RequestParam(defaultValue = "10") int limit) {
         List<CustomerDto> customers = customerService.getTopCustomersByLoyaltyPoints(limit);
-        return ResponseEntity.ok(ApiResponseDTO.success(customers, "Top customers by loyalty points retrieved successfully"));
+        return ResponseEntity.ok(ApiResponseDTO.success("Top customers by loyalty points retrieved successfully", customers));
     }
 } 
