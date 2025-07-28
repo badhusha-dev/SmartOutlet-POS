@@ -32,7 +32,7 @@ import {
   Cell
 } from 'recharts'
 import { motion } from 'framer-motion'
-import apiClient, { API_ENDPOINTS } from '../../../services/client'
+import { api, API_ENDPOINTS } from '../../../services/client'
 import LoadingSpinner from '../../../components/common/LoadingSpinner'
 import { 
   mockDashboardStats, 
@@ -50,7 +50,7 @@ const Dashboard = () => {
   // Fetch dashboard stats
   const { data: stats, isLoading } = useQuery(
     'dashboardStats',
-    () => apiClient.get(API_ENDPOINTS.DASHBOARD_STATS),
+    () => api.get(API_ENDPOINTS.DASHBOARD_STATS),
     {
       select: (response) => response.data.data,
       refetchInterval: 30000, // Refetch every 30 seconds

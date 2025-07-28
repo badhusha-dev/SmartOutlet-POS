@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
+import { authApi, API_ENDPOINTS } from '../services/client'
+import toast from 'react-hot-toast'
 
 const AuthContext = createContext()
 
@@ -14,43 +16,116 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [isDevMode] = useState(import.meta.env.VITE_DEV_MODE === 'true')
+  const [disableAuth] = useState(import.meta.env.VITE_DISABLE_AUTH === 'true')
 
   useEffect(() => {
-    // Check if we're in dev mode and should use mock user
-    if (isDevMode && import.meta.env.VITE_MOCK_USER === 'true') {
+    if (disableAuth) {
       setUser({
         id: 1,
-        name: 'Demo User',
+        username: 'demo',
         email: 'demo@smartoutlet.com',
         role: 'ADMIN',
         permissions: ['read', 'write', 'delete']
       })
+      setLoading(false)
+      return
     }
-    setLoading(false)
-  }, [isDevMode])
+    const token = localStorage.getItem('token')
+    if (token) {
+      getCurrentUser()
+    } else {
+      setLoading(false)
+    }
+    // eslint-disable-next-line
+  }, [isDevMode, disableAuth])
 
+  // Login method
   const login = async (credentials) => {
-    try {
-      // In a real app, this would make an API call
-      if (isDevMode) {
-        setUser({
-          id: 1,
-          name: 'Demo User',
-          email: credentials.email,
-          role: 'ADMIN',
-          permissions: ['read', 'write', 'delete']
-        })
+    if (disableAuth) {
+      setUser({
+        id: 1,
+        username: credentials.username,
+        email: credentials.email || 'demo@smartoutlet.com',
+        role: 'ADMIN',
+        permissions: ['read', 'write', 'delete']
+      })
       return { success: true }
+    }
+    try {
+      setLoading(true)
+      // Pass all credentials (including env) to the API
+      const res = await authApi.post('/auth/login', credentials)
+      const { token } = res.data
+      if (token) {
+        localStorage.setItem('token', token)
+        await getCurrentUser()
+        setLoading(false)
+        return { success: true }
+      } else {
+        setLoading(false)
+        return { success: false, error: 'No token received' }
       }
-      // TODO: Implement real authentication
-      return { success: false, error: 'Authentication not implemented' }
     } catch (error) {
-      return { success: false, error: error.message }
+      setLoading(false)
+      const msg = error.response?.data?.message || error.message || 'Login failed'
+      return { success: false, error: msg }
     }
   }
 
+  // Register method
+  const register = async (data) => {
+    if (disableAuth) {
+      setUser({
+        id: 1,
+        username: data.username,
+        email: data.email || 'demo@smartoutlet.com',
+        role: data.role || 'ADMIN',
+        permissions: ['read', 'write', 'delete']
+      })
+      return { success: true }
+    }
+    try {
+      setLoading(true)
+      await authApi.post('/auth/register', data)
+      setLoading(false)
+      return { success: true }
+    } catch (error) {
+      setLoading(false)
+      const msg = error.response?.data?.message || error.message || 'Registration failed'
+      return { success: false, error: msg }
+    }
+  }
+
+  // Get current user info
+  const getCurrentUser = async () => {
+    if (disableAuth) {
+      setUser({
+        id: 1,
+        username: 'demo',
+        email: 'demo@smartoutlet.com',
+        role: 'ADMIN',
+        permissions: ['read', 'write', 'delete']
+      })
+      return
+    }
+    try {
+      const res = await authApi.get('/auth/me')
+      setUser(res.data)
+      localStorage.setItem('user', JSON.stringify(res.data))
+    } catch (error) {
+      setUser(null)
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Logout method
   const logout = () => {
     setUser(null)
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
   }
 
   const value = {
@@ -59,6 +134,7 @@ export const AuthProvider = ({ children }) => {
     isDevMode,
     login,
     logout,
+    register,
     isAuthenticated: !!user
   }
 

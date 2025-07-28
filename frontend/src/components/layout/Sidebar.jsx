@@ -40,6 +40,12 @@ const Sidebar = ({ isOpen, onClose }) => {
       icon: Package,
       roles: ['ADMIN', 'STAFF'] 
     },
+    {
+      name: 'Categories',
+      href: '/categories',
+      icon: Package,
+      roles: ['ADMIN', 'STAFF']
+    },
     { 
       name: 'POS Sales', 
       href: '/pos', 
@@ -57,6 +63,24 @@ const Sidebar = ({ isOpen, onClose }) => {
       href: '/expenses', 
       icon: Receipt,
       roles: ['ADMIN'] 
+    },
+    {
+      name: 'Expense Management',
+      href: '/expenses-management',
+      icon: Receipt,
+      roles: ['ADMIN']
+    },
+    {
+      name: 'Reporting Dashboard',
+      href: '/reporting-dashboard',
+      icon: TrendingUp,
+      roles: ['ADMIN', 'STAFF']
+    },
+    {
+      name: 'Error Logs',
+      href: '/error-logs',
+      icon: Settings,
+      roles: ['ADMIN']
     },
   ]
 

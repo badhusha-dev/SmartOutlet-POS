@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 @EnableScheduling
 @EnableTransactionManagement
 @RestController
-@ComponentScan(basePackages = "com.smartoutlet.product", 
+@ComponentScan(basePackages = {"com.smartoutlet.product", "com.smartoutlet.common"}, 
                excludeFilters = @ComponentScan.Filter(type = org.springframework.context.annotation.FilterType.REGEX, 
                                                     pattern = ".*backup.*"))
 @EntityScan("com.smartoutlet.product.entity")
-@EnableJpaRepositories("com.smartoutlet.product.repository")
+@EnableJpaRepositories({"com.smartoutlet.product.repository", "com.smartoutlet.product.infrastructure.persistence"})
 public class ProductServiceApplication {
 
     public static void main(String[] args) {

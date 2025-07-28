@@ -50,7 +50,7 @@ start_service() {
     mvn spring-boot:run \
         -Dspring-boot.run.profiles=dev \
         -Dspring-boot.run.jvmArguments="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=$debug_port" \
-        > "../logs/${service_name,,}-service.log" 2>&1 &
+        > "../logs/${service_name}-service.log" 2>&1 &
     
     local pid=$!
     echo "✅ $service_name started with PID: $pid"

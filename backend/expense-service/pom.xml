@@ -59,6 +59,13 @@
             <version>2.2.0</version>
         </dependency>
 
+        <!-- Common Module -->
+        <dependency>
+            <groupId>com.smartoutlet</groupId>
+            <artifactId>common-module</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
         <!-- Testing -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

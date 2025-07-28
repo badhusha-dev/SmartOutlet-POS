@@ -1,10 +1,6 @@
 package com.smartoutlet.auth.infrastructure.config;
 
 import com.smartoutlet.auth.application.service.ErrorLogService;
-import com.smartoutlet.auth.infrastructure.config.UserNotFoundException;
-import com.smartoutlet.auth.infrastructure.config.UserAlreadyExistsException;
-import com.smartoutlet.auth.infrastructure.config.ErrorResponse;
-import com.smartoutlet.auth.infrastructure.config.InvalidTokenException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;

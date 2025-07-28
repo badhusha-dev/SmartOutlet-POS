@@ -3,11 +3,12 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { Store, Eye, EyeOff, UserPlus } from 'lucide-react'
 import { motion } from 'framer-motion'
-// Remove: import { registerUser } from '../../store/slices/authSlice'
 import { InlineSpinner } from '../../components/common/LoadingSpinner'
+import { useAuth } from '../../contexts/AuthContext'
 
 const Register = () => {
   const navigate = useNavigate()
+  const { register: registerUser } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -27,24 +28,19 @@ const Register = () => {
       setError('confirmPassword', { message: 'Passwords do not match' })
       return
     }
-
     setIsLoading(true)
-    
     const userData = {
       username: data.username,
       email: data.email,
       password: data.password,
       role: data.role
     }
-
-    try {
-      // Replace registerUser usage in onSubmit with a mock or context-based registration
-      // For now, we'll just navigate to dashboard
-      navigate('/dashboard')
-    } catch (error) {
-      setError('root', { message: error })
-    } finally {
-      setIsLoading(false)
+    const result = await registerUser(userData)
+    setIsLoading(false)
+    if (result.success) {
+      navigate('/login')
+    } else {
+      setError('root', { message: result.error })
     }
   }
 

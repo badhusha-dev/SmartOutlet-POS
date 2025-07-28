@@ -73,41 +73,6 @@ export const DATE_RANGES = {
   CUSTOM: 'CUSTOM',
 }
 
-// API Endpoints
-export const API_ENDPOINTS = {
-  // Auth
-  LOGIN: '/auth/login',
-  REGISTER: '/auth/register',
-  LOGOUT: '/auth/logout',
-  PROFILE: '/auth/profile',
-  
-  // Outlets
-  OUTLETS: '/outlets',
-  OUTLET_DETAILS: '/outlets/:id',
-  OUTLET_STAFF: '/outlets/:id/staff',
-  OUTLET_NOTICES: '/outlets/:id/notices',
-  OUTLET_TASKS: '/outlets/:id/tasks',
-  
-  // Products
-  PRODUCTS: '/products',
-  PRODUCT_DETAILS: '/products/:id',
-  PRODUCT_CATEGORIES: '/products/categories',
-  
-  // Sales
-  SALES: '/sales',
-  SALES_DETAILS: '/sales/:id',
-  ORDERS: '/orders',
-  
-  // Expenses
-  EXPENSES: '/expenses',
-  EXPENSE_DETAILS: '/expenses/:id',
-  EXPENSE_CATEGORIES: '/expenses/categories',
-  
-  // Reports
-  REPORTS: '/reports',
-  DASHBOARD_STATS: '/dashboard/stats',
-}
-
 // Local Storage Keys
 export const STORAGE_KEYS = {
   TOKEN: 'token',

@@ -88,14 +88,12 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
         </dependency>
-        <!-- Common Module - Commented out as it may not exist yet -->
-        <!--
+        <!-- Common Module -->
         <dependency>
             <groupId>com.smartoutlet</groupId>
             <artifactId>common-module</artifactId>
             <version>1.0.0</version>
         </dependency>
-        -->
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>

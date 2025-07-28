@@ -1,4 +1,4 @@
-package com.smartoutlet.gateway.config;
+package com.smartoutlet.gateway.infrastructure.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,15 +13,17 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         http
-            .csrf().disable()
-            .authorizeExchange()
+            .csrf(csrf -> csrf.disable())
+            .authorizeExchange(authz -> authz
                 .pathMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/webjars/**").permitAll()
                 .pathMatchers("/actuator/**").permitAll()
-                .pathMatchers("/auth/**", "/products/**", "/outlets/**", "/expenses/**", "/sales/**").permitAll()
-                .anyExchange().permitAll()
-            .and()
-            .httpBasic().disable()
-            .formLogin().disable();
+                .pathMatchers("/api-docs/**").permitAll()
+                .pathMatchers("/auth/**").permitAll()
+                .pathMatchers("/api/**").authenticated()
+                .anyExchange().authenticated()
+            )
+            .httpBasic(httpBasic -> httpBasic.disable())
+            .formLogin(formLogin -> formLogin.disable());
         
         return http.build();
     }

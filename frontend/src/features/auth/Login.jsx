@@ -4,10 +4,12 @@ import { useForm } from 'react-hook-form'
 import { Store, Eye, EyeOff, ArrowRight } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { InlineSpinner } from '../../components/common/LoadingSpinner'
+import { useAuth } from '../../contexts/AuthContext'
 
 const Login = () => {
   const navigate = useNavigate()
   const location = useLocation()
+  const { login } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -20,7 +22,23 @@ const Login = () => {
     setError
   } = useForm()
 
-  
+  const getEnvParam = () => {
+    if (import.meta.env.VITE_NODE_ENV === 'staging') return 'staging';
+    if (import.meta.env.VITE_NODE_ENV === 'production') return 'production';
+    return 'dev';
+  }
+
+  const onSubmit = async (data) => {
+    setIsLoading(true)
+    const env = getEnvParam();
+    const result = await login({ usernameOrEmail: data.username, password: data.password})
+    setIsLoading(false)
+    if (result.success) {
+      navigate(from, { replace: true })
+    } else {
+      setError('root', { message: result.error })
+    }
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-purple-50 dark:from-gray-900 dark:to-gray-950 py-12 px-4 sm:px-6 lg:px-8">

@@ -1,4 +1,4 @@
-import apiClient, { API_ENDPOINTS } from '../../services/client'
+import { outletApi, API_ENDPOINTS } from '../../services/client'
 import { mockOutlets, mockStaff } from '../../utils/mockData'
 
 // Development mode flags
@@ -20,7 +20,7 @@ class OutletService {
     }
 
     try {
-      const response = await apiClient.get(API_ENDPOINTS.OUTLETS)
+      const response = await outletApi.get(API_ENDPOINTS.OUTLETS)
       return {
         data: response.data.data,
         success: true,
@@ -48,7 +48,7 @@ class OutletService {
     }
 
     try {
-      const response = await apiClient.get(API_ENDPOINTS.OUTLET_BY_ID(id))
+      const response = await outletApi.get(API_ENDPOINTS.OUTLET_BY_ID(id))
       return {
         data: response.data.data,
         success: true,
@@ -75,16 +75,16 @@ class OutletService {
       return {
         data: newOutlet,
         success: true,
-        message: 'Outlet created successfully'
+        message: 'Outlet created successfully!'
       }
     }
 
     try {
-      const response = await apiClient.post(API_ENDPOINTS.OUTLETS, outletData)
+      const response = await outletApi.post(API_ENDPOINTS.OUTLETS, outletData)
       return {
         data: response.data.data,
         success: true,
-        message: 'Outlet created successfully'
+        message: 'Outlet created successfully!'
       }
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Failed to create outlet')
@@ -109,7 +109,7 @@ class OutletService {
     }
 
     try {
-      const response = await apiClient.put(API_ENDPOINTS.OUTLET_BY_ID(id), outletData)
+      const response = await outletApi.put(API_ENDPOINTS.OUTLET_BY_ID(id), outletData)
       return {
         data: response.data.data,
         success: true,
@@ -136,7 +136,7 @@ class OutletService {
     }
 
     try {
-      await apiClient.delete(API_ENDPOINTS.OUTLET_BY_ID(id))
+      await outletApi.delete(API_ENDPOINTS.OUTLET_BY_ID(id))
       return {
         success: true,
         message: 'Outlet deleted successfully'
@@ -159,7 +159,7 @@ class OutletService {
     }
 
     try {
-      const response = await apiClient.get('/staff')
+      const response = await outletApi.get(API_ENDPOINTS.STAFF_ASSIGNMENTS)
       return {
         data: response.data.data,
         success: true,
@@ -190,7 +190,7 @@ class OutletService {
     }
 
     try {
-      const response = await apiClient.get(`${API_ENDPOINTS.OUTLET_BY_ID(id)}/performance`)
+      const response = await outletApi.get(`${API_ENDPOINTS.OUTLET_BY_ID(id)}/performance`)
       return {
         data: response.data.data,
         success: true,
@@ -231,7 +231,7 @@ class OutletService {
     }
 
     try {
-      const response = await apiClient.get(`${API_ENDPOINTS.OUTLET_BY_ID(id)}/expenses`)
+      const response = await outletApi.get(`${API_ENDPOINTS.OUTLET_BY_ID(id)}/expenses`)
       return {
         data: response.data.data,
         success: true,
@@ -272,7 +272,7 @@ class OutletService {
     }
 
     try {
-      const response = await apiClient.get(`${API_ENDPOINTS.OUTLET_BY_ID(id)}/inventory`)
+      const response = await outletApi.get(`${API_ENDPOINTS.OUTLET_BY_ID(id)}/inventory`)
       return {
         data: response.data.data,
         success: true,
@@ -280,6 +280,74 @@ class OutletService {
       }
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Failed to fetch inventory')
+    }
+  }
+
+  // Assign staff to outlet
+  async assignStaffToOutlet(outletId, staffIds) {
+    // staffIds: array of user IDs
+    if (DEV_MODE && DISABLE_AUTH) {
+      console.log('🔓 Development mode: Mock assignStaffToOutlet', outletId, staffIds)
+      await new Promise(resolve => setTimeout(resolve, 400))
+      return {
+        success: true,
+        message: 'Staff assigned successfully!'
+      }
+    }
+    try {
+      const response = await outletApi.post(`${API_ENDPOINTS.OUTLET_BY_ID(outletId)}/assign-staff`, { staffIds })
+      return {
+        data: response.data.data,
+        success: true,
+        message: 'Staff assigned successfully!'
+      }
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to assign staff')
+    }
+  }
+
+  // Get staff assigned to an outlet
+  async getOutletStaff(outletId) {
+    if (DEV_MODE && DISABLE_AUTH) {
+      console.log('🔓 Development mode: Mock getOutletStaff', outletId)
+      await new Promise(resolve => setTimeout(resolve, 300))
+      // Return a subset of mockStaff for demo
+      return {
+        data: mockStaff.slice(0, 2),
+        success: true,
+        message: 'Assigned staff retrieved successfully'
+      }
+    }
+    try {
+      const response = await outletApi.get(`${API_ENDPOINTS.OUTLET_BY_ID(outletId)}/staff`)
+      return {
+        data: response.data.data,
+        success: true,
+        message: 'Assigned staff retrieved successfully'
+      }
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to fetch assigned staff')
+    }
+  }
+
+  // Remove staff assignment from outlet
+  async removeStaffFromOutlet(outletId, staffId) {
+    if (DEV_MODE && DISABLE_AUTH) {
+      console.log('🔓 Development mode: Mock removeStaffFromOutlet', outletId, staffId)
+      await new Promise(resolve => setTimeout(resolve, 300))
+      return {
+        success: true,
+        message: 'Staff removed from outlet successfully'
+      }
+    }
+    try {
+      await outletApi.delete(`${API_ENDPOINTS.OUTLET_BY_ID(outletId)}/staff/${staffId}`)
+      return {
+        success: true,
+        message: 'Staff removed from outlet successfully'
+      }
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to remove staff from outlet')
     }
   }
 }
