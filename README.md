@@ -2,6 +2,12 @@
 
 A modern, cloud-native Point of Sale (POS) system built with microservices architecture using Spring Boot, React, MySQL, Kafka, and Docker.
 
+## 🚀 Application Front Page Preview
+
+[![Watch the demo](media/preview.png)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
+
+> Click the image above to watch a short video demo of the application's front page in action!
+
 ## 🏗️ Architecture
 
 ### Microservices
