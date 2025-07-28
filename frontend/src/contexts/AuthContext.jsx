@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }) => {
     } else {
       setLoading(false)
     }
-    // eslint-disable-next-line
+     
   }, [isDevMode, disableAuth])
 
   // Login method
