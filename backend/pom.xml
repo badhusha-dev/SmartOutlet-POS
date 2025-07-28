@@ -28,6 +28,8 @@
         <module>auth-service</module>
         <module>outlet-service</module>
         <module>product-service</module>
+        <module>inventory-service</module>
+        <module>recipe-service</module>
         <!-- <module>pos-service</module> -->
         <module>expense-service</module>
     </modules>
