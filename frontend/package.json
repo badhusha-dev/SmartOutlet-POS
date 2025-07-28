@@ -11,6 +11,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.2.0",
+    "@mui/material": "^7.2.0",
+    "@mui/x-data-grid": "^8.9.1",
+    "@mui/x-date-pickers": "^8.9.0",
     "@react-pdf/renderer": "^4.3.0",
     "@reduxjs/toolkit": "^2.8.2",
     "ag-grid-community": "^34.0.1",
@@ -22,6 +28,7 @@
     "framer-motion": "^10.16.5",
     "lucide-react": "^0.294.0",
     "react": "^18.2.0",
+    "react-admin": "^5.10.0",
     "react-datepicker": "^4.25.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.48.2",
@@ -31,8 +38,10 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "^6.20.1",
     "react-select": "^5.8.0",
+    "react-to-pdf": "^2.0.1",
     "recharts": "^2.15.4",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "zustand": "^5.0.6"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.7",
