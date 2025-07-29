@@ -53,7 +53,8 @@ import { OrderEntryForm } from './OrderEntryForm';
 import { OrderHistoryList } from './OrderHistoryList';
 import { CustomerProfile } from './CustomerProfile';
 import { CheckoutModal } from './CheckoutModal';
-import { usePOSStore } from '../../store/posStore';
+import { usePOS, usePOSActions } from '../../store/hooks/usePOS';
+import { useUI, useUIActions } from '../../store/hooks/useUI';
 import { useLiveOrders } from '../../hooks/useLiveOrders';
 import { formatCurrency } from '../../utils/formatters';
 
