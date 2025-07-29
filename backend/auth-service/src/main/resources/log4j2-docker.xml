@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /*
+    Copyright (c) 2025 Badsha - All Rights Reserved
+
+    Unauthorized copying of this file, via any medium is strictly prohibited
+    Proprietary and confidential
+    Written by Badsha Pvt Ltd
+ */
+-->
+<Configuration status="warn">
+
+    <Properties>
+        <Property name="debug-log-file">/opt/smartoutlet/log/debug/smartoutlet-db-debug.log</Property>
+        <Property name="debug-log-file-base">/opt/smartoutlet/log/debug/smartoutlet-debug</Property>
+        <Property name="log-file">/opt/smartoutlet/log/smartoutlet-db.log</Property>
+        <Property name="log-file-base">/opt/smartoutlet/log/smartoutlet</Property>
+    </Properties>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout>
+                <pattern>[%-5p] | %d{yyyy-MM-dd HH:mm:ss.SSS} | [%t] %c (%F:%L) - %m%n</pattern>
+            </PatternLayout>
+        </Console>
+
+        <RollingFile name="RollingFileAtDebug" fileName="${debug-log-file}" filePattern="${debug-log-file-base}-%d{dd-MM-yyyy}-%i.log.gz">
+            <PatternLayout>
+                <pattern>[%-5p] | %d{yyyy-MM-dd HH:mm:ss.SSS} | [%t] %c (%F:%L) - %m%n</pattern>
+            </PatternLayout>
+            <ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="50 MB"/>
+            </Policies>
+        </RollingFile>
+
+        <RollingFile name="RollingFileAtInfo" fileName="${log-file}" filePattern="${log-file-base}-%d{dd-MM-yyyy}-%i.log.gz">
+            <PatternLayout>
+                <pattern>[%-5p] | %d{yyyy-MM-dd HH:mm:ss.SSS} | [%t] %c (%F:%L) - %m%n</pattern>
+            </PatternLayout>
+            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="50 MB"/>
+            </Policies>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="trace">
+            <AppenderRef ref="RollingFileAtDebug"/>
+            <AppenderRef ref="RollingFileAtInfo"/>
+        </Root>
+
+        <Logger name="org.springframework" level="debug" additivity="false">
+            <AppenderRef ref="RollingFileAtDebug"/>
+            <AppenderRef ref="RollingFileAtInfo"/>
+        </Logger>
+
+        <Logger name="org.hibernate" level="debug" additivity="false">
+            <AppenderRef ref="RollingFileAtDebug"/>
+            <AppenderRef ref="RollingFileAtInfo"/>
+        </Logger>
+
+        <Logger name="org.flywaydb" level="debug" additivity="false">
+            <AppenderRef ref="RollingFileAtDebug"/>
+            <AppenderRef ref="RollingFileAtInfo"/>
+        </Logger>
+
+        <Logger name="com.makinus.smartoutlet.db" level="debug" additivity="false">
+            <AppenderRef ref="RollingFileAtDebug"/>
+            <AppenderRef ref="RollingFileAtInfo"/>
+        </Logger>
+    </Loggers>
+
+</Configuration>

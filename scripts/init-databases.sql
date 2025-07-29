@@ -1,15 +1,29 @@
--- Create databases for all microservices
-CREATE DATABASE IF NOT EXISTS smartoutlet_auth;
-CREATE DATABASE IF NOT EXISTS smartoutlet_outlet;
-CREATE DATABASE IF NOT EXISTS smartoutlet_product;
-CREATE DATABASE IF NOT EXISTS smartoutlet_pos;
-CREATE DATABASE IF NOT EXISTS smartoutlet_expense;
+-- SmartOutlet POS System Database Initialization Script (PostgreSQL)
+-- This script creates all necessary databases for the microservices
 
--- Grant privileges (optional, since we're using root)
-GRANT ALL PRIVILEGES ON smartoutlet_auth.* TO 'root'@'%';
-GRANT ALL PRIVILEGES ON smartoutlet_outlet.* TO 'root'@'%';
-GRANT ALL PRIVILEGES ON smartoutlet_product.* TO 'root'@'%';
-GRANT ALL PRIVILEGES ON smartoutlet_pos.* TO 'root'@'%';
-GRANT ALL PRIVILEGES ON smartoutlet_expense.* TO 'root'@'%';
+-- Create databases for each service (run as the postgres superuser)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'smartoutlet_auth') THEN
+        CREATE DATABASE smartoutlet_auth;
+    END IF;
+    IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'smartoutlet_outlet') THEN
+        CREATE DATABASE smartoutlet_outlet;
+    END IF;
+    IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'smartoutlet_product') THEN
+        CREATE DATABASE smartoutlet_product;
+    END IF;
+    IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'smartoutlet_pos') THEN
+        CREATE DATABASE smartoutlet_pos;
+    END IF;
+    IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'smartoutlet_expense') THEN
+        CREATE DATABASE smartoutlet_expense;
+    END IF;
+END $$;
 
-FLUSH PRIVILEGES;
+-- Grant all privileges to the 'postgres' user for all databases
+ALTER DATABASE smartoutlet_auth OWNER TO postgres;
+ALTER DATABASE smartoutlet_outlet OWNER TO postgres;
+ALTER DATABASE smartoutlet_product OWNER TO postgres;
+ALTER DATABASE smartoutlet_pos OWNER TO postgres;
+ALTER DATABASE smartoutlet_expense OWNER TO postgres;

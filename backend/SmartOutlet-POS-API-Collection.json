@@ -1,0 +1,1251 @@
+{
+	"info": {
+		"_postman_id": "smartoutlet-pos-api-collection",
+		"name": "SmartOutlet POS API Collection",
+		"description": "Complete API collection for SmartOutlet POS microservices including Auth, Product, Outlet, Expense, and API Gateway services",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "🔐 Auth Service (Port 8081)",
+			"item": [
+				{
+					"name": "Authentication",
+					"item": [
+						{
+							"name": "Register User",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"admin\",\n    \"email\": \"admin@smartoutlet.com\",\n    \"password\": \"admin123\",\n    \"firstName\": \"Admin\",\n    \"lastName\": \"User\",\n    \"role\": \"ADMIN\"\n}"
+								},
+								"url": {
+									"raw": "{{auth_base_url}}/api/auth/register",
+									"host": ["{{auth_base_url}}"],
+									"path": ["api", "auth", "register"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Login User",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\"\n}"
+								},
+								"url": {
+									"raw": "{{auth_base_url}}/api/auth/login",
+									"host": ["{{auth_base_url}}"],
+									"path": ["api", "auth", "login"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Validate Token",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"token\": \"{{auth_token}}\"\n}"
+								},
+								"url": {
+									"raw": "{{auth_base_url}}/api/auth/validate",
+									"host": ["{{auth_base_url}}"],
+									"path": ["api", "auth", "validate"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get User Profile",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{auth_base_url}}/api/auth/profile",
+									"host": ["{{auth_base_url}}"],
+									"path": ["api", "auth", "profile"]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "User Management",
+					"item": [
+						{
+							"name": "Get All Users",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{auth_base_url}}/api/users",
+									"host": ["{{auth_base_url}}"],
+									"path": ["api", "users"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get User by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{auth_base_url}}/api/users/1",
+									"host": ["{{auth_base_url}}"],
+									"path": ["api", "users", "1"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update User",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstName\": \"Updated Admin\",\n    \"lastName\": \"Updated User\",\n    \"email\": \"updated@smartoutlet.com\"\n}"
+								},
+								"url": {
+									"raw": "{{auth_base_url}}/api/users/1",
+									"host": ["{{auth_base_url}}"],
+									"path": ["api", "users", "1"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete User",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{auth_base_url}}/api/users/1",
+									"host": ["{{auth_base_url}}"],
+									"path": ["api", "users", "1"]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Error Logs",
+					"item": [
+						{
+							"name": "Get All Error Logs",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{auth_base_url}}/api/error-logs",
+									"host": ["{{auth_base_url}}"],
+									"path": ["api", "error-logs"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Error Log by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{auth_base_url}}/api/error-logs/1",
+									"host": ["{{auth_base_url}}"],
+									"path": ["api", "error-logs", "1"]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "📦 Product Service (Port 8082)",
+			"item": [
+				{
+					"name": "Categories",
+					"item": [
+						{
+							"name": "Create Category",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Electronics\",\n    \"description\": \"Electronic products and gadgets\",\n    \"parentId\": null,\n    \"isActive\": true,\n    \"sortOrder\": 1\n}"
+								},
+								"url": {
+									"raw": "{{product_base_url}}/api/categories",
+									"host": ["{{product_base_url}}"],
+									"path": ["api", "categories"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Categories",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{product_base_url}}/api/categories",
+									"host": ["{{product_base_url}}"],
+									"path": ["api", "categories"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Category by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{product_base_url}}/api/categories/1",
+									"host": ["{{product_base_url}}"],
+									"path": ["api", "categories", "1"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Category",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Updated Electronics\",\n    \"description\": \"Updated electronic products\",\n    \"isActive\": true,\n    \"sortOrder\": 2\n}"
+								},
+								"url": {
+									"raw": "{{product_base_url}}/api/categories/1",
+									"host": ["{{product_base_url}}"],
+									"path": ["api", "categories", "1"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Category",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{product_base_url}}/api/categories/1",
+									"host": ["{{product_base_url}}"],
+									"path": ["api", "categories", "1"]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Products",
+					"item": [
+						{
+							"name": "Create Product",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"iPhone 15\",\n    \"description\": \"Latest iPhone model\",\n    \"sku\": \"IPHONE-15-001\",\n    \"barcode\": \"1234567890123\",\n    \"price\": 999.99,\n    \"costPrice\": 800.00,\n    \"stockQuantity\": 50,\n    \"minStockLevel\": 10,\n    \"maxStockLevel\": 100,\n    \"categoryId\": 1,\n    \"isActive\": true,\n    \"weight\": 0.5,\n    \"dimensions\": \"150x75x8mm\",\n    \"supplier\": \"Apple Inc.\",\n    \"tags\": [\"smartphone\", \"apple\", \"5g\"]\n}"
+								},
+								"url": {
+									"raw": "{{product_base_url}}/api/products",
+									"host": ["{{product_base_url}}"],
+									"path": ["api", "products"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Products",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{product_base_url}}/api/products",
+									"host": ["{{product_base_url}}"],
+									"path": ["api", "products"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Product by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{product_base_url}}/api/products/1",
+									"host": ["{{product_base_url}}"],
+									"path": ["api", "products", "1"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Product by SKU",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{product_base_url}}/api/products/sku/IPHONE-15-001",
+									"host": ["{{product_base_url}}"],
+									"path": ["api", "products", "sku", "IPHONE-15-001"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Product by Barcode",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{product_base_url}}/api/products/barcode/1234567890123",
+									"host": ["{{product_base_url}}"],
+									"path": ["api", "products", "barcode", "1234567890123"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Product",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"iPhone 15 Pro\",\n    \"description\": \"Updated iPhone model\",\n    \"price\": 1099.99,\n    \"stockQuantity\": 75,\n    \"isActive\": true\n}"
+								},
+								"url": {
+									"raw": "{{product_base_url}}/api/products/1",
+									"host": ["{{product_base_url}}"],
+									"path": ["api", "products", "1"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Product",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{product_base_url}}/api/products/1",
+									"host": ["{{product_base_url}}"],
+									"path": ["api", "products", "1"]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Stock Management",
+					"item": [
+						{
+							"name": "Update Stock",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"productId\": 1,\n    \"quantity\": 10,\n    \"movementType\": \"IN\",\n    \"reason\": \"Restock\",\n    \"reference\": \"PO-001\",\n    \"notes\": \"Regular restock\"\n}"
+								},
+								"url": {
+									"raw": "{{product_base_url}}/api/products/stock/update",
+									"host": ["{{product_base_url}}"],
+									"path": ["api", "products", "stock", "update"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Stock Movements",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{product_base_url}}/api/products/stock/movements",
+									"host": ["{{product_base_url}}"],
+									"path": ["api", "products", "stock", "movements"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Stock Movements by Product",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{product_base_url}}/api/products/1/stock/movements",
+									"host": ["{{product_base_url}}"],
+									"path": ["api", "products", "1", "stock", "movements"]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Error Logs",
+					"item": [
+						{
+							"name": "Get All Error Logs",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{product_base_url}}/api/error-logs",
+									"host": ["{{product_base_url}}"],
+									"path": ["api", "error-logs"]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "🏪 Outlet Service (Port 8083)",
+			"item": [
+				{
+					"name": "Outlets",
+					"item": [
+						{
+							"name": "Create Outlet",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"SmartOutlet Downtown\",\n    \"description\": \"Main downtown location\",\n    \"address\": \"123 Main Street\",\n    \"phoneNumber\": \"+1-555-0123\",\n    \"email\": \"downtown@smartoutlet.com\",\n    \"managerId\": 1,\n    \"managerName\": \"John Manager\",\n    \"postalCode\": \"12345\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"country\": \"USA\",\n    \"openingHours\": \"9:00 AM - 9:00 PM\",\n    \"isActive\": true\n}"
+								},
+								"url": {
+									"raw": "{{outlet_base_url}}/api/outlets",
+									"host": ["{{outlet_base_url}}"],
+									"path": ["api", "outlets"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Outlets",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{outlet_base_url}}/api/outlets",
+									"host": ["{{outlet_base_url}}"],
+									"path": ["api", "outlets"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Outlet by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{outlet_base_url}}/api/outlets/1",
+									"host": ["{{outlet_base_url}}"],
+									"path": ["api", "outlets", "1"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Outlet",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"SmartOutlet Downtown Updated\",\n    \"description\": \"Updated main downtown location\",\n    \"openingHours\": \"8:00 AM - 10:00 PM\",\n    \"isActive\": true\n}"
+								},
+								"url": {
+									"raw": "{{outlet_base_url}}/api/outlets/1",
+									"host": ["{{outlet_base_url}}"],
+									"path": ["api", "outlets", "1"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Outlet",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{outlet_base_url}}/api/outlets/1",
+									"host": ["{{outlet_base_url}}"],
+									"path": ["api", "outlets", "1"]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Staff Assignments",
+					"item": [
+						{
+							"name": "Assign Staff to Outlet",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"outletId\": 1,\n    \"staffId\": 2,\n    \"staffName\": \"Jane Staff\",\n    \"role\": \"CASHIER\",\n    \"startDate\": \"2024-01-01\",\n    \"endDate\": null,\n    \"isActive\": true\n}"
+								},
+								"url": {
+									"raw": "{{outlet_base_url}}/api/staff-assignments",
+									"host": ["{{outlet_base_url}}"],
+									"path": ["api", "staff-assignments"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Staff Assignments",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{outlet_base_url}}/api/staff-assignments",
+									"host": ["{{outlet_base_url}}"],
+									"path": ["api", "staff-assignments"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Staff Assignments by Outlet",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{outlet_base_url}}/api/outlets/1/staff-assignments",
+									"host": ["{{outlet_base_url}}"],
+									"path": ["api", "outlets", "1", "staff-assignments"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Staff Assignment",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"role\": \"SENIOR_CASHIER\",\n    \"isActive\": true\n}"
+								},
+								"url": {
+									"raw": "{{outlet_base_url}}/api/staff-assignments/1",
+									"host": ["{{outlet_base_url}}"],
+									"path": ["api", "staff-assignments", "1"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Remove Staff Assignment",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{outlet_base_url}}/api/staff-assignments/1",
+									"host": ["{{outlet_base_url}}"],
+									"path": ["api", "staff-assignments", "1"]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Error Logs",
+					"item": [
+						{
+							"name": "Get All Error Logs",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{outlet_base_url}}/api/error-logs",
+									"host": ["{{outlet_base_url}}"],
+									"path": ["api", "error-logs"]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "💰 Expense Service (Port 8084)",
+			"item": [
+				{
+					"name": "Expenses",
+					"item": [
+						{
+							"name": "Create Expense",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"description\": \"Office supplies purchase\",\n    \"amount\": 150.50,\n    \"outletId\": 1,\n    \"category\": \"OFFICE_SUPPLIES\",\n    \"createdBy\": \"admin\"\n}"
+								},
+								"url": {
+									"raw": "{{expense_base_url}}/api/expenses",
+									"host": ["{{expense_base_url}}"],
+									"path": ["api", "expenses"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Expenses",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{expense_base_url}}/api/expenses",
+									"host": ["{{expense_base_url}}"],
+									"path": ["api", "expenses"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Expense by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{expense_base_url}}/api/expenses/1",
+									"host": ["{{expense_base_url}}"],
+									"path": ["api", "expenses", "1"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Expenses by Outlet",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{expense_base_url}}/api/expenses/outlet/1",
+									"host": ["{{expense_base_url}}"],
+									"path": ["api", "expenses", "outlet", "1"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Expenses by Category",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{expense_base_url}}/api/expenses/category/OFFICE_SUPPLIES",
+									"host": ["{{expense_base_url}}"],
+									"path": ["api", "expenses", "category", "OFFICE_SUPPLIES"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Expense",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"description\": \"Updated office supplies purchase\",\n    \"amount\": 175.00,\n    \"category\": \"OFFICE_SUPPLIES\"\n}"
+								},
+								"url": {
+									"raw": "{{expense_base_url}}/api/expenses/1",
+									"host": ["{{expense_base_url}}"],
+									"path": ["api", "expenses", "1"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Expense",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{expense_base_url}}/api/expenses/1",
+									"host": ["{{expense_base_url}}"],
+									"path": ["api", "expenses", "1"]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Error Logs",
+					"item": [
+						{
+							"name": "Get All Error Logs",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{expense_base_url}}/api/error-logs",
+									"host": ["{{expense_base_url}}"],
+									"path": ["api", "error-logs"]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "🌐 API Gateway (Port 8080)",
+			"item": [
+				{
+					"name": "Gateway Routes",
+					"item": [
+						{
+							"name": "Auth Service via Gateway",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\"\n}"
+								},
+								"url": {
+									"raw": "{{gateway_base_url}}/auth/api/auth/login",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["auth", "api", "auth", "login"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Product Service via Gateway",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{gateway_base_url}}/product/api/products",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["product", "api", "products"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Outlet Service via Gateway",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{gateway_base_url}}/outlet/api/outlets",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["outlet", "api", "outlets"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Expense Service via Gateway",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{gateway_base_url}}/expense/api/expenses",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["expense", "api", "expenses"]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Swagger Documentation",
+					"item": [
+						{
+							"name": "Gateway Swagger UI",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base_url}}/swagger-ui.html",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["swagger-ui.html"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Gateway OpenAPI JSON",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base_url}}/v3/api-docs",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["v3", "api-docs"]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "📋 Health Checks",
+			"item": [
+				{
+					"name": "Auth Service Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{auth_base_url}}/actuator/health",
+							"host": ["{{auth_base_url}}"],
+							"path": ["actuator", "health"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Product Service Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{product_base_url}}/actuator/health",
+							"host": ["{{product_base_url}}"],
+							"path": ["actuator", "health"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Outlet Service Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{outlet_base_url}}/actuator/health",
+							"host": ["{{outlet_base_url}}"],
+							"path": ["actuator", "health"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Expense Service Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{expense_base_url}}/actuator/health",
+							"host": ["{{expense_base_url}}"],
+							"path": ["actuator", "health"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "API Gateway Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base_url}}/actuator/health",
+							"host": ["{{gateway_base_url}}"],
+							"path": ["actuator", "health"]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "auth_base_url",
+			"value": "http://localhost:8081",
+			"type": "string"
+		},
+		{
+			"key": "product_base_url",
+			"value": "http://localhost:8082",
+			"type": "string"
+		},
+		{
+			"key": "outlet_base_url",
+			"value": "http://localhost:8083",
+			"type": "string"
+		},
+		{
+			"key": "expense_base_url",
+			"value": "http://localhost:8084",
+			"type": "string"
+		},
+		{
+			"key": "gateway_base_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string"
+		}
+	]
+} 
