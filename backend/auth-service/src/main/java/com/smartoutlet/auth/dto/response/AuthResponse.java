@@ -23,4 +23,5 @@ public class AuthResponse {
     private Set<String> permissions;
     private LocalDateTime expiresAt;
     private LocalDateTime issuedAt;
+    private String refreshToken;
 }

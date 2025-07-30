@@ -1,5 +1,7 @@
 package com.smartoutlet.auth.application.service;
 
+import com.smartoutlet.auth.application.service.RefreshTokenService;
+import com.smartoutlet.auth.domain.entity.RefreshToken;
 import com.smartoutlet.auth.domain.entity.Role;
 import com.smartoutlet.auth.domain.entity.User;
 import com.smartoutlet.auth.dto.request.LoginRequest;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -32,6 +35,7 @@ public class AuthService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
+    private final RefreshTokenService refreshTokenService;
 
     @Transactional
     public AuthResponse login(LoginRequest loginRequest) {
@@ -51,6 +55,7 @@ public class AuthService {
         user.setLastLoginAt(LocalDateTime.now());
         userRepository.save(user);
 
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
         return AuthResponse.builder()
                 .token(jwt)
                 .username(user.getUsername())
@@ -60,6 +65,7 @@ public class AuthService {
                 .permissions(user.getPermissionNames())
                 .expiresAt(tokenProvider.getExpirationLocalDateTimeFromJWT(jwt))
                 .issuedAt(tokenProvider.getIssuedAtLocalDateTimeFromJWT(jwt))
+                .refreshToken(refreshToken.getToken())
                 .build();
     }
 
@@ -111,6 +117,7 @@ public class AuthService {
 
         // Generate JWT token
         String jwt = tokenProvider.generateToken(savedUser);
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(savedUser);
 
         return AuthResponse.builder()
                 .token(jwt)
@@ -121,6 +128,7 @@ public class AuthService {
                 .permissions(savedUser.getPermissionNames())
                 .expiresAt(tokenProvider.getExpirationLocalDateTimeFromJWT(jwt))
                 .issuedAt(tokenProvider.getIssuedAtLocalDateTimeFromJWT(jwt))
+                .refreshToken(refreshToken.getToken())
                 .build();
     }
 
@@ -148,5 +156,13 @@ public class AuthService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public void saveUser(User user) {
+        userRepository.save(user);
+    }
+
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 }
