@@ -40,7 +40,7 @@ import {
   LocalOffer as PriceIcon,
   Info as InfoIcon,
 } from '@mui/icons-material';
-import { usePOSStore } from '../../store/posStore';
+import { useOrderEntry } from '../../store/hooks/usePOS';
 import { Product, OrderItem } from '../../types/pos';
 import { formatCurrency } from '../../utils/formatters';
 
@@ -324,7 +324,7 @@ const SelectedProductCard = ({
 
 export const OrderEntryForm: React.FC<OrderEntryFormProps> = ({ onItemAdded }) => {
   const theme = useTheme();
-  const { products, addItemToOrder } = usePOSStore();
+  const { products, currentOrder, addItemToOrder, loading, error } = useOrderEntry();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [notes, setNotes] = useState('');
@@ -332,7 +332,6 @@ export const OrderEntryForm: React.FC<OrderEntryFormProps> = ({ onItemAdded }) =
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [showAllergenWarning, setShowAllergenWarning] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [loading, setLoading] = useState(false);
 
   // Get unique categories
   const categories = ['all', ...Array.from(new Set(products.map(p => p.category)))];

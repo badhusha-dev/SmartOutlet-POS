@@ -35,7 +35,7 @@ import {
   Schedule as ScheduleIcon,
   LocalShipping as DeliveryIcon,
 } from '@mui/icons-material';
-import { usePOSStore } from '../../store/posStore';
+import { useKPIMetrics, useOrders, useTopProducts, usePOSActions } from '../../store/hooks/usePOS';
 import { useLiveOrders } from '../../hooks/useLiveOrders';
 import { Order, Product, KPIMetrics } from '../../types/pos';
 import { formatCurrency } from '../../utils/formatters';
@@ -394,44 +394,18 @@ const QuickAddButton = ({ product, onClick }: { product: Product; onClick: () =>
 
 export const POSDashboard: React.FC<POSDashboardProps> = ({ outletId }) => {
   const theme = useTheme();
-  const { orders, products, addItemToOrder, setLoading } = usePOSStore();
+  const { orders, currentOrder } = useOrders();
+  const { metrics: kpiMetrics, loading: kpiLoading } = useKPIMetrics();
+  const { topProducts, loading: productsLoading } = useTopProducts();
+  const { addItemToOrder, fetchKPIMetrics, fetchTopProducts } = usePOSActions();
   const { isConnected, connectionError } = useLiveOrders(outletId);
-  const [kpiMetrics, setKpiMetrics] = useState<KPIMetrics | null>(null);
-  const [topProducts, setTopProducts] = useState<Product[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
-  // Fetch KPI metrics
+  // Fetch KPI metrics and top products
   useEffect(() => {
-    const fetchKPIMetrics = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(`/api/pos/outlets/${outletId}/metrics`);
-        const data = await response.json();
-        setKpiMetrics(data);
-      } catch (error) {
-        console.error('Error fetching KPI metrics:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchKPIMetrics();
-  }, [outletId, setLoading]);
-
-  // Fetch top products
-  useEffect(() => {
-    const fetchTopProducts = async () => {
-      try {
-        const response = await fetch('/api/products/top');
-        const data = await response.json();
-        setTopProducts(data.slice(0, 5)); // Top 5 products
-      } catch (error) {
-        console.error('Error fetching top products:', error);
-      }
-    };
-
+    fetchKPIMetrics(outletId);
     fetchTopProducts();
-  }, []);
+  }, [outletId, fetchKPIMetrics, fetchTopProducts]);
 
   const handleQuickAdd = (product: Product) => {
     addItemToOrder(product, 1);
@@ -461,7 +435,7 @@ export const POSDashboard: React.FC<POSDashboardProps> = ({ outletId }) => {
       color: theme.palette.primary.main,
       trend: { value: 12, direction: 'up' as const },
       subtitle: 'vs yesterday',
-      loading: !kpiMetrics,
+      loading: kpiLoading,
     },
     {
       title: "Avg Order Value",
@@ -470,7 +444,7 @@ export const POSDashboard: React.FC<POSDashboardProps> = ({ outletId }) => {
       color: theme.palette.secondary.main,
       trend: { value: 5, direction: 'up' as const },
       subtitle: 'per order',
-      loading: !kpiMetrics,
+      loading: kpiLoading,
     },
     {
       title: "Open Orders",

@@ -50,7 +50,7 @@ import {
   Percent as PercentIcon,
   Star as StarIcon,
 } from '@mui/icons-material';
-import { usePOSStore } from '../../store/posStore';
+import { useCheckout } from '../../store/hooks/usePOS';
 import { Order, Customer, Discount } from '../../types/pos';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import { applyDiscount, validateDiscount } from '../../utils/discountCalculator';
@@ -273,7 +273,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   customer,
 }) => {
   const theme = useTheme();
-  const { updateOrder } = usePOSStore();
+  const { updateOrder } = useCheckout();
   
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [tipPercentage, setTipPercentage] = useState(15);
