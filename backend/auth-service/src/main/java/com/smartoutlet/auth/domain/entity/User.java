@@ -81,6 +81,10 @@ public class User implements UserDetails {
     @Column(name = "password_changed_at")
     private LocalDateTime passwordChangedAt;
     
+    @Column(name = "is_email_verified")
+    @Builder.Default
+    private Boolean isEmailVerified = false;
+    
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "user_roles",
