@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -17,6 +19,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class AuthorizationService {
+
+    private final RestTemplate restTemplate = new RestTemplate();
+    @Value("${outlet.service.url:http://localhost:8082}")
+    private String outletServiceUrl;
 
     /**
      * Check if current user has a specific permission
@@ -210,27 +216,60 @@ public class AuthorizationService {
                 .collect(Collectors.toSet());
     }
 
+    private Long getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof JwtUserDetails userDetails) {
+            return userDetails.getUserId();
+        }
+        return null;
+    }
+    private String getCurrentUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof JwtUserDetails userDetails) {
+            return userDetails.getUsername();
+        }
+        return null;
+    }
+
     /**
      * Validate if current user can access outlet-specific data
      */
     public boolean canAccessOutlet(Long outletId) {
-        // Admin can access all outlets
         if (isAdmin()) {
             return true;
         }
-
-        // Manager can access their assigned outlets
+        Long userId = getCurrentUserId();
+        if (userId == null) return false;
         if (isManager()) {
-            // TODO: Implement outlet assignment check
-            return true;
+            // Check if manager is assigned to this outlet
+            String url = outletServiceUrl + "/api/outlets/" + outletId + "/staff";
+            try {
+                StaffAssignmentResponse[] staff = restTemplate.getForObject(url, StaffAssignmentResponse[].class);
+                if (staff != null) {
+                    for (StaffAssignmentResponse s : staff) {
+                        if (s.getUserId().equals(userId)) return true;
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("Failed to check outlet assignment: {}", e.getMessage());
+            }
+            return false;
         }
-
-        // Staff can access their assigned outlet
         if (isStaff() || isCashier() || isKitchen()) {
-            // TODO: Implement outlet assignment check
-            return true;
+            // Check if staff/cashier/kitchen is assigned to this outlet
+            String url = outletServiceUrl + "/api/outlets/" + outletId + "/staff";
+            try {
+                StaffAssignmentResponse[] staff = restTemplate.getForObject(url, StaffAssignmentResponse[].class);
+                if (staff != null) {
+                    for (StaffAssignmentResponse s : staff) {
+                        if (s.getUserId().equals(userId)) return true;
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("Failed to check outlet assignment: {}", e.getMessage());
+            }
+            return false;
         }
-
         return false;
     }
 
@@ -242,25 +281,37 @@ public class AuthorizationService {
         if (authentication == null) {
             return false;
         }
-
-        String currentUsername = authentication.getName();
-
-        // Users can always modify their own data
-        if (currentUsername.equals(dataOwnerUsername)) {
+        String currentUsername = getCurrentUsername();
+        if (currentUsername != null && currentUsername.equals(dataOwnerUsername)) {
             return true;
         }
-
-        // Admin can modify any user's data
         if (isAdmin()) {
             return true;
         }
-
-        // Manager can modify staff data in their outlet
         if (isManager()) {
-            // TODO: Implement outlet-based permission check
-            return true;
+            // Check if manager and staff are assigned to the same outlet
+            Long managerId = getCurrentUserId();
+            if (managerId == null) return false;
+            String url = outletServiceUrl + "/api/outlets/user/" + managerId;
+            try {
+                StaffAssignmentResponse[] managerAssignments = restTemplate.getForObject(url, StaffAssignmentResponse[].class);
+                if (managerAssignments != null) {
+                    for (StaffAssignmentResponse assignment : managerAssignments) {
+                        // For each outlet the manager is assigned to, check if the staff is also assigned
+                        String staffUrl = outletServiceUrl + "/api/outlets/" + assignment.getOutletId() + "/staff";
+                        StaffAssignmentResponse[] staff = restTemplate.getForObject(staffUrl, StaffAssignmentResponse[].class);
+                        if (staff != null) {
+                            for (StaffAssignmentResponse s : staff) {
+                                if (s.getUsername().equals(dataOwnerUsername)) return true;
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("Failed to check outlet-based permission: {}", e.getMessage());
+            }
+            return false;
         }
-
         return false;
     }
 
