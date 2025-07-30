@@ -71,6 +71,24 @@ cd backend
 ./stop-dev-services.sh
 ```
 
+## 🏗️ Architecture Overview
+
+### Service Communication
+- **Microservices:** 8 independent Spring Boot services
+- **Event-Driven:** Kafka for async communication
+- **API Gateway:** Central routing and authentication
+- **Database:** Separate schemas per service
+
+### Backend Services (8 Services)
+1. **🔐 Auth Service** - Authentication & JWT management (Port: 8081)
+2. **📦 Product Service** - Product catalog & inventory (Port: 8082)
+3. **🏪 Outlet Service** - Outlet management & staff (Port: 8083)
+4. **💰 Expense Service** - Expense tracking & approval (Port: 8084)
+5. **🛒 POS Service** - Point of sale transactions (Port: 8085)
+6. **📊 Inventory Service** - Stock management & tracking (Port: 8086)
+7. **👨‍🍳 Recipe Service** - Recipe & raw material management
+8. **🌐 API Gateway** - Service routing & aggregation (Port: 8080)
+
 ## 📋 Service Dependencies
 
 ### Infrastructure Services
