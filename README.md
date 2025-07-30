@@ -1,271 +1,188 @@
-# 🏪 SmartOutlet POS System
+# SmartOutlet POS - Microservices Architecture
 
-A modern, cloud-native Point of Sale (POS) system built with microservices architecture using Spring Boot, React, MySQL, Kafka, and Docker.
+**A comprehensive Point of Sale system built with Spring Boot microservices**
 
-## 🏗️ Architecture
+## 🏗️ System Architecture
 
-### Microservices
-- **Auth Service** (Port 8081) - Authentication & JWT management
-- **Outlet Service** (Port 8082) - Outlet management with Kafka events
-- **Product Service** (Port 8083) - Product catalog & inventory
-- **POS Service** (Port 8084) - Sales transactions & receipt generation
-- **Expense Service** (Port 8085) - Expense tracking & reporting
-- **API Gateway** (Port 8080) - Centralized routing & CORS
+SmartOutlet POS is built using a microservices architecture with 8 independent services, each handling specific business domains:
 
-### Infrastructure
-- **MySQL** - Primary database for all services
-- **Apache Kafka** - Event streaming for microservices communication
-- **Redis** - Caching and session management
-- **React Frontend** (Port 3000) - Modern web interface
-- **Kafka UI** (Port 8090) - Kafka monitoring dashboard
+### 🔐 **Auth Service** (Port 8081)
+- **Purpose**: Authentication and authorization
+- **Features**: JWT-based authentication, role-based access control (ADMIN/STAFF)
+- **Database**: H2 (dev) / PostgreSQL (prod)
+- **API Docs**: http://localhost:8081/swagger-ui/index.html
+
+### 🌐 **API Gateway** (Port 8080)
+- **Purpose**: Central routing and service aggregation
+- **Features**: Request routing, load balancing, service discovery
+- **Dependencies**: All backend services
+- **API Docs**: http://localhost:8080/swagger-ui/index.html
+
+### 📦 **Product Service** (Port 8082)
+- **Purpose**: Product catalog and inventory management
+- **Features**: Product CRUD, category management, pricing, stock tracking
+- **Kafka Topics**: product-events, inventory-updates, price-updates
+- **API Docs**: http://localhost:8082/swagger-ui/index.html
+
+### 🏪 **Outlet Service** (Port 8083)
+- **Purpose**: Multi-outlet management
+- **Features**: Outlet CRUD, location management, outlet-specific configurations
+- **Kafka Topics**: outlet-events, outlet-updates
+- **API Docs**: http://localhost:8083/swagger-ui/index.html
+
+### 💰 **Expense Service** (Port 8084)
+- **Purpose**: Expense tracking and financial management
+- **Features**: Expense recording, categorization, reporting
+- **Kafka Topics**: Consumes sales-events for expense analysis
+- **API Docs**: http://localhost:8084/swagger-ui/index.html
+
+### 🛒 **POS Service** (Port 8085)
+- **Purpose**: Point of sale transactions
+- **Features**: Sales processing, payment handling, receipt generation
+- **Kafka Topics**: sales-events, payment-events
+- **API Docs**: http://localhost:8085/swagger-ui/index.html
+
+### 📊 **Inventory Service** (Port 8086)
+- **Purpose**: Advanced inventory management
+- **Features**: Stock levels, reorder points, inventory tracking
+- **Dependencies**: Product Service integration
+- **API Docs**: http://localhost:8086/swagger-ui/index.html
+
+### 🍽️ **Recipe Service** (Port 8087)
+- **Purpose**: Recipe and Bill of Materials (BOM) management
+- **Features**: Recipe creation, ingredient tracking, cost calculation
+- **Dependencies**: Product Service for ingredients
+- **API Docs**: http://localhost:8087/swagger-ui/index.html
 
 ## 🚀 Quick Start
 
-### Prerequisites
-- Docker & Docker Compose
-- Java 11+ (for local development)
-- Node.js 16+ (for frontend development)
-
-### 1. Start the Complete System
+### Development Mode (Recommended)
 ```bash
-# Clone the repository
-git clone <repository-url>
-cd smartoutlet-pos
+# Start all 8 services
+cd backend
+./start-dev-services.sh
 
-# Start all services with Docker Compose
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
+# Or use the Run button in Replit
 ```
 
-### 2. Access the Applications
-- **Frontend**: http://localhost:3000
-- **API Gateway**: http://localhost:8080
-- **Kafka UI**: http://localhost:8090
-- **Individual Services**: 
-  - Auth: http://localhost:8081/auth
-  - Outlets: http://localhost:8082/outlets
-  - Products: http://localhost:8083/products
-  - POS: http://localhost:8084/pos
-  - Expenses: http://localhost:8085/expenses
-
-### 3. Health Checks
+### Stop Services
 ```bash
-# Check all services status
-curl http://localhost:8080/actuator/health
-
-# Individual service health
-curl http://localhost:8081/auth/actuator/health
-curl http://localhost:8082/outlets/actuator/health
-curl http://localhost:8083/products/actuator/health
-curl http://localhost:8084/pos/actuator/health
-curl http://localhost:8085/expenses/actuator/health
+cd backend
+./stop-dev-services.sh
 ```
 
-## 📁 Project Structure
+## 📋 Service Dependencies
 
-```
-smartoutlet-pos/
-├── backend/
-│   ├── auth-service/
-│   ├── outlet-service/
-│   ├── product-service/
-│   ├── pos-service/
-│   ├── expense-service/
-│   └── api-gateway/
-├── frontend/
-├── scripts/
-├── docker-compose.yml
-└── README.md
-```
+### Infrastructure Services
+- **PostgreSQL**: Primary database for production
+- **H2 Database**: In-memory database for development/testing
+- **Apache Kafka**: Event streaming and service communication
+- **Redis**: Caching layer (optional)
+
+### Build Dependencies
+- **Java 21**: Runtime environment
+- **Maven 3.9+**: Build tool and dependency management
+- **Common Module**: Shared DTOs and utilities across services
+
+## 🔗 Service Communication
+
+### Synchronous Communication
+- **REST APIs**: Direct service-to-service HTTP calls
+- **API Gateway**: Centralized routing for external requests
+
+### Asynchronous Communication
+- **Kafka Events**: Event-driven architecture for loose coupling
+- **Event Topics**: 
+  - `product-events`, `inventory-updates`, `price-updates`
+  - `outlet-events`, `outlet-updates`
+  - `sales-events`, `payment-events`
+
+## 🛠️ Development Features
+
+### Built-in Capabilities
+- **API Documentation**: Swagger/OpenAPI for all services
+- **Health Checks**: Service monitoring endpoints
+- **Centralized Logging**: Structured JSON logging
+- **Exception Handling**: Global error handling with detailed responses
+- **Security**: JWT authentication with role-based access
+- **Database Migrations**: Flyway for schema management
+
+### Development Tools
+- **Hot Reload**: Spring Boot DevTools enabled
+- **Debug Support**: Remote debugging ports configured
+- **Log Aggregation**: Centralized logs in `backend/logs/`
+- **Service Scripts**: Easy start/stop/restart commands
+
+## 📊 Current Status
+
+### ✅ Production Ready Services (6/8)
+- Auth Service - Complete JWT implementation
+- API Gateway - Full routing configuration
+- Product Service - Complete CRUD with Kafka
+- Outlet Service - Multi-outlet management
+- Expense Service - Financial tracking
+- POS Service - Transaction processing
+
+### 🚧 In Development (2/8)
+- Inventory Service - Advanced stock management
+- Recipe Service - BOM and recipe management
+
+## 🎯 Business Capabilities
+
+### Multi-Tenant Architecture
+- **Multi-Outlet Support**: Manage multiple retail locations
+- **Role-Based Access**: ADMIN and STAFF role separation
+- **Outlet-Specific Data**: Isolated data per outlet
+
+### Real-Time Features
+- **Event-Driven Updates**: Real-time inventory and sales updates
+- **Live Transaction Processing**: Immediate POS transaction handling
+- **Async Communication**: Non-blocking service interactions
+
+### Scalability Features
+- **Microservices Architecture**: Independent service scaling
+- **Event Streaming**: High-throughput message processing
+- **Database Isolation**: Separate schemas per service
 
 ## 🔧 Configuration
 
-### Environment Variables
-All services support both development and Docker environments through application.properties profiles.
+### Environment Profiles
+- **Development**: H2 database, local Kafka, debug logging
+- **Testing**: In-memory databases, mock services
+- **Production**: PostgreSQL, external Kafka, optimized logging
 
-#### Auth Service
-```properties
-# JWT Configuration
-APP_JWT_SECRET=smartoutletSecretKey...
-APP_JWT_EXPIRATION=86400000
-
-# Database
-SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/smartoutlet_auth
-SPRING_DATASOURCE_USERNAME=root
-SPRING_DATASOURCE_PASSWORD=smartoutlet123
+### Port Configuration
+```
+Auth Service:      8081
+Product Service:   8082  
+Outlet Service:    8083
+Expense Service:   8084
+POS Service:       8085
+Inventory Service: 8086
+Recipe Service:    8087
+API Gateway:       8080
 ```
 
-#### Product Service
-```properties
-# Stock Configuration
-APP_PRODUCT_LOW_STOCK_THRESHOLD=10
-APP_PRODUCT_ENABLE_STOCK_ALERTS=true
-```
-
-#### POS Service
-```properties
-# Receipt Configuration
-APP_POS_RECEIPT_NUMBER_PREFIX=RCP
-APP_POS_AUTO_PRINT_RECEIPT=false
-```
-
-### Database Configuration
-Each service has its own database:
-- `smartoutlet_auth` - User management
-- `smartoutlet_outlet` - Outlet data
-- `smartoutlet_product` - Product catalog & inventory
-- `smartoutlet_pos` - Sales transactions
-- `smartoutlet_expense` - Expense records
-
-## 🔐 Authentication & Security
-
-### JWT Authentication
-1. Register/Login through Auth Service
-2. Receive JWT token in response
-3. Include token in Authorization header: `Bearer <token>`
-4. All services validate tokens through Auth Service
-
-### User Roles
-- **ADMIN** - Full system access
-- **STAFF** - Limited access to POS and basic operations
-
-### API Security
-- CORS enabled for frontend origins
-- JWT validation on protected endpoints
-- Input validation and sanitization
-- Rate limiting (configurable)
-
-## 📊 API Documentation
-
-### Auth Service (`/auth/*`)
-```bash
-# Register new user
-POST /auth/register
-{
-  "username": "admin",
-  "email": "admin@example.com",
-  "password": "password123",
-  "role": "ADMIN"
-}
-
-# Login
-POST /auth/login
-{
-  "username": "admin",
-  "password": "password123"
-}
-```
-
-### Product Service (`/products/*`)
-```bash
-# Add product
-POST /products
-{
-  "name": "Coca Cola",
-  "barcode": "123456789",
-  "price": 2.50,
-  "categoryId": 1
-}
-
-# Update stock
-PUT /products/{id}/stock
-{
-  "outletId": 1,
-  "quantity": 100
-}
-```
-
-### POS Service (`/pos/*`)
-```bash
-# Create sale
-POST /pos/sales
-{
-  "outletId": 1,
-  "items": [
-    {
-      "productId": 1,
-      "quantity": 2,
-      "unitPrice": 2.50
-    }
-  ],
-  "paymentMethod": "CASH",
-  "totalAmount": 5.00
-}
-```
-
-## 🔄 Event-Driven Architecture
-
-### Kafka Topics
-- `outlet-events` - Outlet creation/updates
-- `stock-events` - Low stock alerts
-- `sales-events` - Transaction events
-
-### Event Flow
-1. **Outlet Created** → Stock initialization
-2. **Sale Completed** → Stock reduction, Analytics update
-3. **Low Stock** → Alert notifications
-
-## 🛠️ Development
-
-### Local Development Setup
-```bash
-# Start infrastructure only
-docker-compose up mysql kafka zookeeper redis -d
-
-# Run services locally
-cd backend/auth-service && ./gradlew bootRun
-cd backend/product-service && ./gradlew bootRun
-# ... repeat for other services
-
-# Run frontend
-cd frontend && npm install && npm start
-```
-
-### Build & Test
-```bash
-# Build all services
-./scripts/build-all.sh
-
-# Run tests
-./scripts/test-all.sh
-
-# Build Docker images
-docker-compose build
-```
-
-## 🏃‍♂️ Monitoring & Observability
-
-### Health Checks
-- Spring Boot Actuator endpoints
-- Database connectivity checks
-- Kafka connectivity validation
-- Redis connectivity verification
-
-### Logging
-- Structured JSON logging
-- Centralized log aggregation ready
-- Debug/Info/Error level configuration
-- Request/Response tracing
+## 📈 Performance & Monitoring
 
 ### Metrics
-- Application metrics via Actuator
-- Custom business metrics
-- JVM metrics
-- Database connection pool metrics
+- **Application Metrics**: Via Spring Boot Actuator
+- **Business Metrics**: Custom metrics per service
+- **JVM Metrics**: Memory, GC, thread monitoring
+- **Database Metrics**: Connection pool monitoring
 
-## 🚨 Exception Handling
+### Health Monitoring
+- **Service Health**: `/actuator/health` endpoints
+- **Dependency Checks**: Database and Kafka connectivity
+- **Custom Health Indicators**: Business-specific health checks
 
-### Global Exception Handlers
-All services implement comprehensive exception handling:
+## 🚨 Error Handling
 
-- **Validation Errors** - 400 Bad Request with field details
-- **Authentication Errors** - 401 Unauthorized
-- **Authorization Errors** - 403 Forbidden
-- **Not Found Errors** - 404 Not Found
-- **Conflict Errors** - 409 Conflict (duplicates)
-- **Server Errors** - 500 Internal Server Error
+### Comprehensive Error Management
+- **Global Exception Handlers**: Consistent error responses
+- **Validation Errors**: Field-level validation with detailed messages
+- **Business Errors**: Domain-specific error handling
+- **Technical Errors**: Infrastructure failure handling
 
 ### Error Response Format
 ```json
@@ -280,94 +197,3 @@ All services implement comprehensive exception handling:
     "price": "Price must be positive"
   }
 }
-```
-
-## 🔧 Troubleshooting
-
-### Common Issues
-
-#### Services Won't Start
-```bash
-# Check Docker resources
-docker system df
-docker system prune
-
-# Restart with fresh volumes
-docker-compose down -v
-docker-compose up -d
-```
-
-#### Database Connection Issues
-```bash
-# Check MySQL logs
-docker-compose logs mysql
-
-# Verify database creation
-docker exec -it smartoutlet-mysql mysql -u root -p
-SHOW DATABASES;
-```
-
-#### Kafka Connection Issues
-```bash
-# Check Kafka logs
-docker-compose logs kafka
-
-# Verify topics
-docker exec -it smartoutlet-kafka kafka-topics --bootstrap-server localhost:9092 --list
-```
-
-### Performance Tuning
-- Adjust JVM heap size in Dockerfile
-- Configure connection pool sizes
-- Tune Kafka consumer/producer settings
-- Optimize database queries
-
-## 📈 Scalability
-
-### Horizontal Scaling
-- Each service can be scaled independently
-- Load balancer integration ready
-- Stateless service design
-
-### Database Scaling
-- Read replicas for reporting
-- Database sharding strategies
-- Connection pooling optimization
-
-### Caching Strategy
-- Redis for session management
-- Application-level caching
-- Database query result caching
-
-## 🔒 Security Best Practices
-
-- JWT tokens with expiration
-- Password hashing with BCrypt
-- Input validation and sanitization
-- SQL injection prevention
-- XSS protection
-- CORS configuration
-- Rate limiting
-
-## 📝 Contributing
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Spring Boot Community
-- React Community
-- Apache Kafka
-- Docker Community
-
----
-
-**Happy coding! 🚀**
