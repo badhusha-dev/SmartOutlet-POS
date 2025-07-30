@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -24,7 +24,7 @@ public class JwtTokenProvider {
     @Value("${app.jwt.expiration}")
     private int jwtExpirationInMs;
 
-    private Key getSigningKey() {
+    private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
@@ -51,18 +51,20 @@ public class JwtTokenProvider {
 
     public String getUsernameFromJWT(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(getSigningKey())
-                .parseClaimsJws(token)
-                .getBody();
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
 
         return claims.getSubject();
     }
 
     public Long getUserIdFromJWT(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(getSigningKey())
-                .parseClaimsJws(token)
-                .getBody();
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
 
         return claims.get("userId", Long.class);
     }
@@ -70,9 +72,10 @@ public class JwtTokenProvider {
     @SuppressWarnings("unchecked")
     public Set<String> getRolesFromJWT(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(getSigningKey())
-                .parseClaimsJws(token)
-                .getBody();
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
 
         return (Set<String>) claims.get("roles");
     }
@@ -80,18 +83,20 @@ public class JwtTokenProvider {
     @SuppressWarnings("unchecked")
     public Set<String> getPermissionsFromJWT(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(getSigningKey())
-                .parseClaimsJws(token)
-                .getBody();
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
 
         return (Set<String>) claims.get("permissions");
     }
 
     public Date getExpirationDateFromJWT(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(getSigningKey())
-                .parseClaimsJws(token)
-                .getBody();
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
 
         return claims.getExpiration();
     }
@@ -103,9 +108,10 @@ public class JwtTokenProvider {
 
     public Date getIssuedAtFromJWT(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(getSigningKey())
-                .parseClaimsJws(token)
-                .getBody();
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
 
         return claims.getIssuedAt();
     }
@@ -118,8 +124,9 @@ public class JwtTokenProvider {
     public boolean validateToken(String authToken) {
         try {
             Jwts.parser()
-                .setSigningKey(getSigningKey())
-                .parseClaimsJws(authToken);
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(authToken);
             return true;
         } catch (SecurityException ex) {
             log.error("Invalid JWT signature");
