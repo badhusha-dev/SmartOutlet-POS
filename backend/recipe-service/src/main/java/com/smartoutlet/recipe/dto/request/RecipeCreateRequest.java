@@ -1,6 +1,7 @@
 package com.smartoutlet.recipe.dto.request;
 
 import com.smartoutlet.recipe.entity.UnitOfMeasure;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 

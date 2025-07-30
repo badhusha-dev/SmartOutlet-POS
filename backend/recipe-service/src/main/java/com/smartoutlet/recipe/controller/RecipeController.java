@@ -347,7 +347,7 @@ public class RecipeController {
     public ResponseEntity<List<Map<String, Object>>> getUnitsOfMeasure() {
         
         List<Map<String, Object>> units = Arrays.stream(UnitOfMeasure.values())
-                .map(uom -> Map.of(
+                .map(uom -> Map.<String, Object>of(
                         "value", uom.name(),
                         "symbol", uom.getSymbol(),
                         "displayName", uom.getDisplayName(),
