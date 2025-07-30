@@ -1,16 +1,22 @@
 package com.smartoutlet.auth.infrastructure.config;
 
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
-import io.swagger.v3.oas.models.servers.Server;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
-
 @Configuration
+@SecurityScheme(
+    name = "bearer-key",
+    type = SecuritySchemeType.HTTP,
+    bearerFormat = "JWT",
+    scheme = "bearer"
+)
 public class OpenApiConfig {
 
     @Bean
@@ -18,22 +24,15 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("SmartOutlet Auth Service API")
-                        .description("Authentication and Authorization Service for SmartOutlet POS System")
+                        .description("Authentication and Authorization service for SmartOutlet POS system with JWT-based security and dynamic role-based access control")
                         .version("1.0.0")
                         .contact(new Contact()
-                                .name("SmartOutlet Development Team")
-                                .email("dev@smartoutlet.com")
+                                .name("SmartOutlet Team")
+                                .email("support@smartoutlet.com")
                                 .url("https://smartoutlet.com"))
                         .license(new License()
                                 .name("MIT License")
                                 .url("https://opensource.org/licenses/MIT")))
-                .servers(List.of(
-                        new Server()
-                                .url("http://localhost:8081")
-                                .description("Local Development Server"),
-                        new Server()
-                                .url("https://api.smartoutlet.com/auth")
-                                .description("Production Server")
-                ));
+                .addSecurityItem(new SecurityRequirement().addList("bearer-key"));
     }
 } 
