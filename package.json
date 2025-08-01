@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@reduxjs/toolkit": "^2.8.2",
+    "ag-grid-community": "^34.1.0",
+    "ag-grid-react": "^34.1.0",
+    "file-saver": "^2.0.5",
+    "react-redux": "^9.2.0",
+    "xlsx": "^0.18.5"
+  }
+}

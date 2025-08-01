@@ -1,3 +1,5 @@
+modules = ["java-graalvm22.3", "nodejs-20", "bash", "web"]
+
 [workflows]
 runButton = "Start All Services"
 
@@ -9,3 +11,32 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd backend && ./start-dev-services.sh"
+
+[[workflows.workflow]]
+name = "Start Frontend"
+author = 45824518
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd frontend && npm install && npm run dev"
+
+[[workflows.workflow]]
+name = "Start Frontend with Auth"
+author = 45824518
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd frontend && npm install && npm run dev"
+
+[nix]
+channel = "stable-25_05"
+
+[[ports]]
+localPort = 3000
+externalPort = 80
+
+[[ports]]
+localPort = 3001
+externalPort = 3001

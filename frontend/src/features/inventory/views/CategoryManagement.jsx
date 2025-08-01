@@ -1,22 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  fetchCategories,
-  createCategory,
-  updateCategory,
-  deleteCategory,
-  selectCategories,
-  selectProductLoading,
-  selectProductError,
-} from '../productSlice';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux'
+import * as XLSX from 'xlsx';
+import { Plus, Edit, Trash2, Package, Tag } from 'lucide-react';
 import Modal from '../../../components/common/Modal';
+import { mockCategories } from '../../../utils/mockData';
 
 const CategoryManagement = () => {
+  // Development mode flags
+  const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true'
+  const DISABLE_AUTH = import.meta.env.VITE_DISABLE_AUTH === 'true'
+
   const dispatch = useDispatch();
-  const categories = useSelector(selectCategories);
-  const loading = useSelector(selectProductLoading);
-  const error = useSelector(selectProductError);
+  const categories = (DEV_MODE && DISABLE_AUTH) ? mockCategories : (useSelector(state => state.products?.categories) || mockCategories);
+  const loading = useSelector(state => state.products?.loading) || false;
+  const error = useSelector(state => state.products?.error) || null;
 
   const [showModal, setShowModal] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -24,8 +21,10 @@ const CategoryManagement = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
 
   useEffect(() => {
-    dispatch(fetchCategories());
-  }, [dispatch]);
+    if (!(DEV_MODE && DISABLE_AUTH)) {
+      // dispatch(fetchCategories());
+    }
+  }, [dispatch, DEV_MODE, DISABLE_AUTH]);
 
   const handleAdd = () => {
     setFormData({ name: '', description: '' });
@@ -42,16 +41,27 @@ const CategoryManagement = () => {
 
   const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to delete this category?')) {
-      dispatch(deleteCategory(id));
+      if (DEV_MODE && DISABLE_AUTH) {
+        console.log('🔓 Development mode: Mock delete category', id);
+        return;
+      }
+      // dispatch(deleteCategory(id));
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (DEV_MODE && DISABLE_AUTH) {
+      console.log('🔓 Development mode: Mock category operation', { isEdit, formData });
+      setShowModal(false);
+      setSelectedCategory(null);
+      return;
+    }
+    
     if (isEdit && selectedCategory) {
-      dispatch(updateCategory({ id: selectedCategory.id, categoryData: formData }));
+      // dispatch(updateCategory({ id: selectedCategory.id, categoryData: formData }));
     } else {
-      dispatch(createCategory(formData));
+      // dispatch(createCategory(formData));
     }
     setShowModal(false);
     setSelectedCategory(null);

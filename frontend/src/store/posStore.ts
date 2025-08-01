@@ -9,26 +9,26 @@ interface POSActions {
   removeItemFromOrder: (itemId: string) => void;
   updateItemQuantity: (itemId: string, quantity: number) => void;
   clearCurrentOrder: () => void;
-  
+
   // Orders list actions
   setOrders: (orders: Order[]) => void;
   addOrder: (order: Order) => void;
   updateOrder: (orderId: string, updates: Partial<Order>) => void;
   removeOrder: (orderId: string) => void;
-  
+
   // Products actions
   setProducts: (products: Product[]) => void;
   updateProductStock: (productId: string, newStock: number) => void;
-  
+
   // Customers actions
   setCustomers: (customers: Customer[]) => void;
   setSelectedCustomer: (customer: Customer | null) => void;
   updateCustomerLoyaltyPoints: (customerId: string, points: number) => void;
-  
+
   // Loading and error states
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
-  
+
   // Utility actions
   calculateOrderTotals: () => void;
 }
@@ -86,7 +86,7 @@ export const usePOSStore = create<POSState & POSActions>()(
             updatedItems[existingItemIndex].quantity += quantity;
             updatedItems[existingItemIndex].totalPrice = 
               updatedItems[existingItemIndex].quantity * updatedItems[existingItemIndex].unitPrice;
-            
+
             const updatedOrder = {
               ...currentOrder,
               items: updatedItems,
@@ -103,7 +103,7 @@ export const usePOSStore = create<POSState & POSActions>()(
               notes,
               allergens: product.allergens,
             };
-            
+
             const updatedOrder = {
               ...currentOrder,
               items: [...currentOrder.items, newItem],
@@ -214,3 +214,31 @@ export const usePOSStore = create<POSState & POSActions>()(
     }
   )
 );
+
+export const usePOSStore = () => {
+  const store = useStore();
+
+  // Mock functions for development
+  const addItemToOrder = (product: any, quantity: number) => {
+    console.log('🔓 Development mode: Adding item to order', { product, quantity });
+    store.addItemToOrder({ product, quantity });
+  };
+
+  const clearCurrentOrder = () => {
+    console.log('🔓 Development mode: Clearing current order');
+    store.clearCurrentOrder();
+  };
+
+  const setError = (error: string) => {
+    console.log('🔓 Development mode: Setting error', error);
+    store.setError(error);
+  };
+
+  return {
+    ...store,
+    addItemToOrder,
+    clearCurrentOrder,
+    setError,
+    // Add any additional computed values or derived state here
+  };
+};

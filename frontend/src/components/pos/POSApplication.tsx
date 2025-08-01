@@ -28,6 +28,7 @@ import {
   Menu,
   MenuItem,
   ListItemAvatar,
+  Button,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -53,8 +54,7 @@ import { OrderEntryForm } from './OrderEntryForm';
 import { OrderHistoryList } from './OrderHistoryList';
 import { CustomerProfile } from './CustomerProfile';
 import { CheckoutModal } from './CheckoutModal';
-import { usePOS, usePOSActions } from '../../store/hooks/usePOS';
-import { useUI, useUIActions } from '../../store/hooks/useUI';
+import { usePOSStore } from '../../store/posStore';
 import { useLiveOrders } from '../../hooks/useLiveOrders';
 import { formatCurrency } from '../../utils/formatters';
 
