@@ -9,10 +9,9 @@ export default defineConfig({
     host: "0.0.0.0",
     hmr: {
       port: 3000,
+      host: "0.0.0.0",
     },
-    allowedHosts: [
-      "993f7743-03c9-4866-a416-76f8bb7b4ef5-00-3qzer0uo7r8j7.pike.replit.dev",
-    ],
+    allowedHosts: "all",
   },
   build: {
     outDir: "dist",
