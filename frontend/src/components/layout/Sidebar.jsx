@@ -109,7 +109,7 @@ const Sidebar = ({ isOpen, onClose }) => {
               <p className="text-xs text-gray-500 dark:text-gray-400">POS System</p>
             </div>
           </div>
-          
+
           {/* Close button for mobile */}
           <button
             onClick={onClose}
@@ -127,7 +127,7 @@ const Sidebar = ({ isOpen, onClose }) => {
               .map((item) => {
                 const isActive = location.pathname === item.href
                 const Icon = item.icon
-                
+
                 return (
                   <NavLink
                     key={item.name}
