@@ -26,9 +26,6 @@ import LoadingSpinner from '../../../components/common/LoadingSpinner'
 import Modal from '../../../components/common/Modal'
 import { mockProducts, mockCategories } from '../../../utils/mockData'
 import { useDispatch } from 'react-redux'
-import { updateStock } from '../productSlice'
-import { saveAs } from 'file-saver'
-import * as XLSX from 'xlsx'
 import SkeletonTable from '../../../components/common/SkeletonTable'
 
 const ProductManagement = () => {
@@ -197,7 +194,19 @@ const ProductManagement = () => {
   const handleStockSubmit = (e) => {
     e.preventDefault();
     if (!stockProduct) return;
-    dispatch(updateStock({ id: stockProduct.id, quantity: Number(stockForm.quantity), type: stockForm.type }));
+    
+    if (DEV_MODE && DISABLE_AUTH) {
+      console.log('🔓 Development mode: Mock stock update', {
+        productId: stockProduct.id,
+        quantity: stockForm.quantity,
+        type: stockForm.type
+      });
+      setShowStockModal(false);
+      setStockProduct(null);
+      return;
+    }
+    
+    // dispatch(updateStock({ id: stockProduct.id, quantity: Number(stockForm.quantity), type: stockForm.type }));
     setShowStockModal(false);
     setStockProduct(null);
   };
