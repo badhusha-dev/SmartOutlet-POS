@@ -1,100 +1,102 @@
-import React from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
-import { 
-  LayoutDashboard, 
-  Store, 
-  Package, 
-  ShoppingCart, 
-  TrendingUp, 
-  Receipt, 
+import React from "react";
+import { NavLink, useLocation } from "react-router-dom";
+import {
+  LayoutDashboard,
+  Store,
+  Package,
+  ShoppingCart,
+  TrendingUp,
+  Receipt,
   User,
   X,
-  Settings
-} from 'lucide-react'
-import clsx from 'clsx'
-import { useAuth } from '../../contexts/AuthContext';
+  Settings,
+} from "lucide-react";
+import clsx from "clsx";
+import { useAuth } from "../../contexts/AuthContext";
 
-import { useUserRole } from '../../hooks/useUserRole'
+import { useUserRole } from "../../hooks/useUserRole";
 
 const Sidebar = ({ isOpen, onClose }) => {
   const { user } = useAuth();
-  const { isAdmin } = useUserRole()
-  const location = useLocation()
+  const { isAdmin } = useUserRole();
+  const location = useLocation();
 
   const navigation = [
-    { 
-      name: 'Dashboard', 
-      href: '/dashboard', 
+    {
+      name: "Dashboard",
+      href: "/dashboard",
       icon: LayoutDashboard,
-      roles: ['ADMIN', 'STAFF'] 
+      roles: ["ADMIN", "STAFF"],
     },
-    { 
-      name: 'Outlets', 
-      href: '/outlets', 
+    {
+      name: "Outlets",
+      href: "/outlets",
       icon: Store,
-      roles: ['ADMIN'] 
-    },
-    { 
-      name: 'Products', 
-      href: '/products', 
-      icon: Package,
-      roles: ['ADMIN', 'STAFF'] 
+      roles: ["ADMIN"],
     },
     {
-      name: 'Categories',
-      href: '/categories',
+      name: "Products",
+      href: "/products",
       icon: Package,
-      roles: ['ADMIN', 'STAFF']
+      roles: ["ADMIN", "STAFF"],
     },
-    { 
-      name: 'POS Sales', 
-      href: '/pos', 
+    {
+      name: "Categories",
+      href: "/categories",
+      icon: Package,
+      roles: ["ADMIN", "STAFF"],
+    },
+    {
+      name: "POS Sales",
+      href: "/pos",
       icon: ShoppingCart,
-      roles: ['ADMIN', 'STAFF'] 
+      roles: ["ADMIN", "STAFF"],
     },
-    { 
-      name: 'Sales Report', 
-      href: '/sales', 
+    {
+      name: "Sales Report",
+      href: "/sales",
       icon: TrendingUp,
-      roles: ['ADMIN', 'STAFF'] 
-    },
-    { 
-      name: 'Expenses', 
-      href: '/expenses', 
-      icon: Receipt,
-      roles: ['ADMIN'] 
+      roles: ["ADMIN", "STAFF"],
     },
     {
-      name: 'Expense Management',
-      href: '/expenses-management',
+      name: "Expenses",
+      href: "/expenses",
       icon: Receipt,
-      roles: ['ADMIN']
+      roles: ["ADMIN"],
     },
     {
-      name: 'Reporting Dashboard',
-      href: '/reporting-dashboard',
+      name: "Expense Management",
+      href: "/expenses-management",
+      icon: Receipt,
+      roles: ["ADMIN"],
+    },
+    {
+      name: "Reporting Dashboard",
+      href: "/reporting-dashboard",
       icon: TrendingUp,
-      roles: ['ADMIN', 'STAFF']
+      roles: ["ADMIN", "STAFF"],
     },
     {
-      name: 'Error Logs',
-      href: '/error-logs',
+      name: "Error Logs",
+      href: "/error-logs",
       icon: Settings,
-      roles: ['ADMIN']
+      roles: ["ADMIN"],
     },
-  ]
+  ];
 
   const hasAccess = (roles) => {
-    return roles.includes(user?.role)
-  }
+    return roles.includes(user?.role);
+  };
 
   return (
     <>
       {/* Sidebar */}
-      <div className={clsx(
-        'fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-gray-900 shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0',
-        isOpen ? 'translate-x-0' : '-translate-x-full'
-      )}>
+      <div
+        className={clsx(
+          "fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-gray-900 shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0",
+          isOpen ? "translate-x-0" : "-translate-x-full",
+        )}
+      >
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center">
             <div className="flex-shrink-0">
@@ -106,7 +108,9 @@ const Sidebar = ({ isOpen, onClose }) => {
               <h1 className="text-xl font-bold text-gray-900 dark:text-white">
                 SmartOutlet
               </h1>
-              <p className="text-xs text-gray-500 dark:text-gray-400">POS System</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                POS System
+              </p>
             </div>
           </div>
 
@@ -123,10 +127,10 @@ const Sidebar = ({ isOpen, onClose }) => {
         <nav className="mt-6 px-3">
           <div className="space-y-1">
             {navigation
-              .filter(item => hasAccess(item.roles))
+              .filter((item) => hasAccess(item.roles))
               .map((item) => {
-                const isActive = location.pathname === item.href
-                const Icon = item.icon
+                const isActive = location.pathname === item.href;
+                const Icon = item.icon;
 
                 return (
                   <NavLink
@@ -134,23 +138,23 @@ const Sidebar = ({ isOpen, onClose }) => {
                     to={item.href}
                     onClick={onClose}
                     className={clsx(
-                      'group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
+                      "group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
                       isActive
-                        ? 'bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300'
-                        : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                        ? "bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300"
+                        : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800",
                     )}
                   >
-                    <Icon 
+                    <Icon
                       className={clsx(
-                        'mr-3 h-5 w-5 flex-shrink-0',
-                        isActive 
-                          ? 'text-primary-600 dark:text-primary-400' 
-                          : 'text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300'
-                      )} 
+                        "mr-3 h-5 w-5 flex-shrink-0",
+                        isActive
+                          ? "text-primary-600 dark:text-primary-400"
+                          : "text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300",
+                      )}
                     />
                     {item.name}
                   </NavLink>
-                )
+                );
               })}
           </div>
         </nav>
@@ -161,26 +165,26 @@ const Sidebar = ({ isOpen, onClose }) => {
             to="/profile"
             onClick={onClose}
             className={clsx(
-              'group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors w-full',
-              location.pathname === '/profile'
-                ? 'bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300'
-                : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+              "group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors w-full",
+              location.pathname === "/profile"
+                ? "bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300"
+                : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800",
             )}
           >
             <User className="mr-3 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium truncate">
-                {user?.username || 'User'}
+                {user?.username || "User"}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                {user?.role || 'Role'}
+                {user?.role || "Role"}
               </p>
             </div>
           </NavLink>
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Sidebar
+export default Sidebar;
