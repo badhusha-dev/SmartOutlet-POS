@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux'
+import * as XLSX from 'xlsx';
 import { Plus, Edit, Trash2, Package, Tag } from 'lucide-react';
 import Modal from '../../../components/common/Modal';
 import { mockCategories } from '../../../utils/mockData';

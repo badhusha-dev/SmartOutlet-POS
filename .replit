@@ -21,6 +21,15 @@ mode = "sequential"
 task = "shell.exec"
 args = "cd frontend && npm install && npm run dev"
 
+[[workflows.workflow]]
+name = "Start Frontend with Auth"
+author = 45824518
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd frontend && npm install && npm run dev"
+
 [nix]
 channel = "stable-25_05"
 
