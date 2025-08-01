@@ -1,46 +1,35 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
-import { configureStore } from '@reduxjs/toolkit'
+import { ThemeProvider, createTheme } from '@mui/material/styles'
+import CssBaseline from '@mui/material/CssBaseline'
 import App from './App.jsx'
 import './index.css'
 import { AuthProvider } from './contexts/AuthContext'
-import productSlice from './features/inventory/productSlice'
+import { store } from './store'
 
-// Configure Redux store
-const store = configureStore({
-  reducer: {
-    products: productSlice,
-  },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: ['persist/PERSIST'],
-      },
-    }),
-})
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#FF6B6B',
+    },
+    secondary: {
+      main: '#4ECDC4',
     },
   },
 })
 
-const root = ReactDOM.createRoot(document.getElementById('root'))
-root.render(
+ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Provider store={store}>
       <BrowserRouter>
-        <QueryClientProvider client={queryClient}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
           <AuthProvider>
             <App />
           </AuthProvider>
-        </QueryClientProvider>
+        </ThemeProvider>
       </BrowserRouter>
     </Provider>
   </React.StrictMode>

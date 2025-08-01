@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 interface Notification {
   id: string;
@@ -16,91 +16,66 @@ interface ModalState {
 }
 
 interface UIState {
-  // Notifications
+  sidebarOpen: boolean
+  darkMode: boolean
   notifications: Notification[];
-  
-  // Modals
   modals: ModalState;
-  
-  // Theme
-  darkMode: boolean;
-  
-  // Sidebar
-  sidebarOpen: boolean;
-  
-  // Loading states
   globalLoading: boolean;
-  
-  // Current view
   currentView: 'dashboard' | 'order-entry' | 'history' | 'customers' | 'settings';
-  
-  // Search and filters
   searchQuery: string;
   selectedCategory: string;
-  
-  // Pagination
   currentPage: number;
   itemsPerPage: number;
 }
 
 const initialState: UIState = {
-  // Notifications
+  sidebarOpen: true,
+  darkMode: false,
   notifications: [],
-  
-  // Modals
   modals: {
     checkoutOpen: false,
     customerSelectOpen: false,
     settingsOpen: false,
     helpOpen: false,
   },
-  
-  // Theme
-  darkMode: false,
-  
-  // Sidebar
-  sidebarOpen: true,
-  
-  // Loading states
   globalLoading: false,
-  
-  // Current view
   currentView: 'dashboard',
-  
-  // Search and filters
   searchQuery: '',
   selectedCategory: 'all',
-  
-  // Pagination
   currentPage: 1,
   itemsPerPage: 20,
-};
+}
 
 const uiSlice = createSlice({
   name: 'ui',
   initialState,
   reducers: {
-    // Notifications
+    toggleSidebar: (state) => {
+      state.sidebarOpen = !state.sidebarOpen
+    },
+    setSidebarOpen: (state, action: PayloadAction<boolean>) => {
+      state.sidebarOpen = action.payload
+    },
+    toggleDarkMode: (state) => {
+      state.darkMode = !state.darkMode
+    },
+    setDarkMode: (state, action: PayloadAction<boolean>) => {
+      state.darkMode = action.payload
+    },
     addNotification: (state, action: PayloadAction<Omit<Notification, 'id' | 'timestamp'>>) => {
       const notification: Notification = {
         ...action.payload,
         id: `notification-${Date.now()}-${Math.random()}`,
         timestamp: Date.now(),
-      };
-      state.notifications.push(notification);
+      }
+      state.notifications.push(notification)
     },
-
     removeNotification: (state, action: PayloadAction<string>) => {
-      state.notifications = state.notifications.filter(
-        notification => notification.id !== action.payload
-      );
+      state.notifications = state.notifications.filter(notification => notification.id !== action.payload)
     },
-
     clearNotifications: (state) => {
-      state.notifications = [];
+      state.notifications = []
     },
-
-    // Modals
     openModal: (state, action: PayloadAction<keyof ModalState>) => {
       state.modals[action.payload] = true;
     },
@@ -114,36 +89,14 @@ const uiSlice = createSlice({
         state.modals[key as keyof ModalState] = false;
       });
     },
-
-    // Theme
-    toggleDarkMode: (state) => {
-      state.darkMode = !state.darkMode;
-    },
-
-    setDarkMode: (state, action: PayloadAction<boolean>) => {
-      state.darkMode = action.payload;
-    },
-
-    // Sidebar
-    toggleSidebar: (state) => {
-      state.sidebarOpen = !state.sidebarOpen;
-    },
-
-    setSidebarOpen: (state, action: PayloadAction<boolean>) => {
-      state.sidebarOpen = action.payload;
-    },
-
-    // Loading
     setGlobalLoading: (state, action: PayloadAction<boolean>) => {
       state.globalLoading = action.payload;
     },
 
-    // Navigation
     setCurrentView: (state, action: PayloadAction<UIState['currentView']>) => {
       state.currentView = action.payload;
     },
 
-    // Search and filters
     setSearchQuery: (state, action: PayloadAction<string>) => {
       state.searchQuery = action.payload;
     },
@@ -157,7 +110,6 @@ const uiSlice = createSlice({
       state.selectedCategory = 'all';
     },
 
-    // Pagination
     setCurrentPage: (state, action: PayloadAction<number>) => {
       state.currentPage = action.payload;
     },
@@ -167,7 +119,6 @@ const uiSlice = createSlice({
       state.currentPage = 1; // Reset to first page when changing items per page
     },
 
-    // Reset UI state
     resetUI: (state) => {
       state.notifications = [];
       state.modals = initialState.modals;
@@ -176,19 +127,19 @@ const uiSlice = createSlice({
       state.currentPage = 1;
     },
   },
-});
+})
 
 export const {
+  toggleSidebar,
+  setSidebarOpen,
+  toggleDarkMode,
+  setDarkMode,
   addNotification,
   removeNotification,
   clearNotifications,
   openModal,
   closeModal,
   closeAllModals,
-  toggleDarkMode,
-  setDarkMode,
-  toggleSidebar,
-  setSidebarOpen,
   setGlobalLoading,
   setCurrentView,
   setSearchQuery,
@@ -197,6 +148,6 @@ export const {
   setCurrentPage,
   setItemsPerPage,
   resetUI,
-} = uiSlice.actions;
+} = uiSlice.actions
 
-export default uiSlice.reducer;
+export default uiSlice.reducer
