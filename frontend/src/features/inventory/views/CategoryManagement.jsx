@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { productApi, API_ENDPOINTS } from "../../../services/client";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { Plus, Edit, Trash2, Package, Tag } from "lucide-react";
+import { Plus, Edit, Trash2, Package, Tag, PlusCircle, Search } from "lucide-react";
 import { mockCategories } from "../../../utils/mockData";
+import { useAuth } from "../../../contexts/AuthContext";
 
 const CategoryManagement = () => {
   const [categories, setCategories] = useState([]);
@@ -16,8 +17,10 @@ const CategoryManagement = () => {
     description: "",
   });
 
-  // Get auth state from Redux
-  const { user } = useSelector((state) => state.auth || {});
+  // Get auth state from context (fallback to Redux if needed)
+  const { user } = useAuth() || {};
+  const authFromRedux = useSelector((state) => state.auth || {});
+  const currentUser = user || authFromRedux.user;
 
   useEffect(() => {
     fetchCategories();

@@ -5,6 +5,7 @@ import { Provider } from "react-redux";
 import { Toaster } from "react-hot-toast";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { store } from "./store";
+import { AuthProvider } from "./contexts/AuthContext";
 import App from "./App.jsx";
 import "./index.css";
 
@@ -23,8 +24,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
-          <App />
-          <Toaster position="top-right" />
+          <AuthProvider>
+            <App />
+            <Toaster position="top-right" />
+          </AuthProvider>
         </BrowserRouter>
       </QueryClientProvider>
     </Provider>

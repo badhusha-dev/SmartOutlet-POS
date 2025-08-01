@@ -598,3 +598,91 @@ export const mockActivityLog = [
     ipAddress: '192.168.1.103'
   }
 ] 
+export const mockCategories = [
+  {
+    id: 1,
+    name: "Electronics",
+    description: "Electronic devices and accessories"
+  },
+  {
+    id: 2,
+    name: "Clothing",
+    description: "Apparel and fashion items"
+  },
+  {
+    id: 3,
+    name: "Food & Beverages",
+    description: "Food items and drinks"
+  },
+  {
+    id: 4,
+    name: "Books",
+    description: "Books and educational materials"
+  },
+  {
+    id: 5,
+    name: "Home & Garden",
+    description: "Home improvement and gardening supplies"
+  }
+];
+
+export const mockProducts = [
+  {
+    id: 1,
+    name: "Smartphone",
+    category: "Electronics",
+    price: 599.99,
+    stock: 50,
+    description: "Latest smartphone with advanced features"
+  },
+  {
+    id: 2,
+    name: "T-Shirt",
+    category: "Clothing",
+    price: 19.99,
+    stock: 100,
+    description: "Comfortable cotton t-shirt"
+  },
+  {
+    id: 3,
+    name: "Coffee",
+    category: "Food & Beverages",
+    price: 12.99,
+    stock: 200,
+    description: "Premium roasted coffee beans"
+  }
+];
+
+export const mockOutlets = [
+  {
+    id: 1,
+    name: "Main Store",
+    location: "Downtown",
+    manager: "John Doe",
+    status: "Active"
+  },
+  {
+    id: 2,
+    name: "Mall Branch",
+    location: "Shopping Mall",
+    manager: "Jane Smith",
+    status: "Active"
+  }
+];
+
+export const mockUsers = [
+  {
+    id: 1,
+    username: "admin",
+    email: "admin@smartoutlet.com",
+    role: "ADMIN",
+    name: "System Administrator"
+  },
+  {
+    id: 2,
+    username: "manager",
+    email: "manager@smartoutlet.com",
+    role: "OUTLET_MANAGER",
+    name: "Store Manager"
+  }
+];
