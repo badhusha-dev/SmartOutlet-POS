@@ -32,10 +32,6 @@ class AuthorizationServiceTest {
     void setUp() {
         // Setup security context
         SecurityContextHolder.setContext(securityContext);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.isAuthenticated()).thenReturn(true);
-        when(authentication.getName()).thenReturn("testuser");
-        
         // Set outlet service URL
         ReflectionTestUtils.setField(authorizationService, "outletServiceUrl", "http://localhost:8082");
     }
@@ -44,6 +40,7 @@ class AuthorizationServiceTest {
     @DisplayName("Should handle unauthenticated user")
     void shouldHandleUnauthenticatedUser() {
         // Given
+        when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.isAuthenticated()).thenReturn(false);
 
         // When
@@ -70,6 +67,7 @@ class AuthorizationServiceTest {
     @DisplayName("Should handle permission check with authenticated user")
     void shouldHandlePermissionCheckWithAuthenticatedUser() {
         // Given
+        when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.isAuthenticated()).thenReturn(true);
 
         // When
@@ -85,6 +83,7 @@ class AuthorizationServiceTest {
     @DisplayName("Should handle role check with authenticated user")
     void shouldHandleRoleCheckWithAuthenticatedUser() {
         // Given
+        when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.isAuthenticated()).thenReturn(true);
 
         // When
@@ -100,6 +99,7 @@ class AuthorizationServiceTest {
     @DisplayName("Should handle any permission check")
     void shouldHandleAnyPermissionCheck() {
         // Given
+        when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.isAuthenticated()).thenReturn(true);
 
         // When
@@ -115,6 +115,7 @@ class AuthorizationServiceTest {
     @DisplayName("Should handle all permissions check")
     void shouldHandleAllPermissionsCheck() {
         // Given
+        when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.isAuthenticated()).thenReturn(true);
 
         // When
@@ -130,6 +131,7 @@ class AuthorizationServiceTest {
     @DisplayName("Should handle admin check")
     void shouldHandleAdminCheck() {
         // Given
+        when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.isAuthenticated()).thenReturn(true);
 
         // When
@@ -145,6 +147,7 @@ class AuthorizationServiceTest {
     @DisplayName("Should handle manager check")
     void shouldHandleManagerCheck() {
         // Given
+        when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.isAuthenticated()).thenReturn(true);
 
         // When
@@ -160,6 +163,7 @@ class AuthorizationServiceTest {
     @DisplayName("Should handle staff check")
     void shouldHandleStaffCheck() {
         // Given
+        when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.isAuthenticated()).thenReturn(true);
 
         // When
@@ -175,6 +179,7 @@ class AuthorizationServiceTest {
     @DisplayName("Should handle cashier check")
     void shouldHandleCashierCheck() {
         // Given
+        when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.isAuthenticated()).thenReturn(true);
 
         // When
@@ -190,6 +195,7 @@ class AuthorizationServiceTest {
     @DisplayName("Should handle resource access check")
     void shouldHandleResourceAccessCheck() {
         // Given
+        when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.isAuthenticated()).thenReturn(true);
 
         // When
@@ -205,6 +211,7 @@ class AuthorizationServiceTest {
     @DisplayName("Should handle get current user roles")
     void shouldHandleGetCurrentUserRoles() {
         // Given
+        when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.isAuthenticated()).thenReturn(true);
 
         // When
@@ -220,6 +227,7 @@ class AuthorizationServiceTest {
     @DisplayName("Should handle get current user permissions")
     void shouldHandleGetCurrentUserPermissions() {
         // Given
+        when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.isAuthenticated()).thenReturn(true);
 
         // When

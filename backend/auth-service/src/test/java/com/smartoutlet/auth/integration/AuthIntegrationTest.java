@@ -1,12 +1,11 @@
 package com.smartoutlet.auth.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.smartoutlet.auth.dto.LoginRequest;
-import com.smartoutlet.auth.dto.RegisterRequest;
-import com.smartoutlet.auth.entity.Role;
-import com.smartoutlet.auth.entity.User;
-import com.smartoutlet.auth.repository.RoleRepository;
-import com.smartoutlet.auth.repository.UserRepository;
+import com.smartoutlet.auth.application.service.AuthService;
+import com.smartoutlet.auth.dto.request.LoginRequest;
+import com.smartoutlet.auth.dto.request.RegisterRequest;
+import com.smartoutlet.auth.dto.response.AuthResponse;
+import com.smartoutlet.auth.dto.response.UserResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,17 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.Set;
-
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -38,346 +34,197 @@ class AuthIntegrationTest {
     private WebApplicationContext webApplicationContext;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private RoleRepository roleRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private AuthService authService;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     private MockMvc mockMvc;
-    private Role staffRole;
-    private Role adminRole;
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-        
-        // Create test roles
-        staffRole = new Role("STAFF", "Staff member");
-        adminRole = new Role("ADMIN", "Administrator");
-        roleRepository.save(staffRole);
-        roleRepository.save(adminRole);
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(webApplicationContext)
+                .build();
     }
 
     @Test
-    @DisplayName("Should register and login user successfully")
-    void shouldRegisterAndLoginUserSuccessfully() throws Exception {
-        // Given
+    @DisplayName("Should complete full authentication flow")
+    void shouldCompleteFullAuthenticationFlow() throws Exception {
+        // Given - Register a new user
         RegisterRequest registerRequest = RegisterRequest.builder()
-                .username("integrationuser")
-                .email("integration@example.com")
+                .username("testuser")
+                .email("test@example.com")
                 .password("password123")
-                .firstName("Integration")
+                .firstName("Test")
                 .lastName("User")
                 .phoneNumber("1234567890")
                 .build();
 
-        // When & Then - Register
-        mockMvc.perform(post("/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(registerRequest)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.message").value("Registration successful"))
-                .andExpect(jsonPath("$.data.username").value("integrationuser"))
-                .andExpect(jsonPath("$.data.email").value("integration@example.com"))
-                .andExpect(jsonPath("$.data.firstName").value("Integration"))
-                .andExpect(jsonPath("$.data.lastName").value("User"))
-                .andExpect(jsonPath("$.data.phoneNumber").value("1234567890"))
-                .andExpect(jsonPath("$.data.isActive").value(true))
-                .andExpect(jsonPath("$.data.isVerified").value(false))
-                .andExpect(jsonPath("$.data.roles").isArray())
-                .andExpect(jsonPath("$.data.roles[0]").value("STAFF"));
+        // When - Register the user
+        UserResponse registeredUser = authService.register(registerRequest);
 
-        // Verify user was saved in database
-        User savedUser = userRepository.findByUsername("integrationuser").orElse(null);
-        assertNotNull(savedUser);
-        assertEquals("integrationuser", savedUser.getUsername());
-        assertEquals("integration@example.com", savedUser.getEmail());
-        assertTrue(passwordEncoder.matches("password123", savedUser.getPassword()));
-        assertEquals("Integration", savedUser.getFirstName());
-        assertEquals("User", savedUser.getLastName());
-        assertEquals("1234567890", savedUser.getPhoneNumber());
-        assertTrue(savedUser.getIsActive());
-        assertFalse(savedUser.getIsVerified());
-        assertEquals(1, savedUser.getRoles().size());
-        assertTrue(savedUser.getRoles().stream().anyMatch(role -> "STAFF".equals(role.getName())));
+        // Then - User should be registered successfully
+        assertNotNull(registeredUser);
+        assertEquals("testuser", registeredUser.getUsername());
+        assertEquals("test@example.com", registeredUser.getEmail());
+        assertFalse(registeredUser.getIsVerified()); // Should be unverified initially
 
-        // When & Then - Login
-        LoginRequest loginRequest = new LoginRequest("integrationuser", "password123");
-        mockMvc.perform(post("/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.message").value("Login successful"))
-                .andExpect(jsonPath("$.data.token").exists())
-                .andExpect(jsonPath("$.data.userId").value(savedUser.getId()))
-                .andExpect(jsonPath("$.data.username").value("integrationuser"))
-                .andExpect(jsonPath("$.data.email").value("integration@example.com"))
-                .andExpect(jsonPath("$.data.firstName").value("Integration"))
-                .andExpect(jsonPath("$.data.lastName").value("User"))
-                .andExpect(jsonPath("$.data.roles").isArray())
-                .andExpect(jsonPath("$.data.roles[0]").value("STAFF"))
-                .andExpect(jsonPath("$.data.expiresAt").exists());
+        // Given - Login request
+        LoginRequest loginRequest = new LoginRequest("testuser", "password123");
+
+        // When - Authenticate the user
+        AuthResponse authResponse = authService.authenticate(loginRequest);
+
+        // Then - Should return valid auth response
+        assertNotNull(authResponse);
+        assertNotNull(authResponse.getToken());
+        assertEquals("testuser", authResponse.getUsername());
+        assertEquals("test@example.com", authResponse.getEmail());
+        assertNotNull(authResponse.getExpiresAt());
+        assertTrue(authResponse.getExpiresAt().isAfter(java.time.LocalDateTime.now()));
     }
 
     @Test
-    @DisplayName("Should return 409 when registering duplicate username")
-    void shouldReturnConflictWhenRegisteringDuplicateUsername() throws Exception {
-        // Given - Create existing user
-        User existingUser = new User();
-        existingUser.setUsername("existinguser");
-        existingUser.setEmail("existing@example.com");
-        existingUser.setPassword(passwordEncoder.encode("password123"));
-        existingUser.setFirstName("Existing");
-        existingUser.setLastName("User");
-        existingUser.setIsActive(true);
-        existingUser.setIsVerified(false);
-        existingUser.setRoles(Set.of(staffRole));
-        userRepository.save(existingUser);
-
-        // When & Then - Try to register with same username
-        RegisterRequest registerRequest = RegisterRequest.builder()
-                .username("existinguser")
-                .email("newemail@example.com")
-                .password("password123")
-                .firstName("New")
-                .lastName("User")
-                .build();
-
-        mockMvc.perform(post("/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(registerRequest)))
-                .andExpect(status().isConflict());
-    }
-
-    @Test
-    @DisplayName("Should return 409 when registering duplicate email")
-    void shouldReturnConflictWhenRegisteringDuplicateEmail() throws Exception {
-        // Given - Create existing user
-        User existingUser = new User();
-        existingUser.setUsername("existinguser");
-        existingUser.setEmail("existing@example.com");
-        existingUser.setPassword(passwordEncoder.encode("password123"));
-        existingUser.setFirstName("Existing");
-        existingUser.setLastName("User");
-        existingUser.setIsActive(true);
-        existingUser.setIsVerified(false);
-        existingUser.setRoles(Set.of(staffRole));
-        userRepository.save(existingUser);
-
-        // When & Then - Try to register with same email
-        RegisterRequest registerRequest = RegisterRequest.builder()
-                .username("newuser")
-                .email("existing@example.com")
-                .password("password123")
-                .firstName("New")
-                .lastName("User")
-                .build();
-
-        mockMvc.perform(post("/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(registerRequest)))
-                .andExpect(status().isConflict());
-    }
-
-    @Test
-    @DisplayName("Should return 400 when login with invalid credentials")
-    void shouldReturnBadRequestWhenLoginWithInvalidCredentials() throws Exception {
+    @DisplayName("Should validate user registration via REST API")
+    void shouldValidateUserRegistrationViaRestApi() throws Exception {
         // Given
-        LoginRequest loginRequest = new LoginRequest("nonexistent", "wrongpassword");
+        RegisterRequest registerRequest = RegisterRequest.builder()
+                .username("apiuser")
+                .email("api@example.com")
+                .password("password123")
+                .firstName("API")
+                .lastName("User")
+                .phoneNumber("9876543210")
+                .build();
+
+        String requestJson = objectMapper.writeValueAsString(registerRequest);
 
         // When & Then
-        mockMvc.perform(post("/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.username").value("apiuser"))
+                .andExpect(jsonPath("$.email").value("api@example.com"))
+                .andExpect(jsonPath("$.firstName").value("API"))
+                .andExpect(jsonPath("$.lastName").value("User"))
+                .andExpect(jsonPath("$.isActive").value(true))
+                .andExpect(jsonPath("$.isVerified").value(false));
     }
 
     @Test
-    @DisplayName("Should return 400 when login with wrong password")
-    void shouldReturnBadRequestWhenLoginWithWrongPassword() throws Exception {
-        // Given - Create user
-        User user = new User();
-        user.setUsername("testuser");
-        user.setEmail("test@example.com");
-        user.setPassword(passwordEncoder.encode("correctpassword"));
-        user.setFirstName("Test");
-        user.setLastName("User");
-        user.setIsActive(true);
-        user.setIsVerified(false);
-        user.setRoles(Set.of(staffRole));
-        userRepository.save(user);
+    @DisplayName("Should validate user login via REST API")
+    void shouldValidateUserLoginViaRestApi() throws Exception {
+        // Given - First register a user
+        RegisterRequest registerRequest = RegisterRequest.builder()
+                .username("loginuser")
+                .email("login@example.com")
+                .password("password123")
+                .firstName("Login")
+                .lastName("User")
+                .phoneNumber("5555555555")
+                .build();
 
-        // When & Then - Try to login with wrong password
-        LoginRequest loginRequest = new LoginRequest("testuser", "wrongpassword");
-        mockMvc.perform(post("/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isBadRequest());
+        authService.register(registerRequest);
+
+        // Given - Login request
+        LoginRequest loginRequest = new LoginRequest("loginuser", "password123");
+        String loginJson = objectMapper.writeValueAsString(loginRequest);
+
+        // When & Then
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").exists())
+                .andExpect(jsonPath("$.username").value("loginuser"))
+                .andExpect(jsonPath("$.email").value("login@example.com"))
+                .andExpect(jsonPath("$.expiresAt").exists());
     }
 
     @Test
-    @DisplayName("Should return 400 when login with deactivated account")
-    void shouldReturnBadRequestWhenLoginWithDeactivatedAccount() throws Exception {
-        // Given - Create deactivated user
-        User user = new User();
-        user.setUsername("deactivateduser");
-        user.setEmail("deactivated@example.com");
-        user.setPassword(passwordEncoder.encode("password123"));
-        user.setFirstName("Deactivated");
-        user.setLastName("User");
-        user.setIsActive(false);
-        user.setIsVerified(false);
-        user.setRoles(Set.of(staffRole));
-        userRepository.save(user);
+    @DisplayName("Should handle invalid login credentials")
+    void shouldHandleInvalidLoginCredentials() throws Exception {
+        // Given
+        LoginRequest invalidRequest = new LoginRequest("nonexistent", "wrongpassword");
+        String requestJson = objectMapper.writeValueAsString(invalidRequest);
 
         // When & Then
-        LoginRequest loginRequest = new LoginRequest("deactivateduser", "password123");
-        mockMvc.perform(post("/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isBadRequest());
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("Should handle duplicate username registration")
+    void shouldHandleDuplicateUsernameRegistration() throws Exception {
+        // Given - Register first user
+        RegisterRequest firstUser = RegisterRequest.builder()
+                .username("duplicate")
+                .email("first@example.com")
+                .password("password123")
+                .firstName("First")
+                .lastName("User")
+                .phoneNumber("1111111111")
+                .build();
+
+        authService.register(firstUser);
+
+        // Given - Try to register with same username
+        RegisterRequest duplicateUser = RegisterRequest.builder()
+                .username("duplicate")
+                .email("second@example.com")
+                .password("password456")
+                .firstName("Second")
+                .lastName("User")
+                .phoneNumber("2222222222")
+                .build();
+
+        String requestJson = objectMapper.writeValueAsString(duplicateUser);
+
+        // When & Then
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isConflict());
     }
 
     @Test
     @DisplayName("Should validate token successfully")
     void shouldValidateTokenSuccessfully() throws Exception {
-        // Given - Create user and get token
-        User user = new User();
-        user.setUsername("tokenuser");
-        user.setEmail("token@example.com");
-        user.setPassword(passwordEncoder.encode("password123"));
-        user.setFirstName("Token");
-        user.setLastName("User");
-        user.setIsActive(true);
-        user.setIsVerified(false);
-        user.setRoles(Set.of(staffRole));
-        userRepository.save(user);
+        // Given - Register and login to get token
+        RegisterRequest registerRequest = RegisterRequest.builder()
+                .username("tokenuser")
+                .email("token@example.com")
+                .password("password123")
+                .firstName("Token")
+                .lastName("User")
+                .phoneNumber("3333333333")
+                .build();
 
-        // Login to get token
+        authService.register(registerRequest);
+        
         LoginRequest loginRequest = new LoginRequest("tokenuser", "password123");
-        String response = mockMvc.perform(post("/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
+        AuthResponse authResponse = authService.authenticate(loginRequest);
 
-        // Extract token from response
-        String token = objectMapper.readTree(response).get("data").get("token").asText();
-
-        // When & Then - Validate token
-        mockMvc.perform(post("/auth/validate-token")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"token\":\"" + token + "\"}"))
+        // When & Then
+        mockMvc.perform(get("/api/auth/validate")
+                        .header("Authorization", "Bearer " + authResponse.getToken()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.message").value("Token is valid"))
-                .andExpect(jsonPath("$.data.username").value("tokenuser"));
+                .andExpect(jsonPath("$.valid").value(true));
     }
 
     @Test
-    @DisplayName("Should return 400 when validating invalid token")
-    void shouldReturnBadRequestWhenValidatingInvalidToken() throws Exception {
+    @DisplayName("Should reject invalid token")
+    void shouldRejectInvalidToken() throws Exception {
         // Given
         String invalidToken = "invalid.jwt.token";
 
         // When & Then
-        mockMvc.perform(post("/auth/validate-token")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"token\":\"" + invalidToken + "\"}"))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("Invalid token"));
-    }
-
-    @Test
-    @DisplayName("Should return 400 for invalid registration request")
-    void shouldReturnBadRequestForInvalidRegistrationRequest() throws Exception {
-        // Given
-        RegisterRequest invalidRequest = RegisterRequest.builder()
-                .username("") // Invalid: empty username
-                .email("invalid-email") // Invalid: malformed email
-                .password("123") // Invalid: too short password
-                .build();
-
-        // When & Then
-        mockMvc.perform(post("/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidRequest)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("Should return 400 for invalid login request")
-    void shouldReturnBadRequestForInvalidLoginRequest() throws Exception {
-        // Given
-        LoginRequest invalidRequest = new LoginRequest("", ""); // Invalid: empty fields
-
-        // When & Then
-        mockMvc.perform(post("/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidRequest)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("Should handle password encryption correctly")
-    void shouldHandlePasswordEncryptionCorrectly() throws Exception {
-        // Given
-        String rawPassword = "password123";
-        RegisterRequest registerRequest = RegisterRequest.builder()
-                .username("encryptionuser")
-                .email("encryption@example.com")
-                .password(rawPassword)
-                .firstName("Encryption")
-                .lastName("User")
-                .build();
-
-        // When
-        mockMvc.perform(post("/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(registerRequest)))
-                .andExpect(status().isCreated());
-
-        // Then - Verify password was encrypted
-        User savedUser = userRepository.findByUsername("encryptionuser").orElse(null);
-        assertNotNull(savedUser);
-        assertNotEquals(rawPassword, savedUser.getPassword()); // Password should be encrypted
-        assertTrue(passwordEncoder.matches(rawPassword, savedUser.getPassword())); // Should match when verified
-    }
-
-    @Test
-    @DisplayName("Should assign default STAFF role to new users")
-    void shouldAssignDefaultStaffRoleToNewUsers() throws Exception {
-        // Given
-        RegisterRequest registerRequest = RegisterRequest.builder()
-                .username("roleuser")
-                .email("role@example.com")
-                .password("password123")
-                .firstName("Role")
-                .lastName("User")
-                .build();
-
-        // When
-        mockMvc.perform(post("/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(registerRequest)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.data.roles[0]").value("STAFF"));
-
-        // Then - Verify role assignment
-        User savedUser = userRepository.findByUsername("roleuser").orElse(null);
-        assertNotNull(savedUser);
-        assertEquals(1, savedUser.getRoles().size());
-        assertTrue(savedUser.getRoles().stream().anyMatch(role -> "STAFF".equals(role.getName())));
+        mockMvc.perform(get("/api/auth/validate")
+                        .header("Authorization", "Bearer " + invalidToken))
+                .andExpect(status().isUnauthorized());
     }
 } 

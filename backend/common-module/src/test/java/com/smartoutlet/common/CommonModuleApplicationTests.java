@@ -3,8 +3,14 @@ package com.smartoutlet.common;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootTest
+@SpringBootApplication
+class TestApplication {
+    // Test application for common module tests
+}
+
+@SpringBootTest(classes = TestApplication.class)
 @ActiveProfiles("test")
 class CommonModuleApplicationTests {
 
