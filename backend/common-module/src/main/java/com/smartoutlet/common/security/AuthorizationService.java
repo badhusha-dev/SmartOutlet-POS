@@ -7,6 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.beans.factory.annotation.Value;
+import com.smartoutlet.common.dto.StaffAssignmentResponse;
 
 import java.util.Set;
 import java.util.stream.Collectors;
