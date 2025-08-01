@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   Container,
@@ -10,12 +11,15 @@ import {
   Grid,
   Card,
   CardContent,
-  CardActions,
   Chip,
   Alert,
   AlertTitle,
   Fab,
   Badge,
+  IconButton,
+  Tooltip,
+  useTheme,
+  alpha,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -25,6 +29,8 @@ import {
   Analytics as AnalyticsIcon,
   Warning as WarningIcon,
   TrendingUp as TrendingIcon,
+  Refresh as RefreshIcon,
+  Dashboard as DashboardIcon,
 } from '@mui/icons-material';
 import RawMaterialsView from './RawMaterialsView';
 import RecipesView from './RecipesView';
@@ -58,10 +64,12 @@ function TabPanel(props: TabPanelProps) {
 }
 
 const RecipeManagementPage: React.FC = () => {
+  const theme = useTheme();
   const [activeTab, setActiveTab] = useState(0);
   const [showAddMaterial, setShowAddMaterial] = useState(false);
   const [showRecipeBuilder, setShowRecipeBuilder] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [alerts, setAlerts] = useState({
     lowStockMaterials: 0,
     pendingReorders: 0,
@@ -106,6 +114,12 @@ const RecipeManagementPage: React.FC = () => {
     }
   };
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await loadDashboardData();
+    setRefreshing(false);
+  };
+
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
@@ -128,18 +142,97 @@ const RecipeManagementPage: React.FC = () => {
     loadDashboardData();
   };
 
+  const quickActionCards = [
+    {
+      title: 'Raw Materials',
+      subtitle: 'Manage inventory and supplier information',
+      icon: MaterialIcon,
+      color: theme.palette.primary.main,
+      onClick: () => setActiveTab(0),
+      badge: alerts.lowStockMaterials,
+    },
+    {
+      title: 'Recipes & BOM',
+      subtitle: 'Build recipes and manage bill of materials',
+      icon: RecipeIcon,
+      color: theme.palette.secondary.main,
+      onClick: () => setActiveTab(1),
+      badge: alerts.draftRecipes + alerts.pendingApprovals,
+    },
+    {
+      title: 'Usage Forecast',
+      subtitle: 'Predict material consumption based on sales',
+      icon: AnalyticsIcon,
+      color: theme.palette.info.main,
+      onClick: () => setActiveTab(2),
+      badge: 0,
+    },
+    {
+      title: 'Vendor Reorder',
+      subtitle: 'Plan reorders and manage vendor relationships',
+      icon: VendorIcon,
+      color: theme.palette.success.main,
+      onClick: () => setActiveTab(3),
+      badge: alerts.pendingReorders,
+    },
+  ];
+
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
-      {/* Page Header */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
-        <Typography variant="h4" component="h1" fontWeight="bold">
-          🧂 Recipe & Raw Materials Management
-        </Typography>
+      {/* Modern Header */}
+      <Box 
+        display="flex" 
+        justifyContent="space-between" 
+        alignItems="center" 
+        mb={4}
+        sx={{
+          background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.1)} 0%, ${alpha(theme.palette.secondary.main, 0.05)} 100%)`,
+          borderRadius: theme.shape.borderRadius * 2,
+          p: 3,
+          backdropFilter: 'blur(10px)',
+        }}
+      >
+        <Box>
+          <Typography 
+            variant="h3" 
+            component="h1" 
+            fontWeight="bold"
+            sx={{
+              background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              mb: 1,
+            }}
+          >
+            🧂 Recipe Management
+          </Typography>
+          <Typography variant="subtitle1" color="text.secondary">
+            Comprehensive recipe and raw materials management system
+          </Typography>
+        </Box>
         <Box display="flex" gap={2}>
+          <Tooltip title="Refresh Data">
+            <IconButton 
+              onClick={handleRefresh} 
+              disabled={refreshing}
+              sx={{ 
+                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.2) }
+              }}
+            >
+              <RefreshIcon sx={{ animation: refreshing ? 'spin 1s linear infinite' : 'none' }} />
+            </IconButton>
+          </Tooltip>
           <Button
             variant="outlined"
             startIcon={<MaterialIcon />}
             onClick={handleAddMaterial}
+            sx={{ 
+              borderRadius: theme.shape.borderRadius * 2,
+              textTransform: 'none',
+              fontWeight: 600,
+            }}
           >
             Add Material
           </Button>
@@ -147,17 +240,30 @@ const RecipeManagementPage: React.FC = () => {
             variant="contained"
             startIcon={<RecipeIcon />}
             onClick={handleAddRecipe}
+            sx={{ 
+              borderRadius: theme.shape.borderRadius * 2,
+              textTransform: 'none',
+              fontWeight: 600,
+              boxShadow: theme.shadows[4],
+            }}
           >
             Create Recipe
           </Button>
         </Box>
       </Box>
 
-      {/* Alert Summary */}
+      {/* Enhanced Alert Summary */}
       {!loading && (alerts.lowStockMaterials > 0 || alerts.pendingReorders > 0 || 
                     alerts.draftRecipes > 0 || alerts.pendingApprovals > 0) && (
-        <Alert severity="warning" sx={{ mb: 3 }}>
-          <AlertTitle>Action Required</AlertTitle>
+        <Alert 
+          severity="warning" 
+          sx={{ 
+            mb: 3,
+            borderRadius: theme.shape.borderRadius * 2,
+            boxShadow: theme.shadows[2],
+          }}
+        >
+          <AlertTitle sx={{ fontWeight: 'bold' }}>🚨 Action Required</AlertTitle>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             {alerts.lowStockMaterials > 0 && (
               <Grid item>
@@ -166,6 +272,7 @@ const RecipeManagementPage: React.FC = () => {
                   label={`${alerts.lowStockMaterials} Low Stock Materials`}
                   color="warning"
                   size="small"
+                  sx={{ fontWeight: 600 }}
                 />
               </Grid>
             )}
@@ -176,6 +283,7 @@ const RecipeManagementPage: React.FC = () => {
                   label={`${alerts.pendingReorders} Pending Reorders`}
                   color="error"
                   size="small"
+                  sx={{ fontWeight: 600 }}
                 />
               </Grid>
             )}
@@ -186,6 +294,7 @@ const RecipeManagementPage: React.FC = () => {
                   label={`${alerts.draftRecipes} Draft Recipes`}
                   color="info"
                   size="small"
+                  sx={{ fontWeight: 600 }}
                 />
               </Grid>
             )}
@@ -196,6 +305,7 @@ const RecipeManagementPage: React.FC = () => {
                   label={`${alerts.pendingApprovals} Pending Approvals`}
                   color="warning"
                   size="small"
+                  sx={{ fontWeight: 600 }}
                 />
               </Grid>
             )}
@@ -203,97 +313,114 @@ const RecipeManagementPage: React.FC = () => {
         </Alert>
       )}
 
-      {/* Quick Actions Cards */}
+      {/* Modern Quick Actions Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card 
-            sx={{ 
-              cursor: 'pointer',
-              transition: 'transform 0.2s',
-              '&:hover': { transform: 'translateY(-2px)' }
-            }}
-            onClick={() => setActiveTab(0)}
-          >
-            <CardContent sx={{ textAlign: 'center' }}>
-              <MaterialIcon sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
-              <Typography variant="h6" gutterBottom>
-                Raw Materials
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Manage inventory and supplier information
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <Card 
-            sx={{ 
-              cursor: 'pointer',
-              transition: 'transform 0.2s',
-              '&:hover': { transform: 'translateY(-2px)' }
-            }}
-            onClick={() => setActiveTab(1)}
-          >
-            <CardContent sx={{ textAlign: 'center' }}>
-              <RecipeIcon sx={{ fontSize: 40, color: 'secondary.main', mb: 1 }} />
-              <Typography variant="h6" gutterBottom>
-                Recipes & BOM
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Build recipes and manage bill of materials
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <Card 
-            sx={{ 
-              cursor: 'pointer',
-              transition: 'transform 0.2s',
-              '&:hover': { transform: 'translateY(-2px)' }
-            }}
-            onClick={() => setActiveTab(2)}
-          >
-            <CardContent sx={{ textAlign: 'center' }}>
-              <AnalyticsIcon sx={{ fontSize: 40, color: 'info.main', mb: 1 }} />
-              <Typography variant="h6" gutterBottom>
-                Usage Forecast
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Predict material consumption based on sales
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <Card 
-            sx={{ 
-              cursor: 'pointer',
-              transition: 'transform 0.2s',
-              '&:hover': { transform: 'translateY(-2px)' }
-            }}
-            onClick={() => setActiveTab(3)}
-          >
-            <CardContent sx={{ textAlign: 'center' }}>
-              <VendorIcon sx={{ fontSize: 40, color: 'success.main', mb: 1 }} />
-              <Typography variant="h6" gutterBottom>
-                Vendor Reorder
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Plan reorders and manage vendor relationships
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+        {quickActionCards.map((card, index) => (
+          <Grid item xs={12} sm={6} md={3} key={index}>
+            <Card 
+              sx={{ 
+                cursor: 'pointer',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                borderRadius: theme.shape.borderRadius * 2,
+                background: `linear-gradient(135deg, ${alpha(card.color, 0.05)} 0%, ${alpha(card.color, 0.02)} 100%)`,
+                border: `1px solid ${alpha(card.color, 0.12)}`,
+                position: 'relative',
+                overflow: 'visible',
+                '&:hover': { 
+                  transform: 'translateY(-8px) scale(1.02)',
+                  boxShadow: theme.shadows[8],
+                  '& .card-icon': {
+                    transform: 'scale(1.1) rotate(5deg)',
+                  }
+                }
+              }}
+              onClick={card.onClick}
+            >
+              <CardContent sx={{ textAlign: 'center', p: 3 }}>
+                {card.badge > 0 && (
+                  <Badge
+                    badgeContent={card.badge}
+                    color="error"
+                    sx={{
+                      position: 'absolute',
+                      top: 16,
+                      right: 16,
+                      '& .MuiBadge-badge': {
+                        fontSize: '0.75rem',
+                        fontWeight: 'bold',
+                      }
+                    }}
+                  />
+                )}
+                <Box
+                  className="card-icon"
+                  sx={{
+                    display: 'inline-flex',
+                    p: 2,
+                    borderRadius: '50%',
+                    bgcolor: alpha(card.color, 0.1),
+                    mb: 2,
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  }}
+                >
+                  <card.icon sx={{ fontSize: 32, color: card.color }} />
+                </Box>
+                <Typography variant="h6" gutterBottom sx={{ fontWeight: 700, color: 'text.primary' }}>
+                  {card.title}
+                </Typography>
+                <Typography 
+                  variant="body2" 
+                  color="text.secondary"
+                  sx={{ 
+                    lineHeight: 1.5,
+                    fontSize: '0.875rem',
+                  }}
+                >
+                  {card.subtitle}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
       </Grid>
 
-      {/* Main Content Tabs */}
-      <Paper sx={{ width: '100%' }}>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={activeTab} onChange={handleTabChange} aria-label="recipe management tabs">
+      {/* Enhanced Main Content Tabs */}
+      <Paper 
+        sx={{ 
+          width: '100%',
+          borderRadius: theme.shape.borderRadius * 2,
+          overflow: 'hidden',
+          boxShadow: theme.shadows[4],
+        }}
+      >
+        <Box 
+          sx={{ 
+            borderBottom: 1, 
+            borderColor: 'divider',
+            background: `linear-gradient(90deg, ${alpha(theme.palette.primary.main, 0.02)} 0%, ${alpha(theme.palette.secondary.main, 0.02)} 100%)`,
+          }}
+        >
+          <Tabs 
+            value={activeTab} 
+            onChange={handleTabChange} 
+            aria-label="recipe management tabs"
+            sx={{
+              '& .MuiTab-root': {
+                textTransform: 'none',
+                fontWeight: 600,
+                fontSize: '1rem',
+                minHeight: 64,
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  color: theme.palette.primary.main,
+                  backgroundColor: alpha(theme.palette.primary.main, 0.04),
+                }
+              },
+              '& .Mui-selected': {
+                backgroundColor: alpha(theme.palette.primary.main, 0.08),
+              }
+            }}
+          >
             <Tab 
               label={
                 <Badge badgeContent={alerts.lowStockMaterials} color="error">
@@ -352,18 +479,27 @@ const RecipeManagementPage: React.FC = () => {
         </TabPanel>
       </Paper>
 
-      {/* Floating Action Button */}
+      {/* Modern Floating Action Button */}
       <Fab
         color="primary"
         aria-label="add"
         sx={{
           position: 'fixed',
-          bottom: 24,
-          right: 24,
+          bottom: 32,
+          right: 32,
+          width: 64,
+          height: 64,
+          boxShadow: theme.shadows[8],
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+          '&:hover': {
+            transform: 'scale(1.1)',
+            boxShadow: theme.shadows[16],
+          }
         }}
         onClick={activeTab === 0 ? handleAddMaterial : handleAddRecipe}
       >
-        <AddIcon />
+        <AddIcon sx={{ fontSize: 28 }} />
       </Fab>
 
       {/* Modals */}
@@ -378,6 +514,16 @@ const RecipeManagementPage: React.FC = () => {
         onClose={() => setShowRecipeBuilder(false)}
         onSuccess={handleRecipeAdded}
       />
+
+      {/* Global Styles for Animations */}
+      <style>
+        {`
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+        `}
+      </style>
     </Container>
   );
 };
