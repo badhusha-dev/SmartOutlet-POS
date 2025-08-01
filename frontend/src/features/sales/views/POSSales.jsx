@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react'
 import { Plus, Minus, X, Receipt, Search, Grid, List, Filter } from 'lucide-react'
 import { toast } from 'react-hot-toast'
@@ -236,7 +235,7 @@ const POSSales = () => {
                 </button>
               </div>
             </div>
-            
+
             {/* Category Filters */}
             <div className="flex space-x-2 overflow-x-auto">
               {categories.map((category) => (
@@ -256,7 +255,7 @@ const POSSales = () => {
           </div>
 
           {/* Products Grid */}
-          <div className="flex-1 p-4 overflow-auto">
+          <div className="flex-1 p-2 overflow-auto">
             {loading ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 {[...Array(15)].map((_, i) => (
@@ -268,12 +267,12 @@ const POSSales = () => {
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2">
                 {filteredProducts.map((product) => (
                   <div
                     key={product.id}
                     onClick={() => addToCart(product)}
-                    className="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer border border-gray-200 dark:border-gray-700 overflow-hidden"
+                    className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-2 cursor-pointer hover:shadow-md transition-shadow"
                   >
                     <div className="relative">
                       <img

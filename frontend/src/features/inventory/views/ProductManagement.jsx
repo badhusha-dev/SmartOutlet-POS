@@ -343,7 +343,7 @@ const ProductManagement = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -417,7 +417,7 @@ const ProductManagement = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
         <div className="card">
           <div className="flex items-center justify-between">
             <div>
@@ -484,7 +484,7 @@ const ProductManagement = () => {
       </div>
 
       {/* Products Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
         {filteredProducts.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
