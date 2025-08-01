@@ -1,3 +1,4 @@
+modules = ["java-graalvm22.3", "nodejs-20", "bash", "web"]
 [workflows]
 runButton = "Start All Services"
 
@@ -9,3 +10,6 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd backend && ./start-dev-services.sh"
+
+[nix]
+channel = "stable-25_05"
