@@ -1,9 +1,18 @@
+<<<<<<< HEAD
 
 import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { PlusCircle, Edit, Trash2, Search } from 'lucide-react'
 import { productApi, API_ENDPOINTS } from '../../../services/client'
 import toast from 'react-hot-toast'
+=======
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux'
+import * as XLSX from 'xlsx';
+import { Plus, Edit, Trash2, Package, Tag } from 'lucide-react';
+import Modal from '../../../components/common/Modal';
+import { mockCategories } from '../../../utils/mockData';
+>>>>>>> 48f467dcaee06763c597d129975134e2ee7cdf45
 
 const CategoryManagement = () => {
   const [categories, setCategories] = useState([])

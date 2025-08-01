@@ -113,6 +113,7 @@ export const AuthProvider = ({ children }) => {
       setUser(res.data)
       localStorage.setItem('user', JSON.stringify(res.data))
     } catch (error) {
+      console.error('Failed to get current user:', error)
       setUser(null)
       localStorage.removeItem('token')
       localStorage.removeItem('user')

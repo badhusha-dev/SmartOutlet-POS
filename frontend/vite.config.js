@@ -7,15 +7,9 @@ export default defineConfig({
   server: {
     port: 3000,
     host: "0.0.0.0",
-    // for replit
-    allowedHosts: [
-      "993f7743-03c9-4866-a416-76f8bb7b4ef5-00-3qzer0uo7r8j7.pike.replit.dev",
-    ],
     hmr: {
-      clientPort: 3000,
-      host: "993f7743-03c9-4866-a416-76f8bb7b4ef5-00-3qzer0uo7r8j7.pike.replit.dev"
+      port: 3000,
     }
-    // for replit  
   },
   build: {
     outDir: "dist",

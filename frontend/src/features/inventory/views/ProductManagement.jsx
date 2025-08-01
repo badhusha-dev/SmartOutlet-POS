@@ -25,7 +25,8 @@ import { productApi, API_ENDPOINTS } from '../../../services/client'
 import LoadingSpinner from '../../../components/common/LoadingSpinner'
 import Modal from '../../../components/common/Modal'
 import { mockProducts, mockCategories } from '../../../utils/mockData'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import * as XLSX from 'xlsx'
 import SkeletonTable from '../../../components/common/SkeletonTable'
 
 const ProductManagement = () => {
@@ -194,7 +195,7 @@ const ProductManagement = () => {
   const handleStockSubmit = (e) => {
     e.preventDefault();
     if (!stockProduct) return;
-    
+
     if (DEV_MODE && DISABLE_AUTH) {
       console.log('🔓 Development mode: Mock stock update', {
         productId: stockProduct.id,
@@ -205,7 +206,7 @@ const ProductManagement = () => {
       setStockProduct(null);
       return;
     }
-    
+
     // dispatch(updateStock({ id: stockProduct.id, quantity: Number(stockForm.quantity), type: stockForm.type }));
     setShowStockModal(false);
     setStockProduct(null);
@@ -250,7 +251,7 @@ const ProductManagement = () => {
 
   const ProductCard = ({ product }) => {
     const stockStatus = getStockStatus(product)
-    
+
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -269,7 +270,7 @@ const ProductManagement = () => {
                 <XCircle className="h-4 w-4 text-red-500" />
               )}
             </div>
-            
+
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
               {product.description}
             </p>

@@ -2,7 +2,7 @@ import axios from 'axios'
 import toast from 'react-hot-toast'
 
 // API Gateway base URL
-const API_GATEWAY_BASE_URL = import.meta.env.VITE_API_GATEWAY_BASE_URL || 'http://localhost:8080'
+const API_GATEWAY_BASE_URL = import.meta.env.VITE_API_GATEWAY_BASE_URL || 'http://0.0.0.0:8081'
 
 // Helper to create axios instance
 const createApiClient = (baseURL) => {
