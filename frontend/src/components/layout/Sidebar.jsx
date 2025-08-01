@@ -90,7 +90,6 @@ const Sidebar = ({ isOpen, onClose }) => {
 
   return (
     <>
-      {/* Sidebar */}
       <div
         className={clsx(
           "fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-gray-900 shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0",
@@ -113,7 +112,6 @@ const Sidebar = ({ isOpen, onClose }) => {
               </p>
             </div>
           </div>
-
           {/* Close button for mobile */}
           <button
             onClick={onClose}
