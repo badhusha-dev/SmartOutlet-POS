@@ -1,5 +1,7 @@
 package com.smartoutlet.common.security;
 
+import com.smartoutlet.common.dto.UserResponse;
+import com.smartoutlet.common.dto.StaffAssignmentResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -321,8 +323,8 @@ public class AuthorizationService {
     public void logAuthorizationCheck(String permission, boolean granted) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication != null ? authentication.getName() : "anonymous";
-        
+
         log.info("Authorization check - User: {}, Permission: {}, Granted: {}", 
                 username, permission, granted);
     }
-} 
+}

@@ -1,21 +1,21 @@
+
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
-import { ThemeProvider, createTheme } from '@mui/material/styles'
-import CssBaseline from '@mui/material/CssBaseline'
-import App from './App.jsx'
-import './index.css'
+import { Toaster } from 'react-hot-toast'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { AuthProvider } from './contexts/AuthContext'
 import { store } from './store'
+import App from './App.jsx'
+import './index.css'
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#FF6B6B',
-    },
-    secondary: {
-      main: '#4ECDC4',
+// Configure React Query client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
     },
   },
 })
@@ -23,14 +23,14 @@ const theme = createTheme({
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Provider store={store}>
-      <BrowserRouter>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
           <AuthProvider>
             <App />
+            <Toaster position="top-right" />
           </AuthProvider>
-        </ThemeProvider>
-      </BrowserRouter>
+        </BrowserRouter>
+      </QueryClientProvider>
     </Provider>
-  </React.StrictMode>
+  </React.StrictMode>,
 )
