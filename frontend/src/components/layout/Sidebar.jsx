@@ -47,6 +47,12 @@ const Sidebar = ({ isOpen, onClose }) => {
       roles: ["ADMIN", "STAFF"],
     },
     {
+      name: "Recipes",
+      href: "/recipes",
+      icon: Package,
+      roles: ["ADMIN", "STAFF"],
+    },
+    {
       name: "POS Sales",
       href: "/pos",
       icon: ShoppingCart,
