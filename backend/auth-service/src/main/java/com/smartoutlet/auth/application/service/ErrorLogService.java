@@ -1,8 +1,8 @@
 package com.smartoutlet.auth.application.service;
 
-import com.smartoutlet.auth.domain.model.ErrorLog;
-import com.smartoutlet.auth.domain.model.User;
-import com.smartoutlet.auth.infrastructure.persistence.ErrorLogRepository;
+import com.smartoutlet.auth.domain.entity.ErrorLog;
+import com.smartoutlet.auth.domain.entity.User;
+import com.smartoutlet.auth.repository.ErrorLogRepository;
 import com.smartoutlet.auth.infrastructure.config.StackTraceUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +43,7 @@ public class ErrorLogService {
             Integer lineNumber = StackTraceUtil.extractLineNumber(stackTrace);
             
             // Check if similar error already exists (same message, action, and URL)
-            Optional<ErrorLog> existingError = errorLogRepository.findByErrorMessageAndActionAndUrl(
+            Optional<ErrorLog> existingError = errorLogRepository.findByErrorMessageAndActionPerformedAndRequestUrl(
                 errorMessage, actionPerformed, requestUrl);
             
             if (existingError.isPresent()) {
@@ -117,7 +117,7 @@ public class ErrorLogService {
         Optional<ErrorLog> errorLogOpt = errorLogRepository.findById(errorId);
         if (errorLogOpt.isPresent()) {
             ErrorLog errorLog = errorLogOpt.get();
-            errorLog.markAsResolved(resolutionNotes);
+            errorLog.markAsResolved(resolutionNotes, "system");
             return errorLogRepository.save(errorLog);
         }
         return null;

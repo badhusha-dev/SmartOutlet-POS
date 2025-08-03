@@ -48,9 +48,13 @@ public class Transaction {
     @Column(name = "customer_email", length = 200)
     private String customerEmail;
     
-    @Column(name = "customer_phone", length = 50)
+        @Column(name = "customer_phone", length = 50)
     private String customerPhone;
-    
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id", insertable = false, updatable = false)
+    private Customer customer;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type", nullable = false, length = 20)
     private TransactionType transactionType;

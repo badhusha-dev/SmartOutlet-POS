@@ -74,7 +74,7 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
     @Query("SELECT i.productId, i.outletId, SUM(i.quantity - COALESCE(i.reservedQuantity, 0)) as totalStock " +
            "FROM InventoryItem i WHERE i.status = 'AVAILABLE' " +
            "GROUP BY i.productId, i.outletId " +
-           "HAVING totalStock <= :minStock")
+           "HAVING SUM(i.quantity - COALESCE(i.reservedQuantity, 0)) <= :minStock")
     List<Object[]> findLowStockProducts(@Param("minStock") Integer minStock);
     
     // Search with pagination

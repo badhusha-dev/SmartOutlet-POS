@@ -1,6 +1,6 @@
 package com.smartoutlet.auth.api.controller;
 
-import com.smartoutlet.auth.domain.model.ErrorLog;
+import com.smartoutlet.auth.domain.entity.ErrorLog;
 import com.smartoutlet.auth.application.service.ErrorLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;

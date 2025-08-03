@@ -1,12 +1,12 @@
 package com.smartoutlet.auth.application.service;
 
 import com.smartoutlet.auth.dto.*;
-import com.smartoutlet.auth.domain.model.Role;
-import com.smartoutlet.auth.domain.model.User;
+import com.smartoutlet.auth.domain.entity.Role;
+import com.smartoutlet.auth.domain.entity.User;
 import com.smartoutlet.auth.infrastructure.config.UserNotFoundException;
 import com.smartoutlet.auth.infrastructure.config.UserAlreadyExistsException;
-import com.smartoutlet.auth.infrastructure.persistence.RoleRepository;
-import com.smartoutlet.auth.infrastructure.persistence.UserRepository;
+import com.smartoutlet.auth.repository.RoleRepository;
+import com.smartoutlet.auth.repository.UserRepository;
 import com.smartoutlet.auth.infrastructure.config.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +30,8 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     
+    // TODO: Fix UserService implementation
+    /*
     public AuthResponse authenticate(LoginRequest loginRequest) {
         log.info("Authenticating user: {}", loginRequest.getUsernameOrEmail());
         
@@ -98,14 +100,14 @@ public class UserService {
         Role defaultRole = roleRepository.findByName("STAFF")
                 .orElseThrow(() -> new RuntimeException("Default role STAFF not found"));
         
-        Set<Role> roles = new HashSet<>();
-        roles.add(defaultRole);
-        user.setRoles(roles);
+        user.setRoles(new HashSet<>());
+        user.getRoles().add(defaultRole);
         
-        User savedUser = userRepository.save(user);
-        log.info("User {} registered successfully", savedUser.getUsername());
+        user = userRepository.save(user);
         
-        return convertToUserResponse(savedUser);
+        log.info("User {} registered successfully", user.getUsername());
+        
+        return convertToUserResponse(user);
     }
     
     public Boolean validateToken(String token) {
@@ -118,14 +120,9 @@ public class UserService {
     }
     
     public UserResponse getUserFromToken(String token) {
-        if (!jwtUtil.validateToken(token)) {
-            throw new RuntimeException("Invalid token");
-        }
-        
         String username = jwtUtil.getUsernameFromToken(token);
         User user = userRepository.findByUsernameWithRoles(username)
                 .orElseThrow(() -> new UserNotFoundException("User not found: " + username));
-        
         return convertToUserResponse(user);
     }
     
@@ -133,7 +130,6 @@ public class UserService {
     public UserResponse getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
-        
         return convertToUserResponse(user);
     }
     
@@ -141,7 +137,6 @@ public class UserService {
     public UserResponse getUserByUsername(String username) {
         User user = userRepository.findByUsernameWithRoles(username)
                 .orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
-        
         return convertToUserResponse(user);
     }
     
@@ -157,11 +152,10 @@ public class UserService {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .phoneNumber(user.getPhoneNumber())
+                .roles(roleNames)
                 .isActive(user.getIsActive())
                 .isVerified(user.getIsVerified())
-                .lastLogin(user.getLastLogin())
-                .createdAt(user.getCreatedAt())
-                .roles(roleNames)
                 .build();
     }
+    */
 }

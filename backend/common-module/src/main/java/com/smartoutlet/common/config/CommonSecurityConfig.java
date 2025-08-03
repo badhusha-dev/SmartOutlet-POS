@@ -1,7 +1,7 @@
 package com.smartoutlet.common.config;
 
 import com.smartoutlet.common.security.DynamicAuthorizationFilter;
-import com.smartoutlet.common.security.JwtAuthenticationFilter;
+import com.smartoutlet.common.security.CommonJwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,10 +19,10 @@ import java.util.Arrays;
 @EnableWebSecurity
 public class CommonSecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CommonJwtAuthenticationFilter jwtAuthenticationFilter;
     private final DynamicAuthorizationFilter dynamicAuthorizationFilter;
 
-    public CommonSecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, 
+    public CommonSecurityConfig(CommonJwtAuthenticationFilter jwtAuthenticationFilter, 
                                DynamicAuthorizationFilter dynamicAuthorizationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.dynamicAuthorizationFilter = dynamicAuthorizationFilter;
@@ -42,7 +42,7 @@ public class CommonSecurityConfig {
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            .addFilterAfter(dynamicAuthorizationFilter, JwtAuthenticationFilter.class);
+            .addFilterAfter(dynamicAuthorizationFilter, CommonJwtAuthenticationFilter.class);
 
         return http.build();
     }

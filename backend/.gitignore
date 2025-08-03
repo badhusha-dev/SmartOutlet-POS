@@ -1,0 +1,268 @@
+# SmartOutlet POS Backend - .gitignore
+
+# ===========================================
+# Java & Maven
+# ===========================================
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+*.zip
+*.tar.gz
+*.rar
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# ===========================================
+# IDE & Editor Files
+# ===========================================
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# ===========================================
+# Spring Boot
+# ===========================================
+*.log
+logs/
+spring.log
+application.log
+
+# ===========================================
+# Database
+# ===========================================
+*.db
+*.sqlite
+*.sqlite3
+*.h2.db
+*.h2.db.trace.db
+*.h2.db.lock.db
+*.h2.db.mv.db
+
+# ===========================================
+# Temporary Files
+# ===========================================
+# Maven temporary directories
+temp-maven/
+temp/
+tmp/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+*.lnk
+*.tmp
+*.temp
+
+# ===========================================
+# Application Specific
+# ===========================================
+# Configuration files with sensitive data
+application-prod.properties
+application-prod.yml
+application-prod.yaml
+application-staging.properties
+application-staging.yml
+application-staging.yaml
+
+# JWT secrets and keys
+*.jks
+*.p12
+*.pem
+*.key
+*.crt
+*.csr
+
+# ===========================================
+# Docker
+# ===========================================
+.dockerignore
+docker-compose.override.yml
+docker-compose.override.yaml
+
+# ===========================================
+# Testing
+# ===========================================
+# Test reports
+test-results/
+reports/
+coverage/
+.coverage
+*.lcov
+
+# ===========================================
+# Logs & Monitoring
+# ===========================================
+# Application logs
+*.log
+logs/
+log/
+
+# Monitoring
+prometheus.yml
+grafana/
+
+# ===========================================
+# Environment & Local Development
+# ===========================================
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Local configuration
+config/local/
+config/dev/
+
+# ===========================================
+# Backup Files
+# ===========================================
+*.bak
+*.backup
+*.old
+*.orig
+*.save
+*~
+
+# ===========================================
+# Documentation Build
+# ===========================================
+docs/build/
+docs/_build/
+site/
+
+# ===========================================
+# Node.js (if any frontend tools are used)
+# ===========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn-integrity
+
+# ===========================================
+# Python (if any scripts are used)
+# ===========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# ===========================================
+# PowerShell Scripts (temporary)
+# ===========================================
+# Exclude temporary PowerShell scripts created for Maven download
+download-maven.ps1
+
+# ===========================================
+# Git
+# ===========================================
+# Git hooks (if custom)
+.git/hooks/
+
+# ===========================================
+# IDE Workspace Files
+# ===========================================
+*.swp
+*.swo
+*~
+
+# ===========================================
+# Application Runtime
+# ===========================================
+# PID files
+*.pid
+
+# Socket files
+*.sock
+
+# ===========================================
+# Security
+# ===========================================
+# Keystore files
+*.keystore
+*.truststore
+
+# Certificate files
+*.cer
+*.der
+*.p7b
+*.p7c
+*.pfx
+
+# ===========================================
+# Performance & Profiling
+# ===========================================
+# JVM profiling
+*.hprof
+*.dump
+
+# ===========================================
+# Custom Exclusions
+# ===========================================
+# Add any project-specific exclusions here
+# Example:
+# custom-data/
+# external-libs/ 
