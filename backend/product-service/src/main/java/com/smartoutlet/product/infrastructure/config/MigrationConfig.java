@@ -18,11 +18,12 @@ public class MigrationConfig {
     private final DataSource dataSource;
 
     @Bean
-    @DependsOn("flyway")
-    public FlywayMigrationInitializer flywayMigrationInitializer(Flyway flyway) {
-        log.info("Initializing Flyway migration...");
-        return new FlywayMigrationInitializer(flyway);
-    }
+@DependsOn("flyway")
+@org.springframework.boot.autoconfigure.condition.ConditionalOnBean(name = "flyway")
+public FlywayMigrationInitializer flywayMigrationInitializer(Flyway flyway) {
+    log.info("Initializing Flyway migration...");
+    return new FlywayMigrationInitializer(flyway);
+}
 
     @Bean
     public DataCleanMigration dataCleanMigration() {
