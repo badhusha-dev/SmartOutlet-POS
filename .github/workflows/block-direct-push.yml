@@ -1,0 +1,23 @@
+name: Block Direct Push to Main
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check-pusher:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify if user is allowed
+        run: |
+          echo "Pusher: $GITHUB_ACTOR"
+          ALLOWED_USERS="badhusha618 BashaBasha618"
+          
+          if echo "$ALLOWED_USERS" | grep -w "$GITHUB_ACTOR" > /dev/null; then
+            echo "✅ $GITHUB_ACTOR is allowed to push to main."
+          else
+            echo "❌ $GITHUB_ACTOR is NOT allowed to push to main."
+            echo "This push should have been done via a pull request."
+            exit 1
+          fi
