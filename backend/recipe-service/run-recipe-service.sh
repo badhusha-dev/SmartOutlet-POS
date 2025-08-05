@@ -1,58 +1,42 @@
 #!/bin/bash
 
-# Recipe Service Startup Script
-echo "🧂 Starting Recipe Service..."
+# Recipe Service Runner Script
+# This script builds the common module and runs the Recipe service in debug mode with dev profile
 
-# Check if Maven is installed
-if ! command -v mvn &> /dev/null; then
-    echo "❌ Maven is not installed. Please install Maven first."
-    exit 1
+echo "🔧 Building common module..."
+cd ../common-module || { echo "❌ Failed to navigate to common module"; exit 1; }
+
+mvn clean install || { echo "❌ Failed to build common module"; exit 1; }
+
+echo "✅ Common module built successfully."
+echo "=========================================="
+
+cd ../recipe-service || { echo "❌ Failed to navigate to recipe-service module"; exit 1; }
+
+echo "🚀 Starting Recipe Service in Debug Mode..."
+echo "=========================================="
+
+# Check if port 8086 is already in use
+if lsof -Pi :8086 -sTCP:LISTEN -t >/dev/null ; then
+    echo "❌ Port 8086 is already in use!"
+    echo "   Stopping existing process..."
+    lsof -ti:8086 | xargs kill -9 2>/dev/null
+    sleep 2
 fi
 
-# Set environment variables
-export SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-dev}
-
-echo "📦 Building Recipe Service..."
-mvn clean compile -DskipTests
-
-if [ $? -ne 0 ]; then
-    echo "❌ Build failed. Please check for compilation errors."
-    exit 1
+# Check if debug port 5005 is already in use
+if lsof -Pi :5005 -sTCP:LISTEN -t >/dev/null ; then
+    echo "❌ Debug port 5005 is already in use!"
+    echo "   Stopping existing debug process..."
+    lsof -ti:5005 | xargs kill -9 2>/dev/null
+    sleep 2
 fi
 
-echo "🚀 Starting Recipe Service on port 8087..."
+echo "✅ Ports cleared, starting Recipe service..."
 
-# Set JVM options for development
-export JAVA_OPTS="-Xmx1024m -Xms512m -XX:+UseG1GC"
-
-# Database configuration
-export MYSQL_URL=${MYSQL_URL:-"jdbc:mysql://localhost:3306/smartoutlet_recipe?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true"}
-export MYSQL_USERNAME=${MYSQL_USERNAME:-"smartoutlet_user"}
-export MYSQL_PASSWORD=${MYSQL_PASSWORD:-"smartoutlet_password"}
-
-# JWT configuration
-export JWT_SECRET=${JWT_SECRET:-"SmartOutletJWTSecretKeyForDevelopment2024!"}
-export JWT_EXPIRATION=${JWT_EXPIRATION:-86400000}
-
-# Service URLs
-export AUTH_SERVICE_URL=${AUTH_SERVICE_URL:-"http://localhost:8081"}
-export PRODUCT_SERVICE_URL=${PRODUCT_SERVICE_URL:-"http://localhost:8083"}
-
-# Business configuration
-export RECIPE_CONSUMPTION_DEFAULT_WASTAGE_PERCENTAGE=${RECIPE_CONSUMPTION_DEFAULT_WASTAGE_PERCENTAGE:-5.0}
-export RECIPE_FORECASTING_DEFAULT_DAYS_AHEAD=${RECIPE_FORECASTING_DEFAULT_DAYS_AHEAD:-30}
-export RECIPE_VENDOR_LEAD_TIME_DAYS=${RECIPE_VENDOR_LEAD_TIME_DAYS:-7}
-
-echo "📋 Configuration:"
-echo "  Profile: $SPRING_PROFILES_ACTIVE"
-echo "  Database: $MYSQL_URL"
-echo "  Auth Service: $AUTH_SERVICE_URL"
-echo "  Product Service: $PRODUCT_SERVICE_URL"
-echo ""
-
-# Run the application
+# Run the auth service with debug mode and dev profile
 mvn spring-boot:run \
-  -Dspring-boot.run.jvmArguments="$JAVA_OPTS" \
-  -Dspring.profiles.active=$SPRING_PROFILES_ACTIVE
+    -Dspring-boot.run.profiles=dev \
+    -Dspring-boot.run.jvmArguments="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
 
-echo "✅ Recipe Service stopped."
+echo "🏁 Recipe service stopped."
