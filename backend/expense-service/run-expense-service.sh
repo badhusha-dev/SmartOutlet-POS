@@ -1,7 +1,17 @@
 #!/bin/bash
 
 # Expense Service Runner Script
-# This script runs the expense service in debug mode with dev profile
+# This script builds the common module and runs the expense service in debug mode with dev profile
+
+echo "🔧 Building common module..."
+cd ../common-module || { echo "❌ Failed to navigate to common module"; exit 1; }
+
+mvn clean install || { echo "❌ Failed to build common module"; exit 1; }
+
+echo "✅ Common module built successfully."
+echo "=========================================="
+
+cd ../expense-service || { echo "❌ Failed to navigate to auth-service module"; exit 1; }
 
 echo "🚀 Starting Expense Service in Debug Mode..."
 echo "============================================"

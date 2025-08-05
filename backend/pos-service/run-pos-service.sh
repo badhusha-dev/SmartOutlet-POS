@@ -1,13 +1,42 @@
 #!/bin/bash
 
-# Initialize SDKMAN for Maven
-source "/Users/admin/.sdkman/bin/sdkman-init.sh"
+# POS Service Runner Script
+# This script builds the common module and runs the POS service in debug mode with dev profile
 
-echo "Starting SmartOutlet POS Service..."
+echo "🔧 Building common module..."
+cd ../common-module || { echo "❌ Failed to navigate to common module"; exit 1; }
 
-# Check if Maven wrapper exists, otherwise use maven
-if [ -f "./mvnw" ]; then
-    ./mvnw spring-boot:run -Dspring-boot.run.profiles=local
-else
-    mvn spring-boot:run -Dspring-boot.run.profiles=local
-fi 
+mvn clean install || { echo "❌ Failed to build common module"; exit 1; }
+
+echo "✅ Common module built successfully."
+echo "=========================================="
+
+cd ../pos-service || { echo "❌ Failed to navigate to pos-service module"; exit 1; }
+
+echo "🚀 Starting POS Service in Debug Mode..."
+echo "=========================================="
+
+# Check if port 8085 is already in use
+if lsof -Pi :8085 -sTCP:LISTEN -t >/dev/null ; then
+    echo "❌ Port 8085 is already in use!"
+    echo "   Stopping existing process..."
+    lsof -ti:8085 | xargs kill -9 2>/dev/null
+    sleep 2
+fi
+
+# Check if debug port 5005 is already in use
+if lsof -Pi :5005 -sTCP:LISTEN -t >/dev/null ; then
+    echo "❌ Debug port 5005 is already in use!"
+    echo "   Stopping existing debug process..."
+    lsof -ti:5005 | xargs kill -9 2>/dev/null
+    sleep 2
+fi
+
+echo "✅ Ports cleared, starting POS service..."
+
+# Run the auth service with debug mode and dev profile
+mvn spring-boot:run \
+    -Dspring-boot.run.profiles=dev \
+    -Dspring-boot.run.jvmArguments="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+
+echo "🏁 POS service stopped."

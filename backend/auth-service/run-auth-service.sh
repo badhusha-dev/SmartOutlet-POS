@@ -1,7 +1,17 @@
 #!/bin/bash
 
 # Auth Service Runner Script
-# This script runs the auth service in debug mode with dev profile
+# This script builds the common module and runs the auth service in debug mode with dev profile
+
+echo "🔧 Building common module..."
+cd ../common-module || { echo "❌ Failed to navigate to common module"; exit 1; }
+
+mvn clean install || { echo "❌ Failed to build common module"; exit 1; }
+
+echo "✅ Common module built successfully."
+echo "=========================================="
+
+cd ../auth-service || { echo "❌ Failed to navigate to auth-service module"; exit 1; }
 
 echo "🚀 Starting Auth Service in Debug Mode..."
 echo "=========================================="
@@ -27,6 +37,6 @@ echo "✅ Ports cleared, starting auth service..."
 # Run the auth service with debug mode and dev profile
 mvn spring-boot:run \
     -Dspring-boot.run.profiles=dev \
-    -Dspring-boot.run.jvmArguments="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"
+    -Dspring-boot.run.jvmArguments="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
 
-echo "🏁 Auth service stopped." 
+echo "🏁 Auth service stopped."
