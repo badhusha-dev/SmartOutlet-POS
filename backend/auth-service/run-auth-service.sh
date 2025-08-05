@@ -37,6 +37,6 @@ echo "✅ Ports cleared, starting auth service..."
 # Run the auth service with debug mode and dev profile
 mvn spring-boot:run \
     -Dspring-boot.run.profiles=dev \
-    #-Dspring-boot.run.jvmArguments="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+    -Dspring-boot.run.jvmArguments="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
 
 echo "🏁 Auth service stopped."
