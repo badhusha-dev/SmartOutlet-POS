@@ -115,7 +115,7 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>8.5.0</version> <!-- Use the version you're working with -->
+            <version>9.22.3</version>
         </dependency>
     </dependencies>
 
@@ -128,7 +128,7 @@
             <plugin>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
-                <version>8.5.0</version>
+                <version>9.22.3</version>
                 <configuration>
                     <locations>
                         <location>classpath:db/migration</location> <!-- Ensure this points to your migration folder -->

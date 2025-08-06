@@ -1,5 +1,5 @@
--- V2__insert_sample_data.sql
--- Insert sample roles and users data
+-- Sample data insertion for auth service
+-- This file will be automatically executed by Spring Boot
 
 -- Insert sample roles
 INSERT INTO roles (name, description, created_at, updated_at) VALUES
@@ -12,7 +12,7 @@ INSERT INTO roles (name, description, created_at, updated_at) VALUES
 ('STAFF', 'Default staff role for new users', NOW(), NOW())
 ON CONFLICT (name) DO NOTHING;
 
--- Insert sample users
+-- Insert sample users (password is BCrypt hash of 'password123')
 INSERT INTO users (username, email, password, first_name, last_name, phone_number, is_active, is_verified, created_at, updated_at, last_login)
 VALUES
 ('admin', 'admin@example.com', '$2a$10$7EqJtq98hPqEX7fNZaFWoOa5gk5b8pQp1Yy1Q7rS3yY6z1Q7rS3y6', 'Admin', 'User', '1234567890', true, true, NOW(), NOW(), NOW())
@@ -69,78 +69,12 @@ INSERT INTO permissions (name, description, resource, action) VALUES
 -- System permissions
 ('SYSTEM_READ', 'Read system information', 'SYSTEM', 'READ'),
 ('SYSTEM_WRITE', 'Update system configuration', 'SYSTEM', 'WRITE'),
-('SYSTEM_ADMIN', 'Administer system', 'SYSTEM', 'ADMIN');
-
--- Insert default roles
-INSERT INTO roles (name, description) VALUES
-('ROLE_ADMIN', 'System Administrator with full access'),
-('ROLE_MANAGER', 'Outlet Manager with management permissions'),
-('ROLE_STAFF', 'Staff member with limited permissions'),
-('ROLE_CASHIER', 'Cashier with transaction permissions'),
-('ROLE_KITCHEN', 'Kitchen staff with product permissions')
+('SYSTEM_ADMIN', 'Administer system', 'SYSTEM', 'ADMIN')
 ON CONFLICT (name) DO NOTHING;
 
 -- Assign permissions to ADMIN role
 INSERT INTO role_permissions (role_id, permission_id)
 SELECT r.id, p.id
 FROM roles r, permissions p
-WHERE r.name = 'ROLE_ADMIN';
-
--- Assign permissions to MANAGER role
-INSERT INTO role_permissions (role_id, permission_id)
-SELECT r.id, p.id
-FROM roles r, permissions p
-WHERE r.name = 'ROLE_MANAGER' 
-AND p.name IN (
-    'USERS_READ',
-    'OUTLETS_READ', 'OUTLETS_WRITE',
-    'PRODUCTS_READ', 'PRODUCTS_WRITE',
-    'INVENTORY_READ', 'INVENTORY_WRITE',
-    'TRANSACTIONS_READ', 'TRANSACTIONS_WRITE',
-    'CUSTOMERS_READ', 'CUSTOMERS_WRITE',
-    'EXPENSES_READ', 'EXPENSES_WRITE',
-    'REPORTS_READ',
-    'SYSTEM_READ'
-);
-
--- Assign permissions to STAFF role
-INSERT INTO role_permissions (role_id, permission_id)
-SELECT r.id, p.id
-FROM roles r, permissions p
-WHERE r.name = 'ROLE_STAFF' 
-AND p.name IN (
-    'OUTLETS_READ',
-    'PRODUCTS_READ',
-    'INVENTORY_READ',
-    'TRANSACTIONS_READ', 'TRANSACTIONS_WRITE',
-    'CUSTOMERS_READ', 'CUSTOMERS_WRITE',
-    'EXPENSES_READ'
-);
-
--- Assign permissions to CASHIER role
-INSERT INTO role_permissions (role_id, permission_id)
-SELECT r.id, p.id
-FROM roles r, permissions p
-WHERE r.name = 'ROLE_CASHIER' 
-AND p.name IN (
-    'PRODUCTS_READ',
-    'TRANSACTIONS_READ', 'TRANSACTIONS_WRITE',
-    'CUSTOMERS_READ', 'CUSTOMERS_WRITE'
-);
-
--- Assign permissions to KITCHEN role
-INSERT INTO role_permissions (role_id, permission_id)
-SELECT r.id, p.id
-FROM roles r, permissions p
-WHERE r.name = 'ROLE_KITCHEN' 
-AND p.name IN (
-    'PRODUCTS_READ',
-    'INVENTORY_READ',
-    'TRANSACTIONS_READ'
-);
-
--- Assign admin role to existing admin user (assuming user ID 1 is admin)
-INSERT INTO user_roles (user_id, role_id)
-SELECT u.id, r.id
-FROM users u, roles r
-WHERE u.username = 'admin' AND r.name = 'ROLE_ADMIN';
+WHERE r.name = 'ADMIN'
+ON CONFLICT DO NOTHING; 
