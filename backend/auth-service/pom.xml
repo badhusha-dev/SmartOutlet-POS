@@ -115,7 +115,7 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>9.22.3</version>
+            <version>8.5.0</version> <!-- Use the version you're working with -->
         </dependency>
     </dependencies>
 
@@ -124,6 +124,16 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>8.5.0</version>
+                <configuration>
+                    <locations>
+                        <location>classpath:db/migration</location> <!-- Ensure this points to your migration folder -->
+                    </locations>
+                </configuration>
             </plugin>
         </plugins>
     </build>
