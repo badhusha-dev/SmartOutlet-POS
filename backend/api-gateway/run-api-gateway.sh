@@ -1,7 +1,17 @@
 #!/bin/bash
 
 # API Gateway Runner Script
-# This script runs the API gateway service in debug mode with dev profile
+# This script builds the common module and runs the API gateway service in debug mode with dev profile
+
+echo "🔧 Building common module..."
+cd ../common-module || { echo "❌ Failed to navigate to common module"; exit 1; }
+
+mvn clean install || { echo "❌ Failed to build common module"; exit 1; }
+
+echo "✅ Common module built successfully."
+echo "=========================================="
+
+cd ../api-gateway || { echo "❌ Failed to navigate to api-gateway module"; exit 1; }
 
 echo "🚀 Starting API Gateway in Debug Mode..."
 echo "========================================"
