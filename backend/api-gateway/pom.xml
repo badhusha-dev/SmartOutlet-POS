@@ -43,13 +43,6 @@
             <version>${springdoc.version}</version>
         </dependency>
         
-        <!-- SpringDoc OpenAPI Gateway WebFlux UI for Swagger Aggregation -->
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-webflux-ui</artifactId>
-            <version>${springdoc.version}</version>
-        </dependency>
-        
         <!-- Spring Boot Actuator -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
