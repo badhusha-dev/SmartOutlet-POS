@@ -45,6 +45,15 @@ mode = "sequential"
 task = "shell.exec"
 args = "cd frontend && npm run dev"
 
+[[workflows.workflow]]
+name = "API Gateway"
+author = 46046417
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd backend/api-gateway && mvn spring-boot:run"
+
 [deployment]
 run = ["sh", "-c", "node index.js"]
 

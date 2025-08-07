@@ -1,0 +1,120 @@
+
+server:
+  port: 8080
+  address: 0.0.0.0
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        # User Service Route
+        - id: user-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/user-service/**
+          filters:
+            - StripPrefix=1
+
+        # Product Service Route  
+        - id: product-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/product-service/**
+          filters:
+            - StripPrefix=1
+
+        # Order Service Route
+        - id: order-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/order-service/**
+          filters:
+            - StripPrefix=1
+
+        # User Service OpenAPI Route
+        - id: user-service-openapi
+          uri: http://localhost:8081
+          predicates:
+            - Path=/user-service/v3/api-docs
+          filters:
+            - RewritePath=/user-service/v3/api-docs, /v3/api-docs
+
+        # Product Service OpenAPI Route
+        - id: product-service-openapi
+          uri: http://localhost:8082
+          predicates:
+            - Path=/product-service/v3/api-docs
+          filters:
+            - RewritePath=/product-service/v3/api-docs, /v3/api-docs
+
+        # Order Service OpenAPI Route
+        - id: order-service-openapi
+          uri: http://localhost:8083
+          predicates:
+            - Path=/order-service/v3/api-docs
+          filters:
+            - RewritePath=/order-service/v3/api-docs, /v3/api-docs
+
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+
+# SpringDoc Configuration
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    config-url: /v3/api-docs/swagger-config
+    urls:
+      - url: /v3/api-docs
+        name: API Gateway
+      - url: /user-service/v3/api-docs
+        name: User Service
+      - url: /product-service/v3/api-docs
+        name: Product Service
+      - url: /order-service/v3/api-docs
+        name: Order Service
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,gateway,routes
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true
+
+# Logging Configuration
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO
+    org.springframework.web.reactive: DEBUG
+    reactor.netty: INFO
+
+# Service URLs for Swagger Aggregation
+services:
+  user-service:
+    url: http://localhost:8081
+    docs-path: /v3/api-docs
+  product-service:
+    url: http://localhost:8082
+    docs-path: /v3/api-docs
+  order-service:
+    url: http://localhost:8083
+    docs-path: /v3/api-docs
