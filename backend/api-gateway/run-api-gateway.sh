@@ -16,23 +16,29 @@ cd ../api-gateway || { echo "❌ Failed to navigate to api-gateway module"; exit
 echo "🚀 Starting API Gateway in Debug Mode..."
 echo "========================================"
 
-# Check if port 8080 is already in use
+# Check if server is already running and restart if needed
+SERVER_RUNNING=false
+
 if lsof -Pi :8080 -sTCP:LISTEN -t >/dev/null ; then
-    echo "❌ Port 8080 is already in use!"
-    echo "   Stopping existing process..."
+    echo "🔄 API Gateway is already running on port 8080!"
+    echo "   Restarting server..."
+    SERVER_RUNNING=true
     lsof -ti:8080 | xargs kill -9 2>/dev/null
-    sleep 2
+    sleep 3
 fi
 
-# Check if debug port 5006 is already in use
 if lsof -Pi :5006 -sTCP:LISTEN -t >/dev/null ; then
-    echo "❌ Debug port 5006 is already in use!"
+    echo "🔄 Debug service is already running on port 5006!"
     echo "   Stopping existing debug process..."
     lsof -ti:5006 | xargs kill -9 2>/dev/null
     sleep 2
 fi
 
-echo "✅ Ports cleared, starting API gateway..."
+if [ "$SERVER_RUNNING" = true ]; then
+    echo "✅ Server restarted, starting API gateway..."
+else
+    echo "✅ Ports cleared, starting API gateway..."
+fi
 
 # Run the API gateway with debug mode and dev profile
 mvn spring-boot:run \
