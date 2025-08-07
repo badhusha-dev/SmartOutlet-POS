@@ -9,11 +9,11 @@ spring:
   cloud:
     gateway:
       routes:
-        # User Service Route
-        - id: user-service
+        # Auth Service Route
+        - id: auth-service
           uri: http://localhost:8081
           predicates:
-            - Path=/user-service/**
+            - Path=/auth/**
           filters:
             - StripPrefix=1
 
@@ -21,41 +21,33 @@ spring:
         - id: product-service
           uri: http://localhost:8082
           predicates:
-            - Path=/product-service/**
+            - Path=/products/**
           filters:
             - StripPrefix=1
 
-        # Order Service Route
-        - id: order-service
+        # Outlet Service Route
+        - id: outlet-service
           uri: http://localhost:8083
           predicates:
-            - Path=/order-service/**
+            - Path=/outlets/**
           filters:
             - StripPrefix=1
 
-        # User Service OpenAPI Route
-        - id: user-service-openapi
-          uri: http://localhost:8081
+        # Expense Service Route
+        - id: expense-service
+          uri: http://localhost:8084
           predicates:
-            - Path=/user-service/v3/api-docs
+            - Path=/expenses/**
           filters:
-            - RewritePath=/user-service/v3/api-docs, /v3/api-docs
+            - StripPrefix=1
 
-        # Product Service OpenAPI Route
-        - id: product-service-openapi
-          uri: http://localhost:8082
+        # Sales Service Route
+        - id: sales-service
+          uri: http://localhost:8085
           predicates:
-            - Path=/product-service/v3/api-docs
+            - Path=/sales/**
           filters:
-            - RewritePath=/product-service/v3/api-docs, /v3/api-docs
-
-        # Order Service OpenAPI Route
-        - id: order-service-openapi
-          uri: http://localhost:8083
-          predicates:
-            - Path=/order-service/v3/api-docs
-          filters:
-            - RewritePath=/order-service/v3/api-docs, /v3/api-docs
+            - StripPrefix=1
 
       globalcors:
         cors-configurations:
@@ -78,12 +70,16 @@ springdoc:
     urls:
       - url: /v3/api-docs
         name: API Gateway
-      - url: /user-service/v3/api-docs
-        name: User Service
-      - url: /product-service/v3/api-docs
+      - url: /v3/api-docs/auth-service
+        name: Auth Service
+      - url: /v3/api-docs/product-service
         name: Product Service
-      - url: /order-service/v3/api-docs
-        name: Order Service
+      - url: /v3/api-docs/outlet-service
+        name: Outlet Service
+      - url: /v3/api-docs/expense-service
+        name: Expense Service
+      - url: /v3/api-docs/sales-service
+        name: Sales Service
   api-docs:
     enabled: true
     path: /v3/api-docs
@@ -109,12 +105,35 @@ logging:
 
 # Service URLs for Swagger Aggregation
 services:
-  user-service:
+  auth-service:
     url: http://localhost:8081
     docs-path: /v3/api-docs
   product-service:
     url: http://localhost:8082
     docs-path: /v3/api-docs
-  order-service:
+  outlet-service:
     url: http://localhost:8083
     docs-path: /v3/api-docs
+  expense-service:
+    url: http://localhost:8084
+    docs-path: /v3/api-docs
+  sales-service:
+    url: http://localhost:8085
+    docs-path: /v3/api-docs
+
+# Service URLs for Controller Injection
+auth:
+  service:
+    url: http://localhost:8081
+product:
+  service:
+    url: http://localhost:8082
+outlet:
+  service:
+    url: http://localhost:8083
+expense:
+  service:
+    url: http://localhost:8084
+sales:
+  service:
+    url: http://localhost:8085

@@ -17,10 +17,6 @@ public class SwaggerUIConfig {
     @Bean
     public RouterFunction<ServerResponse> swaggerRouterFunction() {
         return RouterFunctions.route(GET("/swagger-ui.html"), 
-            request -> ServerResponse.temporaryRedirect(java.net.URI.create("/swagger-ui/index.html")).build())
-            .andRoute(GET("/swagger-ui/**"), 
-            request -> ServerResponse.ok()
-                .contentType(MediaType.TEXT_HTML)
-                .bodyValue("Swagger UI is available at /swagger-ui/index.html"));
+            request -> ServerResponse.temporaryRedirect(java.net.URI.create("/swagger-ui/index.html")).build());
     }
 }
