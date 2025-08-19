@@ -143,20 +143,68 @@ All services are fully implemented, tested, and ready for production use.
 ## 🛠️ **Technology Stack**
 
 ### **Backend Technologies**
-- **Framework**: Spring Boot 3.x
-- **Language**: Java 17+
-- **Build Tool**: Maven
-- **Database**: PostgreSQL (All Environments)
-- **Security**: Spring Security + JWT
-- **Documentation**: OpenAPI 3.0 + Swagger UI
-- **Database Migration**: Flyway
-- **Connection Pool**: HikariCP
 
-### **Infrastructure**
+#### **Core Framework & Language**
+- **Framework**: Spring Boot 3.x
+  - *Why*: Industry-standard enterprise framework with excellent microservices support, auto-configuration, and production-ready features out of the box
+- **Language**: Java 17+ (LTS)
+  - *Why*: Long-term support, excellent performance, strong typing, extensive ecosystem, and enterprise-grade reliability
+- **Build Tool**: Maven 3.9+
+  - *Why*: Mature dependency management, excellent IDE integration, standardized project structure, and extensive plugin ecosystem
+
+#### **Database & Persistence**
+- **Database**: PostgreSQL (All Environments)
+  - *Why*: ACID compliance, excellent performance, JSON support, advanced indexing, and proven scalability for enterprise applications
+- **Connection Pool**: HikariCP
+  - *Why*: Fastest connection pool available, lightweight, zero-overhead, and production-ready with excellent monitoring
+- **Database Migration**: Flyway
+  - *Why*: Version control for database schemas, automated migrations, rollback support, and team collaboration features
+
+#### **Security & Authentication**
+- **Security**: Spring Security + JWT
+  - *Why*: Industry-standard security framework, stateless authentication, scalable across microservices, and extensive configuration options
+- **JWT Implementation**: Custom token management
+  - *Why*: Stateless authentication perfect for microservices, cross-service communication, and horizontal scaling
+
+#### **API Documentation & Testing**
+- **Documentation**: OpenAPI 3.0 + Swagger UI
+  - *Why*: Interactive API documentation, automatic schema generation, built-in testing interface, and industry-standard specification
+- **API Design**: RESTful principles
+  - *Why*: Stateless, cacheable, uniform interface, and widely understood by developers and systems
+
+#### **Event Streaming & Communication**
+- **Event Streaming**: Apache Kafka (Ready for async communication)
+  - *Why*: High-throughput messaging, event sourcing capabilities, horizontal scaling, and fault tolerance
+- **Service Communication**: Synchronous REST + Asynchronous Events
+  - *Why*: Immediate consistency for critical operations, eventual consistency for non-critical updates
+
+### **Infrastructure & DevOps**
+
+#### **Containerization & Deployment**
 - **Containerization**: Docker
+  - *Why*: Consistent environments across development/staging/production, easy scaling, and simplified deployment
+- **Deployment Platform**: Replit (Production Ready)
+  - *Why*: Integrated development and deployment, automatic scaling, built-in monitoring, and simplified DevOps
+
+#### **Service Architecture**
 - **API Gateway**: Spring Cloud Gateway
-- **Service Discovery**: Eureka (if needed)
-- **Configuration**: Spring Cloud Config (if needed)
+  - *Why*: Reactive gateway, excellent performance, built-in security, load balancing, and service discovery integration
+- **Service Discovery**: Eureka (Configurable)
+  - *Why*: Dynamic service registration, health checking, and automatic failover in distributed environments
+- **Configuration**: Spring Cloud Config (Ready)
+  - *Why*: Centralized configuration management, environment-specific properties, and runtime configuration updates
+
+#### **Monitoring & Observability**
+- **Health Monitoring**: Spring Boot Actuator
+  - *Why*: Production-ready metrics, health checks, application insights, and operational endpoints
+- **Logging**: Logback with JSON structured logging
+  - *Why*: High-performance logging, structured data for analysis, and configurable log levels
+
+#### **Caching & Performance**
+- **Caching**: Redis integration (Ready)
+  - *Why*: In-memory caching, session storage, distributed caching across services, and excellent performance
+- **Load Balancing**: Spring Cloud Gateway + Auto-scaling
+  - *Why*: Intelligent request distribution, health-aware routing, and automatic scaling based on demand
 
 ---
 
